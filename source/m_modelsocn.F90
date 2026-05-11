@@ -1624,48 +1624,37 @@ contains
     write(*, *) 'ivm:', trim(ivnm)
     write(*, *) 'dimlens(3):', dimlens(3)
     !write(*, *) 'kdm:', kdm
-!   if (dimlens(3) == kdm .and. kdm > 0) then
-!     vtype = 'layer'
-!   else if (dimlens(3) == ddm .and. ddm > 0 .or. &
-!     index(special, 'volcello') > 0 .or. &
-!     index(special, 'thkcello') > 0 .or. &
-!     index(special, 'masscello') > 0) then
-!     vtype = 'level'
-!     kk = ddm
-!   else if (dimlens(1) == idm .and. dimlens(2) == jdm .and. ndims <= 3) then
-!     vtype = '2d'
-!     kk = 1
-!   else if (dimlens(1) == ldm .and. dimlens(2) == kdm) then
-!     vtype = 'merk'
-!     ii = ldm
-!     jj = kdm
-!     kk = rdm
-!   else if (dimlens(1) == ldm .and. dimlens(2) == ddm) then
-!     vtype = 'merd'
-!     ii = ldm
-!     jj = ddm
-!     kk = rdm
-!   else if (dimlens(1) == ldm .and. dimlens(2) == rdm) then
-!     vtype = 'mert'
-!     ii = ldm
-!     jj = rdm
-!     kk = 1
-!   else if (dimlens(1) == secdm .and. ndims == 2) then
-!     vtype = 'sect'
-!     ii = secdm
-!     jj = 1
-!     kk = 1
-!   else if (dimlens(1) == 1 .and. ndims == 1) then
-!     vtype = '1d'
-!     ii = 1
-!     jj = 1
-!     kk = 1
-!   end if
    if (dims == 'longitude,latitude,olevel,time') then
      vtype = 'level'
      kk = ddm
-   !else if
-   !else
+   else if (dims == 'longitude,latitude,time') then
+     vtype = '2d'
+     kk = 1
+   else if (dims == 'latitude,rho,basin,time') then
+     vtype = 'merk'
+     ii = ldm
+     jj = kdm
+     kk = rdm
+   else if (dims == 'latitude,olevel,basin,time') then
+     vtype = 'merd'
+     ii = ldm
+     jj = ddm
+     kk = rdm
+   else if (dims == 'latitude,olevel,basin,time') then
+     vtype = 'mert'
+     ii = ldm
+     jj = rdm
+     kk = 1
+   else if (dims == 'oline,time') then
+     vtype = 'sect'
+     ii = secdm
+     jj = 1
+     kk = 1
+   else if (dims == 'time') then
+     vtype = '1d'
+     ii = 1
+     jj = 1
+     kk = 1
    end if
 
     allocate(fld(ii, jj, kk), fld2(ii, jj, kk), fldacc(ii, jj, kk), &

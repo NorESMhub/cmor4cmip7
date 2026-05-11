@@ -27,36 +27,36 @@ compound_names    =
 !   'ocean.evspsbl.tavg-u-hxy-ifs.mon.glb'          ! done
 !   'ocean.ficeberg.tavg-u-hxy-sea.mon.glb'         ! done
 !   'ocean.friver.tavg-u-hxy-sea.mon.glb'           ! done
-!   'ocean.hfacrossline.tavg-u-ht-sea.mon.glb'
-!   'ocean.hfbasin.tavg-u-hyb-sea.mon.glb'
-!   'ocean.hfbasinpadv.tavg-u-hyb-sea.mon.glb'
-!   'ocean.hfbasinpmadv.tavg-u-hyb-sea.mon.glb'
-!   'ocean.hfbasinpmdiff.tavg-u-hyb-sea.mon.glb'
-!   'ocean.hfbasinpsmadv.tavg-u-hyb-sea.mon.glb'
+!   'ocean.hfacrossline.tavg-u-ht-sea.mon.glb'      ! done
+!   'ocean.hfbasin.tavg-u-hyb-sea.mon.glb'          ! done
+!   'ocean.hfbasinpadv.tavg-u-hyb-sea.mon.glb'      ! n/a
+!   'ocean.hfbasinpmadv.tavg-u-hyb-sea.mon.glb'     ! done
+!   'ocean.hfbasinpmdiff.tavg-u-hyb-sea.mon.glb'    ! done
+!   'ocean.hfbasinpsmadv.tavg-u-hyb-sea.mon.glb'    ! done
 !   'ocean.hfds.tavg-u-hxy-sea.mon.glb'             ! done
 !   'ocean.hfx.tavg-ol-hxy-sea.mon.glb'             ! n/a
 !   'ocean.hfx.tavg-u-hxy-sea.mon.glb'              ! n/a
 !   'ocean.hfy.tavg-ol-hxy-sea.mon.glb'             ! n/a
 !   'ocean.hfy.tavg-u-hxy-sea.mon.glb'              ! n/a
 !   'ocean.masscello.tavg-ol-hxy-sea.mon.glb'       ! done
-!   'ocean.masso.tavg-u-hm-sea.mon.glb'             ! Error: You are defining variable 'masso_tavg-u-hm-sea' (table ocean) with 3 dimensions, when it should have 1
-!   'ocean.mfo.tavg-u-ht-sea.mon.glb'
+!   'ocean.masso.tavg-u-hm-sea.mon.glb'             ! done
+!   'ocean.mfo.tavg-u-ht-sea.mon.glb'               ! done
 !   'ocean.mlotst.tavg-u-hxy-sea.day.glb'           ! done
 !   'ocean.mlotst.tavg-u-hxy-sea.mon.glb'           ! done
 !   'ocean.mlotst.tmax-u-hxy-sea.mon.glb'           ! done
 !   'ocean.mlotst.tmin-u-hxy-sea.mon.glb'           ! done
 !   'ocean.mlotstsq.tavg-u-hxy-sea.mon.glb'         ! n/a
 !   'ocean.msftbarot.tavg-u-hxy-sea.mon.glb'        ! done
-!   'ocean.msftm.tavg-ol-hyb-sea.mon.glb'
-!   'ocean.msftm.tavg-rho-hyb-sea.mon.glb'
-!   'ocean.msftmmpa.tavg-ol-hyb-sea.mon.glb'
-!   'ocean.msftmmpa.tavg-rho-hyb-sea.mon.glb'
-!   'ocean.msftmsmpa.tavg-ol-hyb-sea.mon.glb'
+!   'ocean.msftm.tavg-ol-hyb-sea.mon.glb'           ! done
+!   'ocean.msftm.tavg-rho-hyb-sea.mon.glb'          ! done
+!   'ocean.msftmmpa.tavg-ol-hyb-sea.mon.glb'        ! done
+!   'ocean.msftmmpa.tavg-rho-hyb-sea.mon.glb'       ! done
+!   'ocean.msftmsmpa.tavg-ol-hyb-sea.mon.glb'       ! done
 !   'ocean.obvfsq.tavg-ol-hxy-sea.mon.glb'          ! n/a
 !   'ocean.pbo.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.pso.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.sf6.tavg-ol-hxy-sea.mon.glb'             ! n/a
-!   'ocean.sfacrossline.tavg-u-ht-sea.mon.glb'
+!   'ocean.sfacrossline.tavg-u-ht-sea.mon.glb'      ! done
 !   'ocean.sfdsi.tavg-u-hxy-sea.mon.glb'            ! done
 !   'ocean.sftof.ti-u-hxy-u.fx.glb'                 ! done
 !   'ocean.sfx.tavg-ol-hxy-sea.mon.glb'             ! n/a
@@ -64,10 +64,10 @@ compound_names    =
 !   'ocean.sfy.tavg-ol-hxy-sea.mon.glb'             ! n/a
 !   'ocean.sfy.tavg-u-hxy-sea.mon.glb'              ! n/a
 !   'ocean.siflfwbot.tavg-u-hxy-sea.mon.glb'        ! done
-!   'ocean.so.tavg-ol-hm-sea.mon.glb'
+!   'ocean.so.tavg-ol-hm-sea.mon.glb'               ! salnga is provided as 1d, while need to be (olelve, time)
 !   'ocean.so.tavg-ol-hxy-sea.mon.glb'              ! done
 !   'ocean.sob.tavg-u-hxy-sea.mon.glb'              ! done
-!   'ocean.sos.tavg-u-hm-sea.mon.glb'
+!   'ocean.sos.tavg-u-hm-sea.mon.glb'               ! done
 !   'ocean.sos.tavg-u-hxy-sea.day.glb'              ! done
 !   'ocean.sos.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.sossq.tavg-u-hxy-sea.mon.glb'            ! n/a
@@ -79,13 +79,13 @@ compound_names    =
 !   'ocean.thetao.tavg-d2000m-hxy-sea.mon.glb'
 !   'ocean.thetao.tavg-d300m-hxy-sea.mon.glb'
 !   'ocean.thetao.tavg-d700m-hxy-sea.mon.glb'
-!   'ocean.thetao.tavg-ol-hm-sea.mon.glb'
+!   'ocean.thetao.tavg-ol-hm-sea.mon.glb'           ! tempga is provided as 1d, while need to be (olevel, time)
 !   'ocean.thetao.tavg-ol-hxy-sea.mon.glb'          ! done
 !   'ocean.thetaot.tavg-u-hxy-sea.mon.glb'          ! done
-!   'ocean.thkcello.tavg-ol-hxy-sea.mon.glb'
-!   'ocean.thkcello.ti-ol-hxy-sea.fx.glb'
+!   'ocean.thkcello.tavg-ol-hxy-sea.mon.glb'        ! skip
+!   'ocean.thkcello.ti-ol-hxy-sea.fx.glb'           ! done
 !   'ocean.tob.tavg-u-hxy-sea.mon.glb'              ! done
-!   'ocean.tos.tavg-u-hm-sea.mon.glb'
+!   'ocean.tos.tavg-u-hm-sea.mon.glb'               ! done
 !   'ocean.tos.tavg-u-hxy-sea.day.glb'              ! done
 !   'ocean.tos.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.tossq.tavg-u-hxy-sea.day.glb'            ! n/a
@@ -94,10 +94,10 @@ compound_names    =
 !   'ocean.uo.tavg-ol-hxy-sea.mon.glb'              ! done
 !   'ocean.vmo.tavg-ol-hxy-sea.mon.glb'             ! n/a
 !   'ocean.vo.tavg-ol-hxy-sea.mon.glb'              ! done
-!   'ocean.volcello.tavg-ol-hxy-sea.mon.glb'
-!   'ocean.volcello.tavg-ol-hxy-sea.yr.glb'
-!   'ocean.volcello.ti-ol-hxy-sea.fx.glb'
-!   'ocean.volo.tavg-u-hm-sea.mon.glb'
+!   'ocean.volcello.tavg-ol-hxy-sea.mon.glb'        ! skip
+!   'ocean.volcello.tavg-ol-hxy-sea.yr.glb'         ! skip
+!   'ocean.volcello.ti-ol-hxy-sea.fx.glb'           ! done
+!   'ocean.volo.tavg-u-hm-sea.mon.glb'              ! done
 !   'ocean.vsf.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.wfo.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.wmo.tavg-ol-hxy-sea.mon.glb'             ! n/a
@@ -106,7 +106,7 @@ compound_names    =
 !   'ocean.zos.tavg-u-hxy-sea.day.glb'              ! done
 !   'ocean.zos.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.zossq.tavg-u-hxy-sea.mon.glb'            ! n/a
-!   'ocean.zostoga.tavg-u-hm-sea.mon.glb'
+!   'ocean.zostoga.tavg-u-hm-sea.mon.glb'           ! done (check !!!)
 !
 !   'ocnBgchem.calc.tavg-ol-hxy-sea.mon.glb'
 !   'ocnBgchem.chl.tavg-ols-hxy-sea.day.glb'

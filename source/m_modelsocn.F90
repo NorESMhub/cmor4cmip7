@@ -821,7 +821,7 @@ contains
 
         ! Compute thermo-steric sea level
       case ('t2zostoga')
-        if (vtype == 'layer') then
+        !if (vtype == 'layer') then
           r = 0.
           do j = 1, jj
             do i = 1, ii
@@ -837,9 +837,9 @@ contains
           end do
           fld(1, 1, 1) = (r - voglb) / aoglb
           write(*, *) 'zostoga', fld(1, 1, 1)
-        else
-          stop 'input variable for zostoga must be of type layer'
-        end if
+        !else
+          !stop 'input variable for zostoga must be of type layer'
+        !end if
 
         ! Set land mask of streamfunction
       case ('strmf')
@@ -854,13 +854,13 @@ contains
         do j = 1, jj
           do i = 1, ii
             do k = ddm, 1, -1
-              if (fld(i, j, 1) == 0.) then
-                fld(i, j, k) = 1e20
-              else
-                ptoptmp = min(depth_bnds(1, k), fld(i, j, 1))
-                pbottmp = min(depth_bnds(2, k), fld(i, j, 1))
-                fld(i, j, k) = (pbottmp - ptoptmp) * fld2(i, j, 1)
-              end if
+!             if (fld(i, j, 1) == 0.) then
+!               fld(i, j, k) = 1e20
+!             else
+              ptoptmp = min(depth_bnds(1, k), fld(i, j, 1))
+              pbottmp = min(depth_bnds(2, k), fld(i, j, 1))
+              fld(i, j, k) = (pbottmp - ptoptmp) * parea(i, j)
+!             end if
             end do
           end do
         end do
@@ -883,12 +883,12 @@ contains
         do j = 1, jj
           do i = 1, ii
             do k = ddm, 1, -1
-              if (fld(i, j, 1) == 0.) then
-                fld(i, j, k) = 1e20
-              else
+              !if (fld(i, j, 1) == 0.) then
+                !fld(i, j, k) = 1e20
+              !else
                 fld(i, j, k) = min(fld(i, j, 1), depth_bnds(2, k)) - &
                   min(fld(i, j, 1), depth_bnds(1, k))
-              end if
+              !end if
             end do
           end do
         end do
@@ -1625,7 +1625,7 @@ contains
     write(*, *) 'ivm:', trim(ivnm)
     write(*, *) 'dimlens(3):', dimlens(3)
     !write(*, *) 'kdm:', kdm
-   if (dims == 'longitude,latitude,olevel,time') then
+   if (dims == 'longitude,latitude,olevel,time' .or. dims == 'longitude,latitude,olevel') then
      vtype = 'level'
      kk = ddm
    else if (dims == 'longitude,latitude,time') then
@@ -1641,7 +1641,7 @@ contains
      ii = ldm
      jj = ddm
      kk = rdm
-   else if (dims == 'latitude,olevel,basin,time') then
+   else if (dims == 'latitude,basin,time') then
      vtype = 'mert'
      ii = ldm
      jj = rdm
@@ -1943,8 +1943,8 @@ contains
           original_name=trim(original_name))
       end if
     else
-      !write(*, *) 'vtype:', trim(vtype)
-      !write(*, *) 'zcoord:', trim(zcoord)
+      write(*, *) 'vtype:', trim(vtype)
+      write(*, *) 'zcoord:', trim(zcoord)
       if ((trim(vtype) == '2d' .and. .not. (trim(zcoord) == 'ol' .or. &
         index(special, 'glbave') > 0 .or. index(special, '2zos') > 0. &
         )) .or. lsumz .and. .not. index(special, 'glbave') > 0 &
@@ -2022,8 +2022,7 @@ contains
           missing_value=1e20, &
           comment=trim(vcomment), &
           positive=trim(vpositive))
-      else if (index(special, 'glbave') > 0 &
-        .or. index(special, '2zos') > 0.) then
+      else if (vtype(1:2) == '1d') then
         varid = cmor_variable( &
           table=trim(tablepath), &
           table_entry=trim(ovnm), &
@@ -2104,10 +2103,10 @@ contains
       call add_fixed(ivnm, 1.0, ncid)
     end if
 
-    if (index(special, 'volcello') > 0) then
-      fld2 = fld
-      fld = 0.
-    end if
+!   if (index(special, 'volcello') > 0) then
+!     fld2 = fld
+!     fld = 0.
+!   end if
 
     status = nf90_close(ncid)
     call handle_ncerror(status)
@@ -2513,8 +2512,7 @@ contains
             ntimes_passed=1, &
             time_vals=tval, &
             time_bnds=tbnds)
-        else if (index(special, 'glbave') > 0 &
-          .or. index(special, '2zos') > 0.) then
+        else if (vtype(1:2) == '1d' ) then
           error_flag = cmor_write( &
             var_id=varid, &
             data=(/fld(1, 1, 1)/), &

@@ -280,7 +280,18 @@
             "original_name": "depth_bnds"
         },
         "ocean.thkcello.ti-ol-hxy-sea.fx.glb": {
-            "original_name": "pdepth,depth_bnds"
+            "original_name": "pdepth,depth_bnds",
+            "sources": {
+                "vars": [
+                    "pdepth"
+                ],
+                "facs": [
+                    1.0
+                ]
+            },
+            "postprocs":{
+              "thkcello": true
+            }
         },
         "ocean.tob.tavg-u-hxy-sea.mon.glb": {
             "original_name": "tbot"
@@ -319,7 +330,18 @@
             "original_name": "depth_bnds,parea"
         },
         "ocean.volcello.ti-ol-hxy-sea.fx.glb": {
-            "original_name": "pdepth,depth_bnds,parea"
+            "original_name": "(depth_bnds(2,k)-depth_bnds(1,k))*parea",
+            "sources": {
+                "vars": [
+                    "pdepth"
+                ],
+                "facs": [
+                    1.0
+                ]
+            },
+            "postprocs": {
+                "volcello": true
+            }
         },
         "ocean.volo.tavg-u-hm-sea.mon.glb": {
             "original_name": "volgs"
@@ -383,7 +405,18 @@
             "original_name": "slvsq"
         },
         "ocean.zostoga.tavg-u-hm-sea.mon.glb": {
-            "original_name": "temp,saln,dp,dz,parea"
+            "original_name": "temp,saln,dp,dz,parea",
+            "sources": {
+                "vars": [
+                  "temp"
+                ],
+                "facs": [
+                  1.0
+                ]
+            },
+            "postprocs": {
+                "t2zostoga": true
+            }
         },
         "ocnBgchem.calc.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "calclvl"

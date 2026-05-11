@@ -286,27 +286,28 @@ contains
 
       end if
 
-      if (allocated(sigma))          deallocate(sigma)
-      if (allocated(sigmahalf))      deallocate(sigmahalf)
-      if (allocated(sigma_bnds))     deallocate(sigma_bnds)
-      if (allocated(sigmahalf_bnds)) deallocate(sigmahalf_bnds)
-
-      if (allocated(depth))          deallocate(depth)
-      if (allocated(depth_bnds))     deallocate(depth_bnds)
-
-      if (allocated(slat))           deallocate(slat)
-      if (allocated(slat_bnds))      deallocate(slat_bnds)
-
-      if (allocated(section))        deallocate(section)
-      if (allocated(section1))       deallocate(section1)
-
-      if (allocated(region))         deallocate(region)
-      if (allocated(region1))        deallocate(region1)
 
       if (allocated(vars)) deallocate(vars)
       if (allocated(facs)) deallocate(facs)
 
     end do main_loop
+
+    if (allocated(sigma))          deallocate(sigma)
+    if (allocated(sigmahalf))      deallocate(sigmahalf)
+    if (allocated(sigma_bnds))     deallocate(sigma_bnds)
+    if (allocated(sigmahalf_bnds)) deallocate(sigmahalf_bnds)
+
+    if (allocated(depth))          deallocate(depth)
+    if (allocated(depth_bnds))     deallocate(depth_bnds)
+
+    if (allocated(slat))           deallocate(slat)
+    if (allocated(slat_bnds))      deallocate(slat_bnds)
+
+    if (allocated(section))        deallocate(section)
+    if (allocated(section1))       deallocate(section1)
+
+    if (allocated(region))         deallocate(region)
+    if (allocated(region1))        deallocate(region1)
 
     deallocate(parea, pmask, pdepth, &
     plon, plat, bpini, bpinit, &

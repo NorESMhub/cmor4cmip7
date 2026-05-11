@@ -34,7 +34,7 @@ module m_modelsocn
 
   ! Dataset related variables
   character(len=slenmax), save          :: ivnm, ovnm, vunits, vpositive, vtype
-  character(len=slenmax), save          :: bvnm, cvnm
+  character(len=slenmax), save          :: bvnm, cvnm, original_name
   character(len=slenmax * 10), save     :: vcomment
   !character(len=slenmax)               :: key, value
   logical, save :: lsumz
@@ -148,6 +148,7 @@ contains
 
       call json_get_vertcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
 
+      call json_get_original_name(trim(mapping_file), trim(cvnm), original_name)
       call json_get_vars(trim(mapping_file), trim(cvnm), vars, lfound=found) 
       if (found) then
         call json_get_facs(trim(mapping_file), trim(cvnm), facs, lfound=found) 
@@ -157,15 +158,17 @@ contains
         end if
       else
         allocate(vars(1),facs(1))
-        call json_get_original_name(trim(mapping_file), &
-                trim(cvnm), vars(1), lfound=found) 
-        if (.not. found) then
-            write(*,*) "ERROR: "//trim(cvnm)//" not found in "//trim(mapping_file)
-            cycle
-        else
+        vars(1) = trim(original_name)
+        !call json_get_original_name(trim(mapping_file), &
+                !trim(cvnm), vars(1), lfound=found) 
+!       if (.not. found) then
+!           write(*,*) "ERROR: "//trim(cvnm)//" not found in "//trim(mapping_file)
+!           cycle
+!       else
           facs(1) = 1.0
-        end if
+!       end if
       end if
+      ivnm = vars(1)
 
       call json_get_array_string(trim(tabledir)//trim(table), 'variable_entry.'//trim(bvnm)// &
             '.dimensions', dimensions, lfound=found)
@@ -199,7 +202,7 @@ contains
         do k =1, size(vars)
          if (.not. var_in_file(fnm, vars(k))) cycle main_loop
         end do
-        ivnm = vars(1)
+!       ivnm = vars(1)
 
         CALL open_ofile(ivnm,ovnm,fx=.TRUE.)
 
@@ -232,7 +235,7 @@ contains
         do k =1, size(vars)
           if (.not. var_in_file(fnm, vars(k))) cycle main_loop
         end do
-        ivnm = vars(1)
+!       ivnm = vars(1)
 
         !else
           !if (.not. var_in_file(fnm, ivnm)) cycle main_loop
@@ -1927,7 +1930,7 @@ contains
           axis_ids=(/grdid/), &
           missing_value=1e20, &
           comment=trim(vcomment), &
-          original_name=trim(ivnm))
+          original_name=trim(original_name))
       else if (index(special, 'glbave') > 0 &
         .or. index(special, '2zos') > 0.) then
         varid = cmor_variable( &
@@ -1935,7 +1938,7 @@ contains
           table_entry=trim(ovnm), &
           units=trim(vunits), &
           axis_ids=(/taxid/), &
-          original_name=trim(ivnm), &
+          original_name=trim(original_name), &
           missing_value=1e20, &
           comment=trim(vcomment), &
           positive=trim(vpositive))
@@ -1947,7 +1950,7 @@ contains
           axis_ids=(/grdid, kaxid/), &
           missing_value=1e20, &
           comment=trim(vcomment), &
-          original_name=trim(ivnm))
+          original_name=trim(original_name))
       end if
     else
       !write(*, *) 'vtype:', trim(vtype)
@@ -1967,7 +1970,7 @@ contains
           table_entry=trim(ovnm), &
           units=trim(vunits), &
           axis_ids=(/grdid, taxid/), &
-          original_name=trim(ivnm), &
+          original_name=trim(original_name), &
           missing_value=1e20, &
           comment=trim(vcomment), &
           positive=trim(vpositive))
@@ -1977,7 +1980,7 @@ contains
           table_entry=trim(ovnm), &
           units=trim(vunits), &
           axis_ids=(/grdid, taxid, kaxid/), &
-          original_name=trim(ivnm), &
+          original_name=trim(original_name), &
           missing_value=1e20, &
           comment=trim(vcomment), &
           positive=trim(vpositive))
@@ -1990,7 +1993,7 @@ contains
           table_entry=trim(ovnm), &
           units=trim(vunits), &
           axis_ids=(/grdid, kaxid, taxid/), &
-          original_name=trim(ivnm), &
+          original_name=trim(original_name), &
           missing_value=1e20, &
           positive=trim(vpositive), &
           comment='Please note that the layer depth ' &
@@ -2005,7 +2008,7 @@ contains
           table_entry=trim(ovnm), &
           units=trim(vunits), &
           axis_ids=(/laxid, kaxid, raxid, taxid/), &
-          original_name=trim(ivnm), &
+          original_name=trim(original_name), &
           missing_value=1e20, &
           comment=trim(vcomment), &
           positive=trim(vpositive))
@@ -2015,7 +2018,7 @@ contains
           table_entry=trim(ovnm), &
           units=trim(vunits), &
           axis_ids=(/laxid, raxid, taxid/), &
-          original_name=trim(ivnm), &
+          original_name=trim(original_name), &
           missing_value=1e20, &
           comment=trim(vcomment), &
           positive=trim(vpositive))
@@ -2025,7 +2028,7 @@ contains
           table_entry=trim(ovnm), &
           units=trim(vunits), &
           axis_ids=(/saxid, taxid/), &
-          original_name=trim(ivnm), &
+          original_name=trim(original_name), &
           missing_value=1e20, &
           comment=trim(vcomment), &
           positive=trim(vpositive))
@@ -2036,7 +2039,7 @@ contains
           table_entry=trim(ovnm), &
           units=trim(vunits), &
           axis_ids=(/taxid/), &
-          original_name=trim(ivnm), &
+          original_name=trim(original_name), &
           missing_value=1e20, &
           comment=trim(vcomment), &
           positive=trim(vpositive))
@@ -2046,7 +2049,7 @@ contains
           table_entry=trim(ovnm), &
           units=trim(vunits), &
           axis_ids=(/grdid, kaxid, taxid/), &
-          original_name=trim(ivnm), &
+          original_name=trim(original_name), &
           missing_value=1e20, &
           comment=trim(vcomment), &
           positive=trim(vpositive))

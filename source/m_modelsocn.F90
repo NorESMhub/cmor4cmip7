@@ -58,11 +58,12 @@ module m_modelsocn
   real(r8)                                          :: sfac, offs, fill
 
   ! Auxillary variables for special operations
-  character(len=slenmax), save                          :: str1, str2
+  character(len=slenmax), save                          :: str1, str2, dims
 
-    character(len=slenmax), dimension(:), allocatable  :: vars
-    integer, dimension(:), allocatable                 :: idx
-    real(r8), dimension(:), allocatable            :: facs
+  character(len=slenmax), dimension(:), allocatable     :: vars, dimensions
+  integer, dimension(:), allocatable                    :: idx
+  real(r8), dimension(:), allocatable                   :: facs
+
 
 contains
 
@@ -145,13 +146,11 @@ contains
 
       call json_get_units(trim(tabledir)//trim(table), trim(ovnm), vunits)
 
-      call json_get_vertcoord(trim(tabledir)//trim(table), bvnm, zcoord, lfound=found)
+      call json_get_vertcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
 
-      call json_get_vars(trim(mapping_file),&
-                            trim(cvnm), vars, lfound=found) 
+      call json_get_vars(trim(mapping_file), trim(cvnm), vars, lfound=found) 
       if (found) then
-        call json_get_facs(trim(mapping_file),&
-                            trim(cvnm), facs, lfound=found) 
+        call json_get_facs(trim(mapping_file), trim(cvnm), facs, lfound=found) 
         if (.not. found .or. size(vars) /= size(facs)) then
           write(*,*) "ERROR: facs not found or sizes of vars and facs are not equal"
           cycle
@@ -168,8 +167,19 @@ contains
         end if
       end if
 
+      call json_get_array_string(trim(tabledir)//trim(table), 'variable_entry.'//trim(bvnm)// &
+            '.dimensions', dimensions, lfound=found)
+
+      dims = dimensions(1)
+      do k =2, size(dimensions)
+        write(*,*) 'dimension(k):',trim(dimensions(k))
+        dims = trim(dims) // "," // trim(dimensions(k))
+      end do
+      write(*,*) 'dims:', trim(dims)
+      !stop 174
+
       !special = 'test text'
-      call special_concatenate
+      call special_cat
       write(*,*) 'special:'
       write(*,*) trim(special)
 
@@ -314,7 +324,7 @@ contains
   end subroutine ocn2cmor
 
   ! -----------------------------------------------------------------
-  subroutine special_concatenate
+  subroutine special_cat
 
     implicit none
 
@@ -357,7 +367,7 @@ contains
       end if
       if (allocated(keys)) deallocate(keys)
 
-  end subroutine special_concatenate
+  end subroutine special_cat
 
 
   ! -----------------------------------------------------------------
@@ -1058,6 +1068,19 @@ contains
           end do
         end do
 
+      case ('pbot2dp')
+        !fldtmp = 1e20
+        do j = 1, jj
+          do i = 1, ii
+            do k = 1, kk
+              !if (fld(i, j, k) /= 1e20) then
+              fld(i, j, k) = (depth_bnds(2, k) - depth_bnds(1, k)) &
+                / pdepth(i, j) * pbot(i, j)
+              !end if
+            end do
+          end do
+        end do
+
         ! Unit transformation: mol cfcXX m-3 -> mol cfcXX kg-1
       case ('cfcunits')
         do k = 1, kk
@@ -1598,43 +1621,50 @@ contains
     write(*, *) 'ivm:', trim(ivnm)
     write(*, *) 'dimlens(3):', dimlens(3)
     !write(*, *) 'kdm:', kdm
-    if (dimlens(3) == kdm .and. kdm > 0) then
-      vtype = 'layer'
-    else if (dimlens(3) == ddm .and. ddm > 0 .or. &
-      index(special, 'volcello') > 0 .or. &
-      index(special, 'thkcello') > 0 .or. &
-      index(special, 'masscello') > 0) then
-      vtype = 'level'
-      kk = ddm
-    else if (dimlens(1) == idm .and. dimlens(2) == jdm .and. ndims <= 3) then
-      vtype = '2d'
-      kk = 1
-    else if (dimlens(1) == ldm .and. dimlens(2) == kdm) then
-      vtype = 'merk'
-      ii = ldm
-      jj = kdm
-      kk = rdm
-    else if (dimlens(1) == ldm .and. dimlens(2) == ddm) then
-      vtype = 'merd'
-      ii = ldm
-      jj = ddm
-      kk = rdm
-    else if (dimlens(1) == ldm .and. dimlens(2) == rdm) then
-      vtype = 'mert'
-      ii = ldm
-      jj = rdm
-      kk = 1
-    else if (dimlens(1) == secdm .and. ndims == 2) then
-      vtype = 'sect'
-      ii = secdm
-      jj = 1
-      kk = 1
-    else if (dimlens(1) == 1 .and. ndims == 1) then
-      vtype = '1d'
-      ii = 1
-      jj = 1
-      kk = 1
-    end if
+!   if (dimlens(3) == kdm .and. kdm > 0) then
+!     vtype = 'layer'
+!   else if (dimlens(3) == ddm .and. ddm > 0 .or. &
+!     index(special, 'volcello') > 0 .or. &
+!     index(special, 'thkcello') > 0 .or. &
+!     index(special, 'masscello') > 0) then
+!     vtype = 'level'
+!     kk = ddm
+!   else if (dimlens(1) == idm .and. dimlens(2) == jdm .and. ndims <= 3) then
+!     vtype = '2d'
+!     kk = 1
+!   else if (dimlens(1) == ldm .and. dimlens(2) == kdm) then
+!     vtype = 'merk'
+!     ii = ldm
+!     jj = kdm
+!     kk = rdm
+!   else if (dimlens(1) == ldm .and. dimlens(2) == ddm) then
+!     vtype = 'merd'
+!     ii = ldm
+!     jj = ddm
+!     kk = rdm
+!   else if (dimlens(1) == ldm .and. dimlens(2) == rdm) then
+!     vtype = 'mert'
+!     ii = ldm
+!     jj = rdm
+!     kk = 1
+!   else if (dimlens(1) == secdm .and. ndims == 2) then
+!     vtype = 'sect'
+!     ii = secdm
+!     jj = 1
+!     kk = 1
+!   else if (dimlens(1) == 1 .and. ndims == 1) then
+!     vtype = '1d'
+!     ii = 1
+!     jj = 1
+!     kk = 1
+!   end if
+   if (dims == 'longitude,latitude,olevel,time') then
+     vtype = 'level'
+     kk = ddm
+   !else if
+   !else
+   end if
+
     allocate(fld(ii, jj, kk), fld2(ii, jj, kk), fldacc(ii, jj, kk), &
       fldtmp(ii, jj, kk), stat=status)
     if (status /= 0) stop 'cannot ALLOCATE enough memory (4)'
@@ -2180,6 +2210,8 @@ contains
         call strmf_eval(idm, jdm, kdm, fld, fld2, fldtmp)
         fld = fldtmp
       end if
+    else if (index(special, 'pbot2dp') > 0) then
+      fld = 0.
     else
       fld = 0.
       !if (allocated(vars)) then
@@ -2217,7 +2249,7 @@ contains
     end if
 
     ! Read bottom pressure if necessary
-    if (index(special, 'dzavg') > 0) then
+    if (index(special, 'dzavg') > 0 .or. index(special, 'pbot2dp') > 0 ) then
       status = nf90_inq_varid(fid, 'pbot', rhid)
       if (status /= nf90_noerr) then
         write(*, *) 'cannot find input variable pbot '

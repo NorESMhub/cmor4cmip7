@@ -109,9 +109,22 @@
         "ocean.hfy.tavg-u-hxy-sea.mon.glb": {
             "original_name": "vhflx"
         },
-        "ocean.masscello.ti-ol-hxy-sea.fx.glb": {
-            "original_name": "pdepth,depth_bnds,pbot,pdepth"
+        "ocean.masscello.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "pbot(k,j,i)*(depth_bnds(k,2)-depth(k,1))/pdepth/grav",
+            "sources": {
+                "vars": [
+                    "pbot"
+                ],
+                "facs": [
+                    1.0
+                ]
+            },
+            "postprocs": {
+                "pbot2dp": true,
+                "xginv": true
+            }
         },
+
         "ocean.masso.tavg-u-hm-sea.mon.glb": {
             "original_name": "massgs"
         },

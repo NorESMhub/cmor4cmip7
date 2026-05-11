@@ -13,7 +13,7 @@ compound_names    =
 !   'ocean.agessc.tavg-ol-hxy-sea.mon.glb'          ! done
 !   'ocean.areacello.ti-u-hxy-u.fx.glb'             ! done
 !   'ocean.basin.ti-u-hxy-u.fx.glb'                 ! done
-!   'ocean.deptho.ti-u-hxy-sea.fx.glb'
+!   'ocean.deptho.ti-u-hxy-sea.fx.glb'              ! done
 !   'ocean.diftrblo.tavg-ol-hxy-sea.yr.glb'         ! done
 !   'ocean.diftrelo.tavg-ol-hxy-sea.yr.glb'         ! done
 !   'ocean.difvho.tavg-ol-hxy-sea.yr.glb'           ! done
@@ -38,7 +38,7 @@ compound_names    =
 !   'ocean.hfx.tavg-u-hxy-sea.mon.glb'              ! n/a
 !   'ocean.hfy.tavg-ol-hxy-sea.mon.glb'             ! n/a
 !   'ocean.hfy.tavg-u-hxy-sea.mon.glb'              ! n/a
-!   'ocean.masscello.ti-ol-hxy-sea.fx.glb'
+!   'ocean.masscello.tavg-ol-hxy-sea.mon.glb'       ! done
 !   'ocean.masso.tavg-u-hm-sea.mon.glb'             ! Error: You are defining variable 'masso_tavg-u-hm-sea' (table ocean) with 3 dimensions, when it should have 1
 !   'ocean.mfo.tavg-u-ht-sea.mon.glb'
 !   'ocean.mlotst.tavg-u-hxy-sea.day.glb'           ! done

@@ -76,9 +76,9 @@ compound_names    =
 !   'ocean.t20d.tavg-u-hxy-sea.mon.glb'             ! done
 !   'ocean.tauuo.tavg-u-hxy-sea.mon.glb'            ! done
 !   'ocean.tauvo.tavg-u-hxy-sea.mon.glb'            ! done
-!   'ocean.thetao.tavg-d2000m-hxy-sea.mon.glb'
-!   'ocean.thetao.tavg-d300m-hxy-sea.mon.glb'
-!   'ocean.thetao.tavg-d700m-hxy-sea.mon.glb'
+    'ocean.thetao.tavg-d2000m-hxy-sea.mon.glb'      ! done
+    'ocean.thetao.tavg-d300m-hxy-sea.mon.glb'       ! done
+    'ocean.thetao.tavg-d700m-hxy-sea.mon.glb'       ! done
 !   'ocean.thetao.tavg-ol-hm-sea.mon.glb'           ! check: tempga is provided as 1d, while need to be (olevel, time)
 !   'ocean.thetao.tavg-ol-hxy-sea.mon.glb'          ! done
 !   'ocean.thetaot.tavg-u-hxy-sea.mon.glb'          ! done

@@ -998,21 +998,19 @@ contains
         end do
 
         ! Average over upper 300 m
-      case ('dzavg300')
-        fldtmp = 1e20
+      case ('dzavg300m')
+        fldtmp = 1.e20
         do j = 1, jj
           do i = 1, ii
             if (fld(i, j, 1) /= 1e20) then
               fldtmp(i, j, 1) = (min(300., pdepth(i, j), depth_bnds(2, 1)) &
-                - min(300., pdepth(i, j), depth_bnds(1, 1))) &
-                * pbot(i, j) / pdepth(i, j)
+                - min(300., pdepth(i, j), depth_bnds(1, 1))) 
               fld(i, j, 1) = fld(i, j, 1) * fldtmp(i, j, 1)
             end if
             do k = 2, kk
               if (fld(i, j, k) /= 1e20) then
                 fldtmp(i, j, k) = (min(300., pdepth(i, j), depth_bnds(2, k)) &
-                  - min(300., pdepth(i, j), depth_bnds(1, k))) &
-                  * pbot(i, j) / pdepth(i, j)
+                  - min(300., pdepth(i, j), depth_bnds(1, k)))
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k) * fldtmp(i, j, k)
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
@@ -1023,21 +1021,19 @@ contains
         end do
 
         ! Average over upper 700 m
-      case ('dzavg700')
-        fldtmp = 1e20
+      case ('dzavg700m')
+        fldtmp = 1.e20
         do j = 1, jj
           do i = 1, ii
             if (fld(i, j, 1) /= 1e20) then
               fldtmp(i, j, 1) = (min(700., pdepth(i, j), depth_bnds(2, 1)) &
-                - min(700., pdepth(i, j), depth_bnds(1, 1))) &
-                * pbot(i, j) / pdepth(i, j)
+                - min(700., pdepth(i, j), depth_bnds(1, 1)))
               fld(i, j, 1) = fld(i, j, 1) * fldtmp(i, j, 1)
             end if
             do k = 2, kk
               if (fld(i, j, k) /= 1e20) then
                 fldtmp(i, j, k) = (min(700., pdepth(i, j), depth_bnds(2, k)) &
-                  - min(700., pdepth(i, j), depth_bnds(1, k))) &
-                  * pbot(i, j) / pdepth(i, j)
+                  - min(700., pdepth(i, j), depth_bnds(1, k)))
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k) * fldtmp(i, j, k)
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
@@ -1048,21 +1044,19 @@ contains
         end do
 
         ! Average over upper 2000 m
-      case ('dzavg2000')
-        fldtmp = 1e20
+      case ('dzavg2000m')
+        fldtmp = 1.e20
         do j = 1, jj
           do i = 1, ii
             if (fld(i, j, 1) /= 1e20) then
               fldtmp(i, j, 1) = (min(2000., pdepth(i, j), depth_bnds(2, 1)) &
-                - min(2000., pdepth(i, j), depth_bnds(1, 1))) &
-                * pbot(i, j) / pdepth(i, j)
+                - min(2000., pdepth(i, j), depth_bnds(1, 1)))
               fld(i, j, 1) = fld(i, j, 1) * fldtmp(i, j, 1)
             end if
             do k = 2, kk
               if (fld(i, j, k) /= 1e20) then
                 fldtmp(i, j, k) = (min(2000., pdepth(i, j), depth_bnds(2, k)) &
-                  - min(2000., pdepth(i, j), depth_bnds(1, k))) &
-                  * pbot(i, j) / pdepth(i, j)
+                  - min(2000., pdepth(i, j), depth_bnds(1, k)))
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k) * fldtmp(i, j, k)
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
@@ -1078,7 +1072,7 @@ contains
           do i = 1, ii
             do k = 1, kk
               !if (fld(i, j, k) /= 1e20) then
-              fld(i, j, k) = (depth_bnds(2, k) - depth_bnds(1, k)) &
+              fld(i, j, k) = (min(depth_bnds(2, k), pdepth(i,j)) - min(depth_bnds(1, k), pdepth(i,j))) &
                 / pdepth(i, j) * pbot(i, j)
               !end if
             end do
@@ -1628,6 +1622,9 @@ contains
    if (dims == 'longitude,latitude,olevel,time' .or. dims == 'longitude,latitude,olevel') then
      vtype = 'level'
      kk = ddm
+   else if (dims(1:30) == 'longitude,latitude,time,olayer') then
+     vtype = 'olayer'
+     kk = ddm
    else if (dims == 'longitude,latitude,time') then
      vtype = '2d'
      kk = 1
@@ -1656,8 +1653,12 @@ contains
      ii = 1
      jj = 1
      kk = 1
+   else
+     write(*,*) 'Undefined variable type, please check!'
    end if
+    write(*, *) 'vtype:', trim(vtype)
 
+     write(*,*) 'ii,jj,kk:',ii,jj,kk
     allocate(fld(ii, jj, kk), fld2(ii, jj, kk), fldacc(ii, jj, kk), &
       fldtmp(ii, jj, kk), stat=status)
     if (status /= 0) stop 'cannot ALLOCATE enough memory (4)'
@@ -1800,8 +1801,6 @@ contains
     end if
 
     ! Define vertical axis
-    !write(*, *) "line 2428"
-    write(*, *) 'vtype:', trim(vtype)
     if (trim(vtype) == 'layer' .and. .not. &
       (lsumz .or. index(special, 'glbave') > 0 &
       .or. index(special, '2zos') > 0 &
@@ -1832,26 +1831,26 @@ contains
         units='m', &
         length=1, &
         coord_vals=(/0/))
-    else if (index(special, 'dzavg300') > 0) then
+    else if (index(special, 'dzavg300m') > 0) then
       kaxid = cmor_axis( &
         table=trim(tablepath), &
-        table_entry='depth300m', &
+        table_entry='olayer300m', &
         units='m', &
         length=1, &
         coord_vals=(/150./), &
         cell_bounds=(/0., 300./))
-    else if (index(special, 'dzavg700') > 0) then
+    else if (index(special, 'dzavg700m') > 0) then
       kaxid = cmor_axis( &
         table=trim(tablepath), &
-        table_entry='depth700m', &
+        table_entry='olayer700m', &
         units='m', &
         length=1, &
         coord_vals=(/350./), &
         cell_bounds=(/0., 700./))
-    else if (index(special, 'dzavg2000') > 0) then
+    else if (index(special, 'dzavg2000m') > 0) then
       kaxid = cmor_axis( &
         table=trim(tablepath), &
-        table_entry='depth2000m', &
+        table_entry='olayer2000m', &
         units='m', &
         length=1, &
         coord_vals=(/1000./), &
@@ -2298,7 +2297,7 @@ contains
       status = nf90_get_var(fid, rhid, fldtmp, (/1, 1, rec/), (/1, 1, 1/))
     else if (trim(vtype) == 'layer') then
       status = nf90_get_var(fid, rhid, fldtmp, (/1, 1, 1, rec/), (/idm, jdm, kdm, 1/))
-    else if (trim(vtype) == 'level') then
+    else if (trim(vtype) == 'level' .or. trim(vtype) == 'olayer') then
       status = nf90_get_var(fid, rhid, fldtmp, (/1, 1, 1, rec/), (/idm, jdm, ddm, 1/))
     else if (trim(vtype) == 'merk') then
       status = nf90_get_var(fid, rhid, fldtmp, (/1, 1, 1, rec/), (/ldm, kdm, rdm, 1/))
@@ -2337,6 +2336,7 @@ contains
         end do
       end do
     end if
+      ! replace fill with 'where' function?
 
   end subroutine add_tslice
 

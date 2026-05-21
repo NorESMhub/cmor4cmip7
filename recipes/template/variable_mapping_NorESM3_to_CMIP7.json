@@ -246,13 +246,46 @@
             }
         },
         "ocean.thetao.tavg-d2000m-hxy-sea.mon.glb": {
-            "original_name": "templvl;depth_bnds;pdepth;pbot"
+            "original_name": "sum(templvl(i,j,k)*min(pdepth(i,j), depth_bnds(2,k)-depth_bnds(1,k))/sum(min(pdepth(i,j), depth_bnds(2,k)-depth_bnds(1,k))",
+            "sources": {
+                "vars": [
+                    "templvl"
+                ],
+                "facs": [
+                    1.0
+                ]
+            },
+            "postprocs": {
+                "dzavg2000m": true
+            }
         },
         "ocean.thetao.tavg-d300m-hxy-sea.mon.glb": {
-            "original_name": "templvl;depth_bnds;pdepth;pbot"
+            "original_name": "templvl;depth_bnds;pdepth;pbot",
+            "sources": {
+                "vars": [
+                    "templvl"
+                ],
+                "facs": [
+                    1.0
+                ]
+            },
+            "postprocs": {
+                "dzavg300m": true
+            }
         },
         "ocean.thetao.tavg-d700m-hxy-sea.mon.glb": {
-            "original_name": "templvl;depth_bnds;pdepth;pbot"
+            "original_name": "templvl;depth_bnds;pdepth;pbot",
+            "sources": {
+                "vars": [
+                    "templvl"
+                ],
+                "facs": [
+                    1.0
+                ]
+            },
+            "postprocs": {
+                "dzavg700m": true
+            }
         },
         "ocean.thetao.tavg-ol-hm-sea.mon.glb": {
             "original_name": "tempga"

@@ -20,10 +20,12 @@ module m_modelsocn
     sigma, sigmahalf, depth, slat
   real(r8), allocatable, save, dimension(:, :)  :: parea, pmask, pdepth, plon,&
     plat, ulon, ulat, vlon, vlat, slat_bnds, sigma_bnds, sigmahalf_bnds, &
-    depth_bnds, bpini, bpinit, uscaley, vscalex, udepth, vdepth
+    depth_bnds, uscaley, vscalex, udepth, vdepth
+  real(r4), allocatable, save, dimension(:, :)  :: bpini, bpinit
   real(r8), allocatable, save, dimension(:, :, :)   :: plon_crns, plat_crns, &
     ulon_crns, ulat_crns, vlon_crns, vlat_crns, plon_crnsp, plat_crnsp, &
-    ulon_crnsp, ulat_crnsp, vlon_crnsp, vlat_crnsp, dzini, sini, tini
+    ulon_crnsp, ulat_crnsp, vlon_crnsp, vlat_crnsp
+  real(r4), allocatable, save, dimension(:, :, :)   :: dzini, sini, tini
   character(len=slenmax), allocatable, save, dimension(:)   :: region1, section1
   character, allocatable, save, dimension(:, :)             :: region, section
   character(len=slenmax), save                              :: tcoord, zcoord, s1
@@ -52,9 +54,9 @@ module m_modelsocn
   character(len=slenmax), save          :: special
 
   ! Data fields
-  real(r8), allocatable, save, dimension(:, :, :)   :: fld, fld2, fldtmp, &
+  real(r4), allocatable, save, dimension(:, :, :)   :: fld, fld2, fldtmp, &
     fldacc, fldhalf, dp
-  real(r8), allocatable, save, dimension(:, :)      :: sealv, pbot
+  real(r4), allocatable, save, dimension(:, :)      :: sealv, pbot
   real(r8)                                          :: sfac, offs, fill
 
   ! Auxillary variables for special operations
@@ -591,7 +593,7 @@ contains
     implicit none
 
     integer         :: i, j, k, n
-    real(r8)    :: r, rd, p, ptoptmp, pbottmp, sref = 35.0
+    real(r4)    :: r, rd, p, ptoptmp, pbottmp, sref = 35.0
 
     character(len=slenmax), dimension(:), allocatable  :: keys
     character(len=slenmax) :: key, val
@@ -1229,7 +1231,8 @@ contains
 
     logical         :: check
     integer         :: i, j, k, n, fid
-    real(r8)    :: missing, phiu, phil
+    real(r8)        :: missing
+    real(r4)        :: phiu, phil
 
     ! Open first input file
     call scan_files(reset=.true.)
@@ -2078,7 +2081,7 @@ contains
     if (index(special, 'glbave3d') > 0) then
       fld = 0.
       s1 = 'dp'
-      call add_fixed(s1, 1., ncid)
+      call add_fixed(s1, 1.0_r8, ncid)
       do k = 1, kk
         do j = 1, jj
           do i = 1, ii
@@ -2099,7 +2102,7 @@ contains
         call add_fixed(vars(k), facs(k), ncid)
       end do
     else
-      call add_fixed(ivnm, 1.0, ncid)
+      call add_fixed(ivnm, 1.0_r8, ncid)
     end if
 
 !   if (index(special, 'volcello') > 0) then
@@ -2157,7 +2160,7 @@ contains
       .or. index(special, '2zos') > 0) then
       fld = 0.
       s1 = 'dp'
-      call add_tslice(s1, 1., rec1, fid)
+      call add_tslice(s1, 1.0_r8, rec1, fid)
       do k = 1, kk
         do j = 1, jj
           do i = 1, ii
@@ -2278,7 +2281,7 @@ contains
     implicit none
 
     character(len=slenmax), intent(in)  :: vnm
-    real, intent(in)                    :: fac
+    real(r8), intent(in)                :: fac
     integer, intent(in)                 :: rec, fid
     integer                             :: i, j, k
 
@@ -2349,7 +2352,7 @@ contains
     implicit none
 
     character(len=slenmax), intent(in)  :: vnm
-    real, intent(in)                    :: fac
+    real(r8),intent(in)                 :: fac
     integer, intent(in)                 :: fid
     integer                             :: i, j, k
 

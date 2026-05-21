@@ -1,7 +1,7 @@
 module m_utilities
 
   use netcdf
-  use m_namelists, only: itag, verbose, ibasedir, slenmax, r8, &
+  use m_namelists, only: itag, verbose, ibasedir, slenmax, r4, r8, &
     casename, fnm, year1, month1, yearn, monthn, exprefyear, rec, tval, &
     tbnd, mbnd, year, month, forcefilescan, funit, scanallfiles, membertag
 
@@ -537,12 +537,12 @@ contains
 
   ! -----------------------------------------------------------------
 
-  real(r8) function transifs(seclen, iind, jind, iflg, jflg, fldx, fldy)
+  real(r4) function transifs(seclen, iind, jind, iflg, jflg, fldx, fldy)
 
     implicit none
 
     integer, intent(in) :: iind(*), jind(*), iflg(*), jflg(*), seclen
-    real(r8), dimension(:, :), intent(in) :: fldx, fldy
+    real(r4), dimension(:, :), intent(in) :: fldx, fldy
 
     integer :: n
 
@@ -566,8 +566,8 @@ contains
     implicit none
 
     integer, intent(in) :: idm, jdm, kdm
-    real(r8), dimension(idm, jdm, kdm), intent(inout) :: umflx, vmflx
-    real(r8), dimension(idm, jdm, kdm), intent(out) :: strmf
+    real(r4), dimension(idm, jdm, kdm), intent(inout) :: umflx, vmflx
+    real(r4), dimension(idm, jdm, kdm), intent(out) :: strmf
 
     integer :: i, j, ip1, jp1
 
@@ -621,10 +621,10 @@ contains
 
     integer, intent(in) :: idm, jdm
     real(r8), dimension(idm, jdm), intent(in) :: angle
-    real(r8), dimension(idm, jdm), intent(inout) :: u, v
+    real(r4), dimension(idm, jdm), intent(inout) :: u, v
 
     integer :: i, j
-    real(r8) :: urot
+    real(r4) :: urot
 
     do j = 1, jdm
       do i = 1, idm
@@ -638,7 +638,7 @@ contains
 
   ! -----------------------------------------------------------------
 
-  real(r8) function rho(p, th, s)
+  real(r4) function rho(p, th, s)
 
     ! Description: computes in-situ density from potential temperature
     !              and salinity
@@ -646,8 +646,8 @@ contains
 
     implicit none
 
-    real(r8), intent(in) :: p
-    real(r8), intent(in) :: th, s
+    real(r4), intent(in) :: p
+    real(r4), intent(in) :: th, s
 
     real(r8), parameter :: &
       a11 = 9.9985372432159340e-01_r8, a12 = 1.0380621928183473e-02_r8, &
@@ -676,7 +676,7 @@ contains
 
     implicit none
 
-    real(r8), intent(in) :: p1, p2, th, s
+    real(r4), intent(in) :: p1, p2, th, s
 
     real(r8), parameter :: &
       a11 = 9.9985372432159340e-01_r8, a12 = 1.0380621928183473e-02_r8, &
@@ -717,7 +717,7 @@ contains
 
   ! -----------------------------------------------------------------
 
-  real(r8) function getlpi(temp, saln, phiu, phil, pu)
+  real(r4) function getlpi(temp, saln, phiu, phil, pu)
 
     ! get lower pressure interface of a layer knowing the temperature,
     ! salinity of the layer and the geopotential at upper and lower
@@ -725,9 +725,9 @@ contains
 
     implicit none
 
-    real(r8), intent(in) :: temp, saln, phiu, phil, pu
+    real(r4), intent(in) :: temp, saln, phiu, phil, pu
 
-    real(r8) :: pl, q, dphi, alpu, alpl
+    real(r4) :: pl, q, dphi, alpu, alpl
 
     ! first guess on pressure interface
     pl = pu - rho(pu, temp, saln) * (phil - phiu)
@@ -754,8 +754,8 @@ contains
 
     implicit none
 
-    real(r8), intent(in) :: p1, p2, th, s
-    real(r8), intent(out) :: dphi, alp1, alp2
+    real(r4), intent(in) :: p1, p2, th, s
+    real(r4), intent(out) :: dphi, alp1, alp2
 
     real(r8), parameter :: &
       a11 = 9.9985372432159340e-01_r8, a12 = 1.0380621928183473e-02_r8, &

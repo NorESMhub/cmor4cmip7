@@ -25,7 +25,6 @@ contains
     type(json_core) :: json
     type(json_value), pointer :: p
 
-
     !write(*,*) 'varname:',trim(varname)
     call json%initialize()
     call json%create_object(p, '')
@@ -76,10 +75,10 @@ contains
     call json%add(p, 'parent_time_units', trim(parent_time_units))
     call json%add(p, 'tracking_prefix', trim(tracking_prefix))
     call json%add(p, 'output_path_template', &
-      '<mip_era><activity_id><source_id><region><frequency><experiment_id><variant_label>'// &
-      '<variable_id><branding_suffix><grid_label><version>')
+                  '<mip_era><activity_id><source_id><region><frequency><experiment_id><variant_label>'// &
+                  '<variable_id><branding_suffix><grid_label><version>')
     call json%add(p, 'output_file_template', &
-      '<variable_id><branding_suffix><frequency><region><grid_label><source_id><experiment_id><variant_label>')
+                  '<variable_id><branding_suffix><frequency><region><grid_label><source_id><experiment_id><variant_label>')
     call json%add(p, 'license_id', 'CC-BY-4.0')
     call json%add(p, 'archive_id', 'WCRP')
 
@@ -88,18 +87,18 @@ contains
     call json%add(p, 'branded_variable', trim(varname))
     call json%add(p, 'drs_specs', 'MIP-DRS7')
 
-    write(yyyymm1, '(I4.4,I2.2)') year1, month1
-    write(yyyymm2, '(I4.4,I2.2)') yearn, monthn
-    write(r3, '(I3.3)') realization
+    write (yyyymm1, '(I4.4,I2.2)') year1, month1
+    write (yyyymm2, '(I4.4,I2.2)') yearn, monthn
+    write (r3, '(I3.3)') realization
 #ifdef MPI
     call mpi_comm_rank(mpi_comm_world, mpirank, mpierror)
-    write(c2, '(I2.2)') mpirank
+    write (c2, '(I2.2)') mpirank
 #else
     c2 = '00'
 #endif
 
     json_file_attributes = 'attributes_'//trim(casename)//'_'// &
-      trim(varname)//'_'//yyyymm1//'-'//yyyymm2//'_'//r3//'_'//c2//'.json'
+                           trim(varname)//'_'//yyyymm1//'-'//yyyymm2//'_'//r3//'_'//c2//'.json'
     call json%print(p, json_file_attributes)
     call json%destroy(p)            ! cleanup
     !write(*, *) 'json-namelist file: ', trim(json_file_attributes)
@@ -109,7 +108,7 @@ contains
   ! -----------------------------------------------------------------
   subroutine json_get_keys(fnm, path, keys, separator, lfound)
 
-    character(len=*),                                  intent(in)  :: fnm, path
+    character(len=*), intent(in)  :: fnm, path
     character(len=slenmax), dimension(:), allocatable, intent(out) :: keys
     character(len=*), intent(in), optional :: separator
     logical, intent(out), optional :: lfound
@@ -132,15 +131,15 @@ contains
 
     call jsonf%load_file(filename=trim(fnm))
     if (jsonf%failed()) stop "Error: Could not load JSON file: "//fnm
-    call jsonf%get(path, entry_ptr,found)
+    call jsonf%get(path, entry_ptr, found)
 
     if (associated(entry_ptr)) then
       call jsonc%info(entry_ptr, n_children=num_children)
-      allocate(keys(num_children))
+      allocate (keys(num_children))
       do i = 1, num_children
-          call jsonc%get_child(entry_ptr, i, child_ptr)
-          call jsonc%info(child_ptr, name=key_name)
-          keys(i) = key_name
+        call jsonc%get_child(entry_ptr, i, child_ptr)
+        call jsonc%info(child_ptr, name=key_name)
+        keys(i) = key_name
       end do
 !   else
 !     if (verbose) write(*,*) "Warning: '"//trim(path)//"' not found in JSON."
@@ -149,7 +148,7 @@ contains
     call jsonf%destroy()
 
     !if (allocated(keys)) deallocate(keys)
-    if (allocated(key_name)) deallocate(key_name)
+    if (allocated(key_name)) deallocate (key_name)
 
     if (present(lfound)) lfound = found
 
@@ -158,7 +157,7 @@ contains
   ! -----------------------------------------------------------------
   subroutine json_get_val_str(fnm, path, str, separator, lfound)
 
-    character(len=*),              intent(in)  :: fnm, path
+    character(len=*), intent(in)  :: fnm, path
     character(len=*), intent(out) :: str
     logical, intent(out), optional :: lfound
     character(len=*), intent(in), optional :: separator
@@ -181,8 +180,8 @@ contains
     !if (.not. found) write(*,*) "Warning: value of "//trim(path)//" in "//trim(fnm)//" not found"
 
     if (found) then
-      str=cval
-      deallocate(cval)
+      str = cval
+      deallocate (cval)
     end if
 
     if (present(lfound)) lfound = found
@@ -190,9 +189,9 @@ contains
   end subroutine json_get_val_str
 
   ! -----------------------------------------------------------------
-  subroutine json_get_array_string(fnm,path,array,separator,lfound)
+  subroutine json_get_array_string(fnm, path, array, separator, lfound)
 
-    character(len=*),                                  intent(in)  :: fnm, path
+    character(len=*), intent(in)  :: fnm, path
     character(len=slenmax), dimension(:), allocatable, intent(out) :: array
     logical, intent(out), optional :: lfound
     character(len=*), intent(in), optional :: separator
@@ -218,9 +217,9 @@ contains
   end subroutine json_get_array_string
 
   ! -----------------------------------------------------------------
-  subroutine json_get_array_real(fnm,path,array,separator,lfound)
+  subroutine json_get_array_real(fnm, path, array, separator, lfound)
 
-    character(len=*),                        intent(in)  :: fnm, path
+    character(len=*), intent(in)  :: fnm, path
     real(kind=8), dimension(:), allocatable, intent(out) :: array
     logical, intent(out), optional :: lfound
     character(len=*), intent(in), optional :: separator
@@ -264,9 +263,8 @@ contains
       call json%initialize()
     end if
     call json%load_file(filename=trim(tnm))
-    call json%get('variable_entry.' // trim(vnm) // '.dimensions', cval, found)
+    call json%get('variable_entry.'//trim(vnm)//'.dimensions', cval, found)
     call json%destroy()
-      
 
     if (.not. found) then
       if (present(lfound)) lfound = found
@@ -276,7 +274,7 @@ contains
     found = .false.
     pdm = size(cval)
     do k = 1, pdm
-      if (cval(k) == 'alevel' .or. cval(k)(1:4) == 'plev' .or. &
+      if (cval(k) == 'alevel' .or. cval(k) (1:4) == 'plev' .or. &
           cval(k) == 'olevel') then
         str = cval(k)
         found = .true.
@@ -286,7 +284,7 @@ contains
 
     if (present(lfound)) lfound = found
 
-    if (allocated(cval)) deallocate(cval)
+    if (allocated(cval)) deallocate (cval)
 
   end subroutine json_get_vertcoord
 
@@ -309,9 +307,9 @@ contains
       call json%initialize()
     end if
     call json%load_file(filename=trim(tnm))
-    call json%get('variable_entry.' // trim(vnm) // '.dimensions', cval, found)
+    call json%get('variable_entry.'//trim(vnm)//'.dimensions', cval, found)
     call json%destroy()
-    
+
     if (.not. found) then
       if (present(lfound)) lfound = found
       return
@@ -320,78 +318,78 @@ contains
     found = .false.
     pdm = size(cval)
     do k = 1, pdm
-      if (cval(k)(1:4) == 'time') then
+      if (cval(k) (1:4) == 'time') then
         str = cval(k)
         found = .true.
         exit
       end if
     end do
 
-    if(present(lfound)) lfound = found
-    if(allocated(cval)) deallocate(cval)
+    if (present(lfound)) lfound = found
+    if (allocated(cval)) deallocate (cval)
 
   end subroutine json_get_timecoord
 
   ! -----------------------------------------------------------------
   subroutine json_get_original_name(tnm, vnm, str, lfound)
 
-    character(len=*),              intent(in)  :: tnm, vnm
+    character(len=*), intent(in)  :: tnm, vnm
     character(len=*), intent(out) :: str
     logical, intent(out), optional :: lfound
     !character(len=*), intent(in), optional :: separator
 
     call json_get_val_str(trim(tnm), 'variable_entry:'//trim(vnm)// &
-            ':original_name', str, separator=':', lfound=lfound)
+                          ':original_name', str, separator=':', lfound=lfound)
 
   end subroutine json_get_original_name
 
   ! -----------------------------------------------------------------
   subroutine json_get_units(tnm, vnm, str, lfound)
 
-    character(len=*),              intent(in)  :: tnm, vnm
+    character(len=*), intent(in)  :: tnm, vnm
     character(len=*), intent(out) :: str
     logical, intent(out), optional :: lfound
     !character(len=*), intent(in), optional :: separator
 
     call json_get_val_str(trim(tnm), 'variable_entry.'//trim(vnm)// &
-            '.units', str, separator='.', lfound=lfound)
+                          '.units', str, separator='.', lfound=lfound)
 
   end subroutine json_get_units
 
 ! -----------------------------------------------------------------
-  subroutine json_get_vars(fnm,vnm,array,lfound)
+  subroutine json_get_vars(fnm, vnm, array, lfound)
 
-    character(len=*),                                  intent(in)  :: fnm, vnm
+    character(len=*), intent(in)  :: fnm, vnm
     character(len=slenmax), dimension(:), allocatable, intent(out) :: array
     logical, intent(out), optional :: lfound
 
     call json_get_array_string(trim(fnm), 'variable_entry:'//trim(vnm)// &
-            ':sources:vars', array, separator=':', lfound=lfound)
+                               ':sources:vars', array, separator=':', lfound=lfound)
 
   end subroutine json_get_vars
 
 ! -----------------------------------------------------------------
-  subroutine json_get_facs(fnm,vnm,array,lfound)
+  subroutine json_get_facs(fnm, vnm, array, lfound)
 
-    character(len=*),                        intent(in)  :: fnm, vnm
+    character(len=*), intent(in)  :: fnm, vnm
     !character(len=slenmax), dimension(:), allocatable, intent(out) :: array
     real(kind=8), dimension(:), allocatable, intent(out) :: array
     logical, intent(out), optional :: lfound
 
     call json_get_array_real(trim(fnm), 'variable_entry:'//trim(vnm)// &
-            ':sources:facs', array, separator=':', lfound=lfound)
+                             ':sources:facs', array, separator=':', lfound=lfound)
 
   end subroutine json_get_facs
 
 ! -----------------------------------------------------------------
   subroutine json_get_preproc_keys(fnm, vnm, keys, lfound)
 
-    character(len=*),                                  intent(in)  :: fnm, vnm
+    character(len=*), intent(in)  :: fnm, vnm
     character(len=slenmax), dimension(:), allocatable, intent(out) :: keys
     logical, intent(out), optional :: lfound
 
-    call json_get_keys(trim(fnm),'variable_entry:'//trim(vnm)//':preprocs', keys, &
-        separator=':',lfound=lfound)
+    call json_get_keys(trim(fnm), 'variable_entry:'//trim(vnm)//':preprocs', keys, &
+                       separator=':', lfound=lfound)
 
   end subroutine json_get_preproc_keys
 
@@ -402,20 +400,20 @@ contains
     character(len=*), intent(out) :: val
     logical, intent(out), optional :: lfound
 
-    call json_get_val_str(tnm,'variable_entry:'//trim(vnm)//':preprocs:' &
-        //trim(key), val, separator=':', lfound=lfound)
+    call json_get_val_str(tnm, 'variable_entry:'//trim(vnm)//':preprocs:' &
+                          //trim(key), val, separator=':', lfound=lfound)
 
   end subroutine json_get_preproc_val
 
 ! -----------------------------------------------------------------
   subroutine json_get_postproc_keys(fnm, vnm, keys, lfound)
 
-    character(len=*),                                  intent(in)  :: fnm, vnm
+    character(len=*), intent(in)  :: fnm, vnm
     character(len=slenmax), dimension(:), allocatable, intent(out) :: keys
     logical, intent(out), optional :: lfound
 
-    call json_get_keys(trim(fnm),'variable_entry:'//trim(vnm)//':postprocs', keys, &
-        separator=':',lfound=lfound)
+    call json_get_keys(trim(fnm), 'variable_entry:'//trim(vnm)//':postprocs', keys, &
+                       separator=':', lfound=lfound)
 
   end subroutine json_get_postproc_keys
 
@@ -426,8 +424,8 @@ contains
     character(len=*), intent(out) :: val
     logical, intent(out), optional :: lfound
 
-    call json_get_val_str(tnm,'variable_entry:'//trim(vnm)//':postprocs:' &
-        //trim(key), val, separator=':', lfound=lfound)
+    call json_get_val_str(tnm, 'variable_entry:'//trim(vnm)//':postprocs:' &
+                          //trim(key), val, separator=':', lfound=lfound)
 
   end subroutine json_get_postproc_val
 

@@ -2,13 +2,12 @@ module m_utilities
 
   use netcdf
   use m_namelists, only: itag, verbose, ibasedir, slenmax, r4, r8, &
-    casename, fnm, year1, month1, yearn, monthn, exprefyear, rec, tval, &
-    tbnd, mbnd, year, month, forcefilescan, funit, scanallfiles, membertag
+                         casename, fnm, year1, month1, yearn, monthn, exprefyear, rec, tval, &
+                         tbnd, mbnd, year, month, forcefilescan, funit, scanallfiles, membertag
 
   implicit none
 
 contains
-
 
   ! -----------------------------------------------------------------
 
@@ -24,25 +23,25 @@ contains
     if (len_trim(fnm) > 0) then
       status = nf90_open(trim(fnm), nf90_nowrite, ncid)
       if (status /= nf90_noerr) then
-        if (verbose) write(*, *) &
+        if (verbose) write (*, *) &
           'WARNING: error open file ', trim(fnm), &
           '. Will skip respective output group.'
         return
       end if
     else
-      if (verbose) write(*, *) &
+      if (verbose) write (*, *) &
         'WARNING: no file found for tag=', trim(itag), &
         '. Will skip respective output group.'
       return
     end if
 
     var_in_file = .true.
-    
+
     status = nf90_inq_varid(ncid, trim(vnm), rhid)
     if (status /= nf90_noerr) then
       var_in_file = .false.
-      if (verbose) write(*, *) &
-        'skipping variable. ' // trim(vnm) // ' not in ' // trim(fnm)
+      if (verbose) write (*, *) &
+        'skipping variable. '//trim(vnm)//' not in '//trim(fnm)
     end if
 
     status = nf90_close(ncid)
@@ -80,7 +79,7 @@ contains
     integer, intent(in) :: status
 
     if (status /= nf90_noerr) then
-      write(*, *) trim(nf90_strerror(status))
+      write (*, *) trim(nf90_strerror(status))
       stop
     end if
 
@@ -100,12 +99,12 @@ contains
     do while (isloop)
       if (present(reset)) then
         call get_file_info(ibasedir, casename, itag, fnm, year1, month1, &
-          yearn, monthn, exprefyear, reset, rec, tval(1), tbnd, &
-          mbnd, year, month)
+                           yearn, monthn, exprefyear, reset, rec, tval(1), tbnd, &
+                           mbnd, year, month)
       else
         call get_file_info(ibasedir, casename, itag, fnm, year1, month1, &
-          yearn, monthn, exprefyear, .false., rec, tval(1), tbnd, &
-          mbnd, year, month)
+                           yearn, monthn, exprefyear, .false., rec, tval(1), tbnd, &
+                           mbnd, year, month)
       end if
 
       isloop = .false.
@@ -116,7 +115,7 @@ contains
   ! -----------------------------------------------------------------
 
   subroutine get_file_info(idir, cnam, ftag, fnam, y1, m1, y2, m2, yr, &
-      lreset, irec, tval, tbnd, mbnd, year, month)
+                           lreset, irec, tval, tbnd, mbnd, year, month)
 
     use netcdf
     implicit none
@@ -136,7 +135,7 @@ contains
     character(len=1024), save   :: fpreold = 'xxx'
     character(len=1024)         :: units, calendar
     integer, save       :: fstat, n, nrec, unlimdimid, ncid, rhid, rhid2, &
-                           status, sstartend(2,10), nskip, irecold, toff, ndays
+                           status, sstartend(2, 10), nskip, irecold, toff, ndays
     real(r8), save  :: dnumlo, dnumhi, tbndold(2) = (/-999999., -999999./)
     logical, save       :: ltimebnds, ldone
 
@@ -145,9 +144,9 @@ contains
     str1 = ftag(1:idx - 1)
     str2 = ftag(idx + 1:)
     if (len_trim(membertag) > 0) then
-      fpre = trim(cnam) // '.' // trim(str1) // '_' // trim(membertag) // '.' // trim(str2) // '.'
+      fpre = trim(cnam)//'.'//trim(str1)//'_'//trim(membertag)//'.'//trim(str2)//'.'
     else
-      fpre = trim(cnam) // '.' // trim(ftag) // '.'
+      fpre = trim(cnam)//'.'//trim(ftag)//'.'
     end if
 
     if (y1old /= y1 .or. y2old /= y2 .or. m1old /= m1 .or. &
@@ -172,18 +171,18 @@ contains
     end if
 
     ! loop over files
-    open(funit, file=trim('filelist_' // cnam) // trim(membertag), form='formatted')
+    open (funit, file=trim('filelist_'//cnam)//trim(membertag), form='formatted')
 
     ! skip all files that have already been scanned
     do n = 1, nskip
-      read(funit, '(a1024)', iostat=status) fnam
+      read (funit, '(a1024)', iostat=status) fnam
       if (status /= 0) stop 'unexpected end of list file'
     end do
 
     ! continue with files that have not yet been scanned
     ldone = .false.
     do
-      read(funit, '(a1024)', iostat=status) fnam
+      read (funit, '(a1024)', iostat=status) fnam
       if (status /= 0) then
         fnam = ' '
         irec = 0
@@ -203,7 +202,7 @@ contains
         str1 = fnam(1:idx - 1)
         idx = scan(str1, ".", back=.true.)
         str2 = str1(idx + 1:idx + 4)
-        read(str2, "(i4)") yyyy
+        read (str2, "(i4)") yyyy
         if (yyyy < y1 - 1 .or. yyyy > y2 + 1) then
           nskip = nskip + 1
           irecold = 0
@@ -222,9 +221,9 @@ contains
       units = ' '
       call handle_ncerror(nf90_get_att(ncid, rhid, 'units', units))
       call ncsevl(units, n, sstartend)
-      read(units(sstartend(1, 3):sstartend(1, 3) + 3), *) yref
-      read(units(sstartend(1, 4):sstartend(1, 4) + 1), *) mref
-      read(units(sstartend(1, 5):sstartend(1, 5) + 1), *) dref
+      read (units(sstartend(1, 3):sstartend(1, 3) + 3), *) yref
+      read (units(sstartend(1, 4):sstartend(1, 4) + 1), *) mref
+      read (units(sstartend(1, 5):sstartend(1, 5) + 1), *) dref
       calendar = ' '
       call handle_ncerror(nf90_get_att(ncid, rhid, 'calendar', calendar))
 
@@ -252,7 +251,7 @@ contains
         call handle_ncerror(nf90_get_var(ncid, rhid, tval, start=(/n/)))
         if (ltimebnds) then
           call handle_ncerror(nf90_get_var(ncid, rhid2, tbnd, &
-            start=(/1, n/), count=(/2, 1/)))
+                                           start=(/1, n/), count=(/2, 1/)))
         else
           tbnd = tval
         end if
@@ -293,10 +292,10 @@ contains
       if (ldone) exit
     end do
 
-    close(funit)
+    close (funit)
 
     ! get bounds of month
-    call tbndmon(calendar, yr, 0.5 * (tbnd(1) + tbnd(2)), mbnd, year, month)
+    call tbndmon(calendar, yr, 0.5*(tbnd(1) + tbnd(2)), mbnd, year, month)
 
   end subroutine get_file_info
 
@@ -322,7 +321,6 @@ contains
     m2 = 1
     year = yref
     month = 1
-
 
     do while (ndays < tval)
       ndayslast = ndays
@@ -373,7 +371,7 @@ contains
         strgn = strgn + 1
         strgind(strgn) = i
       elseif ((charnew == ' ' .or. charnew == '-' .or. charnew == ':') &
-          .and. (charold /= ' ' .and. charold /= '-' .and. charold /= ':')) then
+              .and. (charold /= ' ' .and. charold /= '-' .and. charold /= ':')) then
         strgn = strgn + 1
         strgind(strgn) = i - 1
       end if
@@ -383,7 +381,7 @@ contains
       strgn = strgn + 1
       strgind(strgn) = len(strg)
     end if
-    strgn = strgn / 2
+    strgn = strgn/2
 
   end subroutine ncsevl
 
@@ -406,35 +404,35 @@ contains
 
     integer :: y
     integer, parameter :: yoffset = 1000000, yr1 = 365, yr4 = 1461, &
-      yr100 = 36524, yr400 = 146097
+                          yr100 = 36524, yr400 = 146097
     integer :: acc_leap(12), acc_noleap(12)
-    data acc_leap   /0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335/
-    data acc_noleap /0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334/
+    data acc_leap/0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335/
+    data acc_noleap/0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334/
 
     y = year + yoffset
     if (calendar(1:3) == 'pro') then
-      ndays = int((y - 1) / 400) * yr400 &
-        + int(mod((y - 1), 400) / 100) * yr100 &
-        + int(mod(mod((y - 1), 400), 100) / 4) * yr4 &
-        + mod(mod(mod((y - 1), 400), 100), 4) * yr1
+      ndays = int((y - 1)/400)*yr400 &
+              + int(mod((y - 1), 400)/100)*yr100 &
+              + int(mod(mod((y - 1), 400), 100)/4)*yr4 &
+              + mod(mod(mod((y - 1), 400), 100), 4)*yr1
       if (month > 2 .and. ((mod(y, 4) == 0 .and. mod(y, 100) /= 0) .or. mod(y, 400) == 0)) then
         ndays = ndays + acc_leap(month) + day
       else
         ndays = ndays + acc_noleap(month) + day
       end if
     elseif (calendar(1:3) == 'jul') then
-      ndays = int((y - 1) / 4) * yr4 + mod(y, 4) * yr1
+      ndays = int((y - 1)/4)*yr4 + mod(y, 4)*yr1
       if (month > 2 .and. mod(y, 4) == 0) then
         ndays = ndays + acc_leap(month) + day
       else
         ndays = ndays + acc_noleap(month) + day
       end if
     elseif (calendar(1:3) == '360') then
-      ndays = (y - 1) * 360 + 30 * (month - 1) + day
+      ndays = (y - 1)*360 + 30*(month - 1) + day
     elseif (calendar(1:2) == 'no' .or. calendar(1:3) == '365') then
-      ndays = (y - 1) * 365 + acc_noleap(month) + day
+      ndays = (y - 1)*365 + acc_noleap(month) + day
     elseif (calendar(1:3) == 'all' .or. calendar(1:3) == '366') then
-      ndays = (y - 1) * 366 + acc_leap(month) + day
+      ndays = (y - 1)*366 + acc_leap(month) + day
     end if
 
   end subroutine ncdnum
@@ -509,29 +507,29 @@ contains
     character(len=100) :: c100
     integer :: iostatus
 
-    inquire(file=trim(fname), exist=fexist)
+    inquire (file=trim(fname), exist=fexist)
     if (.not. fexist) return
 
     seclen = 0
-    open(funit, file=trim(fname))
+    open (funit, file=trim(fname))
     do
       c100 = ' '
-      read(funit, '(a100)', iostat=iostatus) c100
+      read (funit, '(a100)', iostat=iostatus) c100
       if (iostatus < 0) exit
       if (index(c100, 'fram_strait') > 0) then
         do
           c100 = ' '
-          read(funit, '(a100)', iostat=iostatus) c100
+          read (funit, '(a100)', iostat=iostatus) c100
           if (iostatus < 0) exit
           if (index(c100, 'Name') > 0) exit
           seclen = seclen + 1
-          read(c100, *, iostat=iostatus) iind(seclen), jind(seclen), &
+          read (c100, *, iostat=iostatus) iind(seclen), jind(seclen), &
             iflg(seclen), jflg(seclen)
           if (iostatus < 0) exit
         end do
       end if
     end do
-    close(funit)
+    close (funit)
 
   end subroutine read_secindex
 
@@ -549,8 +547,8 @@ contains
     transifs = 0
     do n = 1, seclen
       transifs = transifs - &
-        fldx(iind(n) - 1, jind(n)) * iflg(n) - &
-        fldy(iind(n), jind(n) - 1) * jflg(n)
+                 fldx(iind(n) - 1, jind(n))*iflg(n) - &
+                 fldy(iind(n), jind(n) - 1)*jflg(n)
     end do
 
   end function transifs
@@ -606,8 +604,8 @@ contains
       jp1 = mod(j, jdm) + 1
       do i = 1, idm - 1
         ip1 = mod(i, idm) + 1
-        strmf(i, j, 1) = 0.25 * (strmf(i, j, 1) + strmf(ip1, j, 1) &
-          + strmf(i, jp1, 1) + strmf(ip1, jp1, 1))
+        strmf(i, j, 1) = 0.25*(strmf(i, j, 1) + strmf(ip1, j, 1) &
+                               + strmf(i, jp1, 1) + strmf(ip1, jp1, 1))
       end do
     end do
 
@@ -628,8 +626,8 @@ contains
 
     do j = 1, jdm
       do i = 1, idm
-        urot = u(i, j) * cos(angle(i, j)) - v(i, j) * sin(angle(i, j))
-        v(i, j) = u(i, j) * sin(angle(i, j)) + v(i, j) * cos(angle(i, j))
+        urot = u(i, j)*cos(angle(i, j)) - v(i, j)*sin(angle(i, j))
+        v(i, j) = u(i, j)*sin(angle(i, j)) + v(i, j)*cos(angle(i, j))
         u(i, j) = urot
       end do
     end do
@@ -660,10 +658,10 @@ contains
       a26 = -4.0163964812921489e-06_r8, b21 = 1.1995545126831476e-10_r8, &
       b22 = 5.5234008384648383e-13_r8, b23 = 8.4310335919950873e-14_r8
 
-    rho = (a11 + (a12 + a14 * th + a15 * s) * th + (a13 + a16 * s) * s &
-      + (b11 + b12 * th + b13 * s) * p) &
-      / (a21 + (a22 + a24 * th + a25 * s) * th + (a23 + a26 * s) * s &
-      + (b21 + b22 * th + b23 * s) * p)
+    rho = (a11 + (a12 + a14*th + a15*s)*th + (a13 + a16*s)*s &
+           + (b11 + b12*th + b13*s)*p) &
+          /(a21 + (a22 + a24*th + a25*s)*th + (a23 + a26*s)*s &
+            + (b21 + b22*th + b23*s)*p)
 
   end function rho
 
@@ -689,14 +687,14 @@ contains
       a26 = -4.0163964812921489e-06_r8, b21 = 1.1995545126831476e-10_r8, &
       b22 = 5.5234008384648383e-13_r8, b23 = 8.4310335919950873e-14_r8
 
-    real(r8), parameter :: r1_3 = 1. / 3., r1_5 = 1. / 5., r1_7 = 1. / 7., r1_9 = 1. / 9.
+    real(r8), parameter :: r1_3 = 1./3., r1_5 = 1./5., r1_7 = 1./7., r1_9 = 1./9.
 
     real(r8) :: a1, a2, b1, b2, pm, r, q, qq
 
-    a1 = a11 + (a12 + a14 * th + a15 * s) * th + (a13 + a16 * s) * s
-    a2 = a21 + (a22 + a24 * th + a25 * s) * th + (a23 + a26 * s) * s
-    b1 = b11 + b12 * th + b13 * s
-    b2 = b21 + b22 * th + b23 * s
+    a1 = a11 + (a12 + a14*th + a15*s)*th + (a13 + a16*s)*s
+    a2 = a21 + (a22 + a24*th + a25*s)*th + (a23 + a26*s)*s
+    b1 = b11 + b12*th + b13*s
+    b2 = b21 + b22*th + b23*s
 
     ! the analytic solution of the integral is
     !   p_alpha=(b2*(p2-p1)
@@ -705,13 +703,13 @@ contains
     ! better computational efficiency and accuarcy for most relevant
     ! parameters
 
-    pm = 0.5 * (p2 + p1)
-    r = 0.5 * (p2 - p1) / (a1 + b1 * pm)
-    q = b1 * r
-    qq = q * q
+    pm = 0.5*(p2 + p1)
+    r = 0.5*(p2 - p1)/(a1 + b1*pm)
+    q = b1*r
+    qq = q*q
 
-    p_alpha = 2. * r * (a2 + b2 * pm &
-      + (a2 - a1 * b2 / b1) * qq * (r1_3 + qq * (r1_5 + qq * (r1_7 + qq * r1_9))))
+    p_alpha = 2.*r*(a2 + b2*pm &
+                    + (a2 - a1*b2/b1)*qq*(r1_3 + qq*(r1_5 + qq*(r1_7 + qq*r1_9))))
 
   end function p_alpha
 
@@ -730,14 +728,14 @@ contains
     real(r4) :: pl, q, dphi, alpu, alpl
 
     ! first guess on pressure interface
-    pl = pu - rho(pu, temp, saln) * (phil - phiu)
+    pl = pu - rho(pu, temp, saln)*(phil - phiu)
 
     ! improve the accuracy of the pressure interface by an
     ! iterative procedure
     q = 1.
     do while (abs(q) > 1.e-4)
       call delphi(pu, pl, temp, saln, dphi, alpu, alpl)
-      q = (phil - phiu - dphi) / alpl
+      q = (phil - phiu - dphi)/alpl
       pl = pl - q
     end do
 
@@ -768,14 +766,14 @@ contains
       a26 = -4.0163964812921489e-06_r8, b21 = 1.1995545126831476e-10_r8, &
       b22 = 5.5234008384648383e-13_r8, b23 = 8.4310335919950873e-14_r8
 
-    real(r8), parameter :: r1_3 = 1. / 3., r1_5 = 1. / 5., r1_7 = 1. / 7., r1_9 = 1. / 9.
+    real(r8), parameter :: r1_3 = 1./3., r1_5 = 1./5., r1_7 = 1./7., r1_9 = 1./9.
 
     real(r8) :: a1, a2, b1, b2, pm, r, q, qq
 
-    a1 = a11 + (a12 + a14 * th + a15 * s) * th + (a13 + a16 * s) * s
-    a2 = a21 + (a22 + a24 * th + a25 * s) * th + (a23 + a26 * s) * s
-    b1 = b11 + b12 * th + b13 * s
-    b2 = b21 + b22 * th + b23 * s
+    a1 = a11 + (a12 + a14*th + a15*s)*th + (a13 + a16*s)*s
+    a2 = a21 + (a22 + a24*th + a25*s)*th + (a23 + a26*s)*s
+    b1 = b11 + b12*th + b13*s
+    b2 = b21 + b22*th + b23*s
 
     ! the analytic solution of the integral is
     !   dphi=-(b2*(p2-p1)
@@ -784,16 +782,16 @@ contains
     ! better computational efficiency and accuarcy for most relevant
     ! parameters
 
-    pm = 0.5 * (p2 + p1)
-    r = 0.5 * (p2 - p1) / (a1 + b1 * pm)
-    q = b1 * r
-    qq = q * q
+    pm = 0.5*(p2 + p1)
+    r = 0.5*(p2 - p1)/(a1 + b1*pm)
+    q = b1*r
+    qq = q*q
 
-    dphi = -2. * r * (a2 + b2 * pm &
-      + (a2 - a1 * b2 / b1) * qq * (r1_3 + qq * (r1_5 + qq * (r1_7 + qq * r1_9))))
+    dphi = -2.*r*(a2 + b2*pm &
+                  + (a2 - a1*b2/b1)*qq*(r1_3 + qq*(r1_5 + qq*(r1_7 + qq*r1_9))))
 
-    alp1 = (a2 + b2 * p1) / (a1 + b1 * p1)
-    alp2 = (a2 + b2 * p2) / (a1 + b1 * p2)
+    alp1 = (a2 + b2*p1)/(a1 + b1*p1)
+    alp2 = (a2 + b2*p2)/(a1 + b1*p2)
 
   end subroutine delphi
 
@@ -813,25 +811,25 @@ contains
 
     real(r8) :: x_a, y_a, z_a, x_b, y_b, z_b, beta, x_c, y_c, z_c
 
-    real(r8), parameter :: deg2rad = 3.141592654_r8 / 180._r8, rad2deg = 1._r8 / deg2rad
+    real(r8), parameter :: deg2rad = 3.141592654_r8/180._r8, rad2deg = 1._r8/deg2rad
 
     ! Represent the spherical coordinates as Cartesian coordinates on a
     ! unit sphere.
-    x_a = cos(lambda_a * deg2rad) * cos(theta_a * deg2rad)
-    y_a = cos(lambda_a * deg2rad) * sin(theta_a * deg2rad)
-    z_a = sin(lambda_a * deg2rad)
+    x_a = cos(lambda_a*deg2rad)*cos(theta_a*deg2rad)
+    y_a = cos(lambda_a*deg2rad)*sin(theta_a*deg2rad)
+    z_a = sin(lambda_a*deg2rad)
 
-    x_b = cos(lambda_b * deg2rad) * cos(theta_b * deg2rad)
-    y_b = cos(lambda_b * deg2rad) * sin(theta_b * deg2rad)
-    z_b = sin(lambda_b * deg2rad)
+    x_b = cos(lambda_b*deg2rad)*cos(theta_b*deg2rad)
+    y_b = cos(lambda_b*deg2rad)*sin(theta_b*deg2rad)
+    z_b = sin(lambda_b*deg2rad)
 
     x_c = x_a + x_b
     y_c = y_a + y_b
     z_c = z_a + z_b
 
     ! Convert from Cartesian coordinates to spherical coordinates
-    theta_c = atan2(y_c, x_c) * rad2deg
-    lambda_c = atan2(z_c, sqrt(x_c * x_c + y_c * y_c)) * rad2deg
+    theta_c = atan2(y_c, x_c)*rad2deg
+    lambda_c = atan2(z_c, sqrt(x_c*x_c + y_c*y_c))*rad2deg
 
   end subroutine sphmidpnt
 
@@ -852,34 +850,34 @@ contains
 
     real(r8) :: x_a, y_a, z_a, x_b, y_b, z_b, beta, x_c, y_c, z_c
 
-    real(r8), parameter :: deg2rad = 3.141592654_r8 / 180._r8, rad2deg = 1._r8 / deg2rad
+    real(r8), parameter :: deg2rad = 3.141592654_r8/180._r8, rad2deg = 1._r8/deg2rad
 
     ! Represent the spherical coordinates as Cartesian coordinates on
     ! a unit sphere.
-    x_a = cos(lambda_a * deg2rad) * cos(theta_a * deg2rad)
-    y_a = cos(lambda_a * deg2rad) * sin(theta_a * deg2rad)
-    z_a = sin(lambda_a * deg2rad)
+    x_a = cos(lambda_a*deg2rad)*cos(theta_a*deg2rad)
+    y_a = cos(lambda_a*deg2rad)*sin(theta_a*deg2rad)
+    z_a = sin(lambda_a*deg2rad)
 
-    x_b = cos(lambda_b * deg2rad) * cos(theta_b * deg2rad)
-    y_b = cos(lambda_b * deg2rad) * sin(theta_b * deg2rad)
-    z_b = sin(lambda_b * deg2rad)
+    x_b = cos(lambda_b*deg2rad)*cos(theta_b*deg2rad)
+    y_b = cos(lambda_b*deg2rad)*sin(theta_b*deg2rad)
+    z_b = sin(lambda_b*deg2rad)
 
-    beta = 2 * (x_a * x_b + y_a * y_b + z_a * z_b)
+    beta = 2*(x_a*x_b + y_a*y_b + z_a*z_b)
 
-    x_c = beta * x_b - x_a
-    y_c = beta * y_b - y_a
-    z_c = beta * z_b - z_a
+    x_c = beta*x_b - x_a
+    y_c = beta*y_b - y_a
+    z_c = beta*z_b - z_a
 
     ! Convert from Cartesian coordinates to spherical coordinates
-    theta_c = atan2(y_c, x_c) * rad2deg
-    lambda_c = atan2(z_c, sqrt(x_c * x_c + y_c * y_c)) * rad2deg
+    theta_c = atan2(y_c, x_c)*rad2deg
+    lambda_c = atan2(z_c, sqrt(x_c*x_c + y_c*y_c))*rad2deg
 
   end subroutine sphextpnt
 
   ! -----------------------------------------------------------------
 
   subroutine vinth2pecmwf(dati, dato, hbcofa, hbcofb, p0, plevi, plevo, &
-      intyp, psfc, spvl, kxtrp, imax, nlat, nlevi, nlevip1, nlevo, varflg, tbot, phis)
+                          intyp, psfc, spvl, kxtrp, imax, nlat, nlevi, nlevip1, nlevo, varflg, tbot, phis)
 
     !     THIS ROUTINE INTERPLOATES CCM2/3 HYBRID COORDINATE DATA
     !     TO PRESSURE COORDINATES USING PRESSURE SURFACES AS THE
@@ -977,8 +975,8 @@ contains
     real(r8) :: tstar, hgt, alnp, t0, tplat, tprime0, alpha, alnp3, psfcmb
     real(r8) :: alp, alphp
     real(r8), parameter :: rd = 287.04d0
-    real(r8), parameter :: ginv = 1.d0 / 9.80616d0
-    real(r8), parameter :: alpha0 = 0.0065d0 * rd * ginv
+    real(r8), parameter :: ginv = 1.d0/9.80616d0
+    real(r8), parameter :: alpha0 = 0.0065d0*rd*ginv
 
     ! statement function for double log interpolation
     a2ln(a1) = log(log(a1 + 2.72d0))
@@ -998,7 +996,7 @@ contains
         ! if the data is on those levels start the
         do k = 1, nlevi
           kpi = k
-          plevi(k) = (hbcofa(kpi) * p0) + hbcofb(kpi) * (psfc(i, j) * 0.01d0)
+          plevi(k) = (hbcofa(kpi)*p0) + hbcofb(kpi)*(psfc(i, j)*0.01d0)
         end do
 
         ! Perform vertical interpolation
@@ -1018,52 +1016,52 @@ contains
               go to 40
             else if (varflg > 0) then
               ! Variable is "T" and ECMWF extrapolation is desired
-              psfcmb = psfc(i, j) * 0.01d0
-              tstar = dati(i, j, nlevi) * (1.d0 + alpha0 * (psfcmb / plevi(nlevi) - 1.d0))
-              hgt = phis(i, j) * ginv
+              psfcmb = psfc(i, j)*0.01d0
+              tstar = dati(i, j, nlevi)*(1.d0 + alpha0*(psfcmb/plevi(nlevi) - 1.d0))
+              hgt = phis(i, j)*ginv
               if (hgt < 2000.d0) then
-                alnp = alpha0 * log(plevo(k) / psfcmb)
+                alnp = alpha0*log(plevo(k)/psfcmb)
               else
-                t0 = tstar + 0.0065d0 * hgt
+                t0 = tstar + 0.0065d0*hgt
                 tplat = min(t0, 298.d0)
                 if (hgt <= 2500.d0) then
-                  tprime0 = 0.002d0 * ((2500.d0 - hgt) * t0 + (hgt - 2000.d0) * tplat)
+                  tprime0 = 0.002d0*((2500.d0 - hgt)*t0 + (hgt - 2000.d0)*tplat)
                 else
                   tprime0 = tplat
                 end if
                 if (tprime0 < tstar) then
                   alnp = 0.d0
                 else
-                  alnp = rd * (tprime0 - tstar) / phis(i, j) * log(plevo(k) / psfcmb)
+                  alnp = rd*(tprime0 - tstar)/phis(i, j)*log(plevo(k)/psfcmb)
                 end if
               end if
-              alnp3 = alnp * alnp * alnp
-              dato(i, j, k) = tstar * (1.d0 + alnp + 0.5d0 * alnp**2 + 1.d0 / 6.d0 * alnp3)
+              alnp3 = alnp*alnp*alnp
+              dato(i, j, k) = tstar*(1.d0 + alnp + 0.5d0*alnp**2 + 1.d0/6.d0*alnp3)
               go to 40
 
             else if (varflg < 0) then
               ! Variable is "Z" and ECMWF extrapolation is desired
-              psfcmb = psfc(i, j) * 0.01d0
-              hgt = phis(i, j) * ginv
-              tstar = tbot(i, j) * (1.d0 + alpha0 * (psfcmb / plevi(nlevi) - 1.d0))
-              t0 = tstar + 0.0065d0 * hgt
+              psfcmb = psfc(i, j)*0.01d0
+              hgt = phis(i, j)*ginv
+              tstar = tbot(i, j)*(1.d0 + alpha0*(psfcmb/plevi(nlevi) - 1.d0))
+              t0 = tstar + 0.0065d0*hgt
 
               if (tstar <= 290.5d0 .and. t0 > 290.5d0) then
-                alp = rd / phis(i, j) * (290.5d0 - tstar)
+                alp = rd/phis(i, j)*(290.5d0 - tstar)
               else if (tstar > 290.5d0 .and. t0 > 290.5d0) then
                 alp = 0
-                tstar = 0.5d0 * (290.5d0 + tstar)
+                tstar = 0.5d0*(290.5d0 + tstar)
               else
                 alp = alpha0
               end if
 
               if (tstar < 255.d0) then
-                tstar = 0.5d0 * (tstar + 255.d0)
+                tstar = 0.5d0*(tstar + 255.d0)
               end if
-              alnp = alp * log(plevo(k) / psfcmb)
-              alnp3 = alnp * alnp * alnp
-              dato(i, j, k) = hgt - rd * tstar * ginv * log(plevo(k) / psfcmb) &
-                * (1.d0 + 0.5d0 * alnp + 1.d0 / 6.d0 * alnp**2)
+              alnp = alp*log(plevo(k)/psfcmb)
+              alnp3 = alnp*alnp*alnp
+              dato(i, j, k) = hgt - rd*tstar*ginv*log(plevo(k)/psfcmb) &
+                              *(1.d0 + 0.5d0*alnp + 1.d0/6.d0*alnp**2)
               go to 40
             else
               ! Use lowest sigma layer
@@ -1086,7 +1084,7 @@ contains
             kp = kp + 1
             if (plevo(k) <= plevi(kp + 1)) go to 30
             if (kp > nlevi) then
-              write(6, fmt=25) kp, nlevi
+              write (6, fmt=25) kp, nlevi
 25            format(' KP.GT.NLEVI IN P2HBD.  KP,NLEVI= ', 2i5)
             end if
             go to 20
@@ -1098,17 +1096,17 @@ contains
           select case (intyp)
           case (1) ! Linear interpolation
             dato(i, j, k) = dati(i, j, kp) &
-              + (dati(i, j, kp + 1) - dati(i, j, kp)) &
-              * (plevo(k) - plevi(kp)) / (plevi(kp + 1) - plevi(kp))
+                            + (dati(i, j, kp + 1) - dati(i, j, kp)) &
+                            *(plevo(k) - plevi(kp))/(plevi(kp + 1) - plevi(kp))
           case (2) ! Log interpolation
             dato(i, j, k) = dati(i, j, kp) &
-              + (dati(i, j, kp + 1) - dati(i, j, kp)) &
-              * log(plevo(k) / plevi(kp)) / log(plevi(kp + 1) / plevi(kp))
+                            + (dati(i, j, kp + 1) - dati(i, j, kp)) &
+                            *log(plevo(k)/plevi(kp))/log(plevi(kp + 1)/plevi(kp))
           case (3) ! Log-log interpolation
             dato(i, j, k) = dati(i, j, kp) &
-              + (dati(i, j, kp + 1) - dati(i, j, kp)) &
-              * (a2ln(plevo(k)) - a2ln(plevi(kp))) &
-              / (a2ln(plevi(kp + 1)) - a2ln(plevi(kp)))
+                            + (dati(i, j, kp + 1) - dati(i, j, kp)) &
+                            *(a2ln(plevo(k)) - a2ln(plevi(kp))) &
+                            /(a2ln(plevi(kp + 1)) - a2ln(plevi(kp)))
           end select
 
 40        continue

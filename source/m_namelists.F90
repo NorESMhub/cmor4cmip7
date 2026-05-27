@@ -1,6 +1,6 @@
 module m_namelists
 
-  use, intrinsic        :: iso_fortran_env, only    : r4=>real32, r8=>real64
+  use, intrinsic        :: iso_fortran_env, only: r4 => real32, r8 => real64
 
   implicit none
 
@@ -17,59 +17,59 @@ module m_namelists
   character(len=slenmax), save                  :: model_id, institute_id
   character(len=slenmax), save :: institution, source, references, contact
   character(len=slenmax), save :: tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, &
-    tagodaybgc, tagimon, tagiday, tagamon, tagaday, taga6hr, taga6hri, taga3hr, &
-    taga3hri, taglmon, taglday, tagl3hr, tagl3hri, taglyr
+                                  tagodaybgc, tagimon, tagiday, tagamon, tagaday, taga6hr, taga6hri, taga3hr, &
+                                  taga3hri, taglmon, taglday, tagl3hr, tagl3hri, taglyr
   character(len=slenmax), save :: secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
-    rhotablesuff, atmgridfile, ocnregnfile
+                                  rhotablesuff, atmgridfile, ocnregnfile
   character(len=slenmax), save  :: parent_source_id, coordtable, json_file_attributes, &
-    atmgrid, atmgrid_label, atmgrid_resolution, ocngrid, ocngrid_label, ocngrid_resolution, &
-    icegrid, icegrid_label, icegrid_resolution, lndgrid, lndgrid_label, lndgrid_resolution
+                                   atmgrid, atmgrid_label, atmgrid_resolution, ocngrid, ocngrid_label, ocngrid_resolution, &
+                                   icegrid, icegrid_label, icegrid_resolution, lndgrid, lndgrid_label, lndgrid_resolution
 
-  namelist /model/  model_id, institute_id, &
-                    institution, source, references, contact, &
-                    tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc, &
-                    tagimon, tagiday, tagamon, tagaday, taga6hr, taga6hri, taga3hr, &
-                    taga3hri, taglmon, taglday, tagl3hr, tagl3hri, taglyr, &
-                    secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
-                    rhotablesuff, atmgridfile, ocnregnfile, &
-                    parent_source_id, coordtable, json_file_attributes, &
-                    atmgrid, atmgrid_label, atmgrid_resolution, &
-                    ocngrid, ocngrid_label, ocngrid_resolution, &
-                    icegrid, icegrid_label, icegrid_resolution, &
-                    lndgrid, lndgrid_label, lndgrid_resolution
+  namelist /model/ model_id, institute_id, &
+    institution, source, references, contact, &
+    tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc, &
+    tagimon, tagiday, tagamon, tagaday, taga6hr, taga6hri, taga3hr, &
+    taga3hri, taglmon, taglday, tagl3hr, tagl3hri, taglyr, &
+    secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
+    rhotablesuff, atmgridfile, ocnregnfile, &
+    parent_source_id, coordtable, json_file_attributes, &
+    atmgrid, atmgrid_label, atmgrid_resolution, &
+    ocngrid, ocngrid_label, ocngrid_resolution, &
+    icegrid, icegrid_label, icegrid_resolution, &
+    lndgrid, lndgrid_label, lndgrid_resolution
 
   ! Experiment namelist
   character(len=slenmax), save :: casename, experiment_id, parent_experiment_id, &
-    parent_experiment_rip, isubdir, osubdir, membertag
+                                  parent_experiment_rip, isubdir, osubdir, membertag
   character(len=slenmax), save :: history, comment, forcing
   integer, save                                 :: realization, exprefyear, year1, yearn, month1, monthn
   real(r8), save                            :: branch_time
   logical, save :: dry_run, plevdummy, readdummy, add_fill_day, scanallfiles
   integer, save :: physics_version = 1, initialization_method = 1
   character(len=slenmax), save  :: activity_id, parent_variant_label, &
-    parent_mip_era, mip_era, sub_experiment_id, parent_sub_experiment, &
-    parent_activity_id, branch_method, parent_time_units, tracking_prefix, &
-    variant_label, source_type
+                                   parent_mip_era, mip_era, sub_experiment_id, parent_sub_experiment, &
+                                   parent_activity_id, branch_method, parent_time_units, tracking_prefix, &
+                                   variant_label, source_type
   real(r8), save            :: branch_time_in_child, branch_time_in_parent
   character(len=slenmax), save  :: forcing_index, physics_index, realization_index, &
-    initialization_index
+                                   initialization_index
   namelist /experiment/ casename, experiment_id, parent_experiment_id, &
-                        parent_experiment_rip, isubdir, osubdir, membertag, &
-                        history, comment, forcing, &
-                        realization, exprefyear, year1, yearn, month1, monthn, &
-                        branch_time, &
-                        dry_run, plevdummy, readdummy, add_fill_day, scanallfiles, &
-                        activity_id, parent_variant_label, parent_mip_era, mip_era, &
-                        sub_experiment_id, parent_sub_experiment, parent_activity_id, branch_method, &
-                        parent_time_units, tracking_prefix, variant_label, source_type, &
-                        branch_time_in_child, branch_time_in_parent, &
-                        forcing_index, physics_index, realization_index, initialization_index
+    parent_experiment_rip, isubdir, osubdir, membertag, &
+    history, comment, forcing, &
+    realization, exprefyear, year1, yearn, month1, monthn, &
+    branch_time, &
+    dry_run, plevdummy, readdummy, add_fill_day, scanallfiles, &
+    activity_id, parent_variant_label, parent_mip_era, mip_era, &
+    sub_experiment_id, parent_sub_experiment, parent_activity_id, branch_method, &
+    parent_time_units, tracking_prefix, variant_label, source_type, &
+    branch_time_in_child, branch_time_in_parent, &
+    forcing_index, physics_index, realization_index, initialization_index
 
   ! Variables
   character(len=slenmax), save  :: pomon
   integer, save                 :: n_variables
   character(len=slenmax), dimension(rowmax), save :: compound_names, branded_names, &
-    realms, frequencies, regions
+                                                     realms, frequencies, regions
   character(len=slenmax) :: realm, frequency
 
   namelist /variables/ compound_names
@@ -82,9 +82,9 @@ module m_namelists
   ! Time related variables
   logical, save :: linstant
   integer, save :: year, month, rec
-  real(r8), save :: tval(1), tval2(2), tbnd(2), mbnd(2), tbnds(2,1), mbnds(2,1)
+  real(r8), save :: tval(1), tval2(2), tbnd(2), mbnd(2), tbnds(2, 1), mbnds(2, 1)
   character(len=slenmax), save :: calendar = 'noleap', &
-    calunits = 'days since 1850-01-01 00:00:00'
+                                  calunits = 'days since 1850-01-01 00:00:00'
 
 contains
 
@@ -99,166 +99,165 @@ contains
     character(len=slenmax)  :: substr, tmpstr
 
     ! Initialise namelist variables
-    ibasedir      = ' '
-    obasedir      = ' '
-    tabledir      = ' '
-    griddata      = ' '
-    tagoyr        = ' '
-    tagoyrbgc     = ' '
-    tagomon       = ' '
-    tagomonbgc    = ' '
-    tagoday       = ' '
-    tagodaybgc    = ' '
-    tagimon       = ' '
-    tagiday       = ' '
-    tagamon       = ' '
-    tagaday       = ' '
-    taga6hr       = ' '
-    taga6hri      = ' '
-    taga3hr       = ' '
-    taga3hri      = ' '
-    taglyr        = ' '
-    taglmon       = ' '
-    taglday       = ' '
-    tagl3hr       = ' '
-    tagl3hri      = ' '
-    atmgridfile   = ' '
-    ocngridfile   = ' '
-    ocninitfile   = ' '
-    ocnmertfile   = ' '
-    ocnregnfile   = ' '
-    secindexfile  = ' '
-    rhotablesuff  = 'OnRho'
-    coordtable    = 'CMIP7_coordinate.json'
-    year1         = 0
-    month1        = 1
-    yearn         = 0
-    monthn        = 12
+    ibasedir = ' '
+    obasedir = ' '
+    tabledir = ' '
+    griddata = ' '
+    tagoyr = ' '
+    tagoyrbgc = ' '
+    tagomon = ' '
+    tagomonbgc = ' '
+    tagoday = ' '
+    tagodaybgc = ' '
+    tagimon = ' '
+    tagiday = ' '
+    tagamon = ' '
+    tagaday = ' '
+    taga6hr = ' '
+    taga6hri = ' '
+    taga3hr = ' '
+    taga3hri = ' '
+    taglyr = ' '
+    taglmon = ' '
+    taglday = ' '
+    tagl3hr = ' '
+    tagl3hri = ' '
+    atmgridfile = ' '
+    ocngridfile = ' '
+    ocninitfile = ' '
+    ocnmertfile = ' '
+    ocnregnfile = ' '
+    secindexfile = ' '
+    rhotablesuff = 'OnRho'
+    coordtable = 'CMIP7_coordinate.json'
+    year1 = 0
+    month1 = 1
+    yearn = 0
+    monthn = 12
     createsubdirs = .true.
     forcefilescan = .true.
-    verbose       = .true.
-    dry_run       = .false.
-    plevdummy     = .false.
-    readdummy     = .false.
-    add_fill_day  = .false.
+    verbose = .true.
+    dry_run = .false.
+    plevdummy = .false.
+    readdummy = .false.
+    add_fill_day = .false.
     !newcolumnorder= .true.
-    scanallfiles  = .true.
+    scanallfiles = .true.
 
-    casename      = ' '
+    casename = ' '
     experiment_id = ' '
-    institute_id  = ' '
-    institution   = ' '
-    source        = ' '
-    contact       = ' '
-    history       = ' '
-    comment       = ' '
-    references    = ' '
-    model_id      = ' '
-    forcing       = ' '
-    realization   = 1
-    branch_time   = 0.0
+    institute_id = ' '
+    institution = ' '
+    source = ' '
+    contact = ' '
+    history = ' '
+    comment = ' '
+    references = ' '
+    model_id = ' '
+    forcing = ' '
+    realization = 1
+    branch_time = 0.0
     parent_experiment_id = ' '
     parent_experiment_rip = ' '
-    isubdir       = ' '
-    osubdir       = ' '
-    membertag     = ' '
+    isubdir = ' '
+    osubdir = ' '
+    membertag = ' '
 
     compound_names = ''
 
     pomon = ''
 
-
     ! Read namelists
     if (iargc() /= 4) then
-      write(*, *) 'Usage: noresm2cmor <system nml-file> <model nml-file>' // &
+      write (*, *) 'Usage: noresm2cmor <system nml-file> <model nml-file>'// &
         '<exp nml-file> <variable nml-file>'
       stop
     end if
     !else if (iargc() == 4 .or. iargc() == 5) then
     nmlfpsys = ' '
     call getarg(1, nmlfpsys)
-    inquire(file=trim(nmlfpsys), exist=fexist)
+    inquire (file=trim(nmlfpsys), exist=fexist)
     if (.not. fexist) then
-      write(*, *) 'cannot find namelist file: '//trim(nmlfpsys)
+      write (*, *) 'cannot find namelist file: '//trim(nmlfpsys)
       stop
     end if
     nmlfpmod = ' '
     call getarg(2, nmlfpmod)
-    inquire(file=trim(nmlfpmod), exist=fexist)
+    inquire (file=trim(nmlfpmod), exist=fexist)
     if (.not. fexist) then
-      write(*, *) 'cannot find namelist file: '//trim(nmlfpmod)
+      write (*, *) 'cannot find namelist file: '//trim(nmlfpmod)
       stop
     end if
     nmlfpexp = ' '
     call getarg(3, nmlfpexp)
-    inquire(file=trim(nmlfpexp), exist=fexist)
+    inquire (file=trim(nmlfpexp), exist=fexist)
     if (.not. fexist) then
-      write(*, *) 'cannot find namelist file: '//trim(nmlfpexp)
+      write (*, *) 'cannot find namelist file: '//trim(nmlfpexp)
       stop
     end if
     nmlfpvar = ' '
     call getarg(4, nmlfpvar)
-    inquire(file=trim(nmlfpvar), exist=fexist)
+    inquire (file=trim(nmlfpvar), exist=fexist)
     if (.not. fexist) then
-      write(*, *) 'cannot find namelist file: '//trim(nmlfpvar)
+      write (*, *) 'cannot find namelist file: '//trim(nmlfpvar)
       stop
     end if
-      !if (iargc() == 5) then
-        !call getarg(5, vsingle)
-      !end if
+    !if (iargc() == 5) then
+    !call getarg(5, vsingle)
+    !end if
     !end if
 
     funit = get_free_unit()
-    open(funit, file=trim(nmlfpsys), status='old', action='read', recl=200)
-    read(funit, nml=sys, iostat=istatus)
-    close(funit)
+    open (funit, file=trim(nmlfpsys), status='old', action='read', recl=200)
+    read (funit, nml=sys, iostat=istatus)
+    close (funit)
     if (istatus /= 0) then
-      write(*, *) 'Problem reading namelist system in file '//trim(nmlfpsys)
+      write (*, *) 'Problem reading namelist system in file '//trim(nmlfpsys)
       stop
     end if
     griddata = trim(griddata)//'/'
     tabledir = trim(tabledir)//'/'
 
-    open(funit, file=trim(nmlfpmod), status='old', action='read', recl=200)
-    read(funit, nml=model, iostat=istatus)
-    close(funit)
+    open (funit, file=trim(nmlfpmod), status='old', action='read', recl=200)
+    read (funit, nml=model, iostat=istatus)
+    close (funit)
     if (istatus /= 0) then
-      write(*, *) 'Problem reading namelist model in file '//trim(nmlfpmod)
+      write (*, *) 'Problem reading namelist model in file '//trim(nmlfpmod)
       stop
     end if
 
-    open(funit, file=trim(nmlfpexp), status='old', action='read', recl=200)
-    read(funit, nml=experiment, iostat=istatus)
-    close(funit)
+    open (funit, file=trim(nmlfpexp), status='old', action='read', recl=200)
+    read (funit, nml=experiment, iostat=istatus)
+    close (funit)
     if (istatus /= 0) then
-      write(*, *) 'Problem reading namelist experiment in file '//trim(nmlfpexp)
+      write (*, *) 'Problem reading namelist experiment in file '//trim(nmlfpexp)
       stop
     end if
 
-    open(funit, file=trim(nmlfpvar), status='old', action='read', recl=200)
-    read(funit, nml=variables, iostat=istatus)
+    open (funit, file=trim(nmlfpvar), status='old', action='read', recl=200)
+    read (funit, nml=variables, iostat=istatus)
     !rewind(funit)
-    if (istatus /= 0) write(*, *) &
+    if (istatus /= 0) write (*, *) &
       'WARNING: compound_names not in namelist file.'
-    close(funit)
+    close (funit)
 
     n_variables = 0
     do n = 1, rowmax
       nstr = len_trim(compound_names(n))
       if (nstr /= 0) then
         substr = compound_names(n)
-        pos = index(substr,'.')
-        realms(n) = substr(1:pos-1)
-        substr = substr(pos+1:nstr)
-        pos = index(substr,'.')
-        tmpstr = substr(1:pos-1)
-        substr = substr(pos+1:nstr)
-        pos = index(substr,'.')
-        branded_names(n) = trim(tmpstr)//'_'//substr(1:pos-1)
-        substr = substr(pos+1:nstr)
-        pos = index(substr,'.')
-        frequencies(n) = substr(1:pos-1)
-        regions(n) = substr(pos+1:nstr)
+        pos = index(substr, '.')
+        realms(n) = substr(1:pos - 1)
+        substr = substr(pos + 1:nstr)
+        pos = index(substr, '.')
+        tmpstr = substr(1:pos - 1)
+        substr = substr(pos + 1:nstr)
+        pos = index(substr, '.')
+        branded_names(n) = trim(tmpstr)//'_'//substr(1:pos - 1)
+        substr = substr(pos + 1:nstr)
+        pos = index(substr, '.')
+        frequencies(n) = substr(1:pos - 1)
+        regions(n) = substr(pos + 1:nstr)
         n_variables = n_variables + 1
       else
         exit
@@ -271,7 +270,7 @@ contains
 
     ! Modify output path and create output folder
     obasedir = trim(obasedir)//'/'//trim(osubdir)
-    write(*,*) 'obsedir:',trim(obasedir)
+    write (*, *) 'obsedir:', trim(obasedir)
     call system('mkdir -p '//trim(obasedir))
 
   end subroutine read_namelists
@@ -284,64 +283,64 @@ contains
 
     integer :: n
 
-    write(*, *)
-    write(*, *) 'System namelist:'
-    write(*, *) ' input directory  = ', trim(ibasedir)
-    write(*, *) ' output directory = ', trim(obasedir)
-    write(*, *) ' table directory  = ', trim(tabledir)
-    write(*, *) ' grid data dir.   = ', trim(griddata)
-    write(*, *) ' create sub-dirs  = ', createsubdirs
-    write(*, *) ' verbose          = ', verbose
-    write(*, *)
-    write(*, *) 'Model namelist:'
-    write(*, *) ' institution      = ', trim(institution)
-    write(*, *) ' model id         = ', trim(model_id)
-    write(*, *) ' source           = ', trim(source)
-    write(*, *) ' references       = ', trim(references)
-    write(*, *) ' contact          = ', trim(contact)
-    write(*, *) ' tag annual ocn   = ', trim(tagoyr)
-    write(*, *) ' tag annual bgc   = ', trim(tagoyrbgc)
-    write(*, *) ' tag monthly ocn  = ', trim(tagomon)
-    write(*, *) ' tag monthly bgc  = ', trim(tagomonbgc)
-    write(*, *) ' tag daily ocn    = ', trim(tagoday)
-    write(*, *) ' tag daily bgc    = ', trim(tagodaybgc)
-    write(*, *) ' tag monthly ice  = ', trim(tagimon)
-    write(*, *) ' tag daily ice    = ', trim(tagiday)
-    write(*, *) ' tag monthly atm  = ', trim(tagamon)
-    write(*, *) ' tag daily atm    = ', trim(tagaday)
-    write(*, *) ' tag 6hourly atm  = ', trim(taga6hr)
-    write(*, *) ' tag 6hourly insa = ', trim(taga6hri)
-    write(*, *) ' tag 3hourly atm  = ', trim(taga3hr)
-    write(*, *) ' tag 3hourly insa = ', trim(taga3hri)
-    write(*, *) ' tag yearly lnd   = ', trim(taglyr)
-    write(*, *) ' tag monthly lnd  = ', trim(taglmon)
-    write(*, *) ' tag daily lnd    = ', trim(taglday)
-    write(*, *) ' tag 3hourly lnd  = ', trim(tagl3hr)
-    write(*, *) ' tag 3hourly insl = ', trim(tagl3hri)
-    write(*, *) ' atmos grid file  = ', trim(atmgridfile)
-    write(*, *) ' ocean grid file  = ', trim(ocngridfile)
-    write(*, *) ' ocean ini file   = ', trim(ocninitfile)
-    write(*, *) ' ocean sec file   = ', trim(secindexfile)
-    write(*, *) ' ocean moc file   = ', trim(ocnmertfile)
-    write(*, *) ' ocean reg file   = ', trim(ocnregnfile)
+    write (*, *)
+    write (*, *) 'System namelist:'
+    write (*, *) ' input directory  = ', trim(ibasedir)
+    write (*, *) ' output directory = ', trim(obasedir)
+    write (*, *) ' table directory  = ', trim(tabledir)
+    write (*, *) ' grid data dir.   = ', trim(griddata)
+    write (*, *) ' create sub-dirs  = ', createsubdirs
+    write (*, *) ' verbose          = ', verbose
+    write (*, *)
+    write (*, *) 'Model namelist:'
+    write (*, *) ' institution      = ', trim(institution)
+    write (*, *) ' model id         = ', trim(model_id)
+    write (*, *) ' source           = ', trim(source)
+    write (*, *) ' references       = ', trim(references)
+    write (*, *) ' contact          = ', trim(contact)
+    write (*, *) ' tag annual ocn   = ', trim(tagoyr)
+    write (*, *) ' tag annual bgc   = ', trim(tagoyrbgc)
+    write (*, *) ' tag monthly ocn  = ', trim(tagomon)
+    write (*, *) ' tag monthly bgc  = ', trim(tagomonbgc)
+    write (*, *) ' tag daily ocn    = ', trim(tagoday)
+    write (*, *) ' tag daily bgc    = ', trim(tagodaybgc)
+    write (*, *) ' tag monthly ice  = ', trim(tagimon)
+    write (*, *) ' tag daily ice    = ', trim(tagiday)
+    write (*, *) ' tag monthly atm  = ', trim(tagamon)
+    write (*, *) ' tag daily atm    = ', trim(tagaday)
+    write (*, *) ' tag 6hourly atm  = ', trim(taga6hr)
+    write (*, *) ' tag 6hourly insa = ', trim(taga6hri)
+    write (*, *) ' tag 3hourly atm  = ', trim(taga3hr)
+    write (*, *) ' tag 3hourly insa = ', trim(taga3hri)
+    write (*, *) ' tag yearly lnd   = ', trim(taglyr)
+    write (*, *) ' tag monthly lnd  = ', trim(taglmon)
+    write (*, *) ' tag daily lnd    = ', trim(taglday)
+    write (*, *) ' tag 3hourly lnd  = ', trim(tagl3hr)
+    write (*, *) ' tag 3hourly insl = ', trim(tagl3hri)
+    write (*, *) ' atmos grid file  = ', trim(atmgridfile)
+    write (*, *) ' ocean grid file  = ', trim(ocngridfile)
+    write (*, *) ' ocean ini file   = ', trim(ocninitfile)
+    write (*, *) ' ocean sec file   = ', trim(secindexfile)
+    write (*, *) ' ocean moc file   = ', trim(ocnmertfile)
+    write (*, *) ' ocean reg file   = ', trim(ocnregnfile)
     !write(*, *) ' allow line break = ', linebreaks
 
-    write(*, *)
-    write(*, *) 'Experiment namelist:'
-    write(*, *) ' case name        = ', trim(casename)
-    write(*, *) ' experiment id    = ', trim(experiment_id)
-    write(*, *) ' history          = ', trim(history)
-    write(*, *) ' comment          = ', trim(comment)
-    write(*, *) ' forcing          = ', trim(forcing)
-    write(*, *) ' realization      = ', realization
-    write(*, *) ' start year       = ', year1
-    write(*, *) ' end year         = ', yearn
-    write(*, *) ' start month      = ', month1
-    write(*, *) ' end month        = ', monthn
-    write(*, *) ' add dummy day    = ', add_fill_day
-    write(*, *) ' dry run          = ', dry_run
+    write (*, *)
+    write (*, *) 'Experiment namelist:'
+    write (*, *) ' case name        = ', trim(casename)
+    write (*, *) ' experiment id    = ', trim(experiment_id)
+    write (*, *) ' history          = ', trim(history)
+    write (*, *) ' comment          = ', trim(comment)
+    write (*, *) ' forcing          = ', trim(forcing)
+    write (*, *) ' realization      = ', realization
+    write (*, *) ' start year       = ', year1
+    write (*, *) ' end year         = ', yearn
+    write (*, *) ' start month      = ', month1
+    write (*, *) ' end month        = ', monthn
+    write (*, *) ' add dummy day    = ', add_fill_day
+    write (*, *) ' dry run          = ', dry_run
 
-    write(*, *)
+    write (*, *)
     print *, 'Variable list:'
     do n = 1, n_variables
       print *, trim(compound_names(n))
@@ -357,7 +356,7 @@ contains
 
     integer, intent(in) :: sdm, slen
     character(len=slen), dimension(sdm), intent(in) :: strin
-    character(len=(slen+1)*sdm), intent(out) :: strout
+    character(len=(slen + 1)*sdm), intent(out) :: strout
     logical, intent(in) :: lb
 
     integer :: n, pos
@@ -374,7 +373,7 @@ contains
             strout(pos:pos) = ' '
           end if
         end if
-        strout(pos+1:pos+len_trim(strin(n))) = trim(strin(n))
+        strout(pos + 1:pos + len_trim(strin(n))) = trim(strin(n))
         pos = pos + len_trim(strin(n))
       end if
     end do
@@ -382,7 +381,7 @@ contains
     do
       if (index(strout(pos:), '\n') > 0) then
         pos = pos + index(strout(pos:), '\n')
-        strout(pos-1:pos) = ' '//achar(10)
+        strout(pos - 1:pos) = ' '//achar(10)
         pos = pos + 2
         if (pos >= len(strout)) exit
       else
@@ -402,7 +401,7 @@ contains
     logical :: in_use
 
     do free_unit = 10, 99
-      inquire(free_unit, opened=in_use)
+      inquire (free_unit, opened=in_use)
       if (.not. in_use) exit
     end do
 

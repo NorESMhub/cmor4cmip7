@@ -43,7 +43,7 @@ module m_modelsocn
   logical       :: found
 
   ! Table related variables
-  character(len=slenmax), save          :: table, tablepath, mapping_file
+  character(len=slenmax), save          :: table, tablepath
 
   ! Cmor parameters
   character(len=1024)   :: fnmo
@@ -113,8 +113,8 @@ contains
     pomon = ''
     fnm = pomon
 
-    !tabledir_mapping_file='/diagnostics/CMOR/esm2cmor/recipes/template/'
-    mapping_file='/diagnostics/CMOR/esm2cmor/recipes/template/variable_mapping_NorESM3_to_CMIP7.json'
+    !tabledir_mapfile='/diagnostics/CMOR/esm2cmor/recipes/template/'
+    mapfile='/diagnostics/CMOR/esm2cmor/recipes/template/mapping.json'
 
     ! filter only ocean variables, facilitate parallisation
     n = count(realms == 'ocean' .or. realms == 'ocnBgchem')
@@ -150,10 +150,10 @@ contains
 
       call json_get_vertcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
 
-      call json_get_original_name(trim(mapping_file), trim(cvnm), original_name)
-      call json_get_vars(trim(mapping_file), trim(cvnm), vars, lfound=found) 
+      call json_get_original_name(trim(mapfile), trim(cvnm), original_name)
+      call json_get_vars(trim(mapfile), trim(cvnm), vars, lfound=found) 
       if (found) then
-        call json_get_facs(trim(mapping_file), trim(cvnm), facs, lfound=found) 
+        call json_get_facs(trim(mapfile), trim(cvnm), facs, lfound=found) 
         if (.not. found .or. size(vars) /= size(facs)) then
           write(*,*) "ERROR: facs not found or sizes of vars and facs are not equal"
           cycle
@@ -161,10 +161,10 @@ contains
       else
         allocate(vars(1),facs(1))
         vars(1) = trim(original_name)
-        !call json_get_original_name(trim(mapping_file), &
+        !call json_get_original_name(trim(mapfile), &
                 !trim(cvnm), vars(1), lfound=found) 
 !       if (.not. found) then
-!           write(*,*) "ERROR: "//trim(cvnm)//" not found in "//trim(mapping_file)
+!           write(*,*) "ERROR: "//trim(cvnm)//" not found in "//trim(mapfile)
 !           cycle
 !       else
           facs(1) = 1.0
@@ -340,12 +340,12 @@ contains
     character(len=slenmax)        :: key, val
     logical       :: found
 
-      call json_get_preproc_keys(trim(mapping_file),&
+      call json_get_preproc_keys(trim(mapfile),&
           trim(cvnm), keys, lfound=found)
       if (found) then
         do n=1,size(keys)
           key = keys(n)
-          call json_get_preproc_val(trim(mapping_file),&
+          call json_get_preproc_val(trim(mapfile),&
               trim(cvnm),trim(key), val, lfound=found)
           if (found .and. val /= 'false') then
             special = trim(special)//trim(key)//";"
@@ -356,12 +356,12 @@ contains
       end if
       if (allocated(keys)) deallocate(keys)
 
-      call json_get_postproc_keys(trim(mapping_file),&
+      call json_get_postproc_keys(trim(mapfile),&
           trim(cvnm), keys, lfound=found)
       if (found) then
         do n=1,size(keys)
           key = keys(n)
-          call json_get_postproc_val(trim(mapping_file),&
+          call json_get_postproc_val(trim(mapfile),&
               trim(cvnm),trim(key), val, lfound=found)
           if (found .and. val /= 'false') then
             write(*,*) trim(key),":",trim(val)
@@ -387,7 +387,7 @@ contains
     character(len=slenmax)        :: key, val
 
     lsumz = .false.
-    call json_get_preproc_keys(trim(mapping_file),&
+    call json_get_preproc_keys(trim(mapfile),&
         trim(cvnm), keys, lfound=found)
 
     if (.not. found) return
@@ -396,7 +396,7 @@ contains
       write(*,*) 'n:',n
       key = keys(n)
       write(*,*) 'key:', trim(key)
-      call json_get_preproc_val(trim(mapping_file),&
+      call json_get_preproc_val(trim(mapfile),&
           trim(cvnm),trim(key), val, lfound=found)
       if (found) then
         write(*,*) trim(key),":",trim(val)
@@ -601,13 +601,13 @@ contains
     character(len=slenmax), dimension(:), allocatable  :: keys
     character(len=slenmax) :: key, val
 
-    call json_get_postproc_keys(trim(mapping_file),&
+    call json_get_postproc_keys(trim(mapfile),&
         trim(cvnm), keys, lfound=found)
     if (.not. found) return
 
     do n=1,size(keys)
       key = keys(n)
-      call json_get_postproc_val(trim(mapping_file),&
+      call json_get_postproc_val(trim(mapfile),&
           trim(cvnm),trim(key), val, lfound=found)
       if (found) then
         write(*,*) trim(key),":",trim(val)

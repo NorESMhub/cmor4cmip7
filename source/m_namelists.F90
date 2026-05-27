@@ -8,9 +8,9 @@ module m_namelists
   integer, parameter :: rowmax = 200, slenmax = 1024
 
   ! System namelist
-  character(len=slenmax), save  :: ibasedir, obasedir, tabledir, griddata
+  character(len=slenmax), save  :: ibasedir, obasedir, tabledir, griddata, mapfile
   logical, save                 :: createsubdirs, forcefilescan, verbose
-  namelist /sys/ ibasedir, obasedir, tabledir, griddata, createsubdirs, &
+  namelist /sys/ ibasedir, obasedir, tabledir, griddata, mapfile, createsubdirs, &
     forcefilescan, verbose
 
   ! Model namelist

@@ -37,7 +37,7 @@ module m_modelsocn
   ! Dataset related variables
   character(len=slenmax), save          :: ivnm, ovnm, vunits, vpositive, vtype
   character(len=slenmax), save          :: bvnm, cvnm, original_name
-  character(len=slenmax * 10), save     :: vcomment
+  character(len=slenmax * 10), save     :: vcomment, vhistory
   !character(len=slenmax)               :: key, value
   logical, save :: lsumz
   logical       :: found
@@ -405,6 +405,9 @@ contains
       end if
 
       select case (key)
+        
+      case ('history')
+        vhistory = val
 
         ! atm to Pa
       case ('atm2Pa')
@@ -1072,12 +1075,12 @@ contains
         !fldtmp = 1e20
         do j = 1, jj
           do i = 1, ii
-            do k = 1, kk
-              !if (fld(i, j, k) /= 1e20) then
-              fld(i, j, k) = (min(depth_bnds(2, k), pdepth(i,j)) - min(depth_bnds(1, k), pdepth(i,j))) &
-                / pdepth(i, j) * pbot(i, j)
-              !end if
-            end do
+            if (pbot(i, j) /= 1e20) then
+              do k = 1, kk
+                fld(i, j, k) = (min(depth_bnds(2, k), pdepth(i,j)) - min(depth_bnds(1, k), pdepth(i,j))) &
+                  / pdepth(i, j) * pbot(i, j)
+              end do
+            end if
           end do
         end do
 
@@ -1921,6 +1924,7 @@ contains
           units=trim(vunits), &
           axis_ids=(/grdid/), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           original_name=trim(original_name))
       else if (index(special, 'glbave') > 0 &
@@ -1932,6 +1936,7 @@ contains
           axis_ids=(/taxid/), &
           original_name=trim(original_name), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           positive=trim(vpositive))
       else
@@ -1941,6 +1946,7 @@ contains
           units=trim(vunits), &
           axis_ids=(/grdid, kaxid/), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           original_name=trim(original_name))
       end if
@@ -1964,6 +1970,7 @@ contains
           axis_ids=(/grdid, taxid/), &
           original_name=trim(original_name), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           positive=trim(vpositive))
       else if (index(special, 'dzavg') > 0.) then
@@ -1974,6 +1981,7 @@ contains
           axis_ids=(/grdid, taxid, kaxid/), &
           original_name=trim(original_name), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           positive=trim(vpositive))
       else if (trim(vtype) == 'layer' .and. .not. (trim(ovnm) == 'zfull' &
@@ -1988,6 +1996,7 @@ contains
           original_name=trim(original_name), &
           missing_value=1e20, &
           positive=trim(vpositive), &
+          history=trim(vhistory), &
           comment='Please note that the layer depth ' &
           // 'information is stored ' &
           // 'separately in "zfull" ' &
@@ -2002,6 +2011,7 @@ contains
           axis_ids=(/laxid, kaxid, raxid, taxid/), &
           original_name=trim(original_name), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           positive=trim(vpositive))
       else if (vtype(1:4) == 'mert') then
@@ -2012,6 +2022,7 @@ contains
           axis_ids=(/laxid, raxid, taxid/), &
           original_name=trim(original_name), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           positive=trim(vpositive))
       else if (vtype(1:4) == 'sect') then
@@ -2022,6 +2033,7 @@ contains
           axis_ids=(/saxid, taxid/), &
           original_name=trim(original_name), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           positive=trim(vpositive))
       else if (vtype(1:2) == '1d') then
@@ -2032,6 +2044,7 @@ contains
           axis_ids=(/taxid/), &
           original_name=trim(original_name), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           positive=trim(vpositive))
       else
@@ -2042,6 +2055,7 @@ contains
           axis_ids=(/grdid, kaxid, taxid/), &
           original_name=trim(original_name), &
           missing_value=1e20, &
+          history=trim(vhistory), &
           comment=trim(vcomment), &
           positive=trim(vpositive))
       end if

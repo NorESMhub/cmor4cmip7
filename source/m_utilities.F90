@@ -94,9 +94,9 @@ contains
     logical, intent(in), optional :: reset
     logical :: isloop
 
-    isloop = .true.
+!   isloop = .true.
 
-    do while (isloop)
+!   do while (isloop)
       if (present(reset)) then
         call get_file_info(ibasedir, casename, itag, fnm, year1, month1, &
                            yearn, monthn, exprefyear, reset, rec, tval(1), tbnd, &
@@ -107,8 +107,8 @@ contains
                            mbnd, year, month)
       end if
 
-      isloop = .false.
-    end do
+!     isloop = .false.
+!   end do
 
   end subroutine scan_files
 

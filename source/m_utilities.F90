@@ -97,7 +97,7 @@ contains
 !   isloop = .true.
 
 !   do while (isloop)
-      if (present(reset)) then
+      if (present(reset).and.reset) then
         call get_file_info(ibasedir, casename, itag, fnm, year1, month1, &
                            yearn, monthn, exprefyear, reset, rec, tval(1), tbnd, &
                            mbnd, year, month)

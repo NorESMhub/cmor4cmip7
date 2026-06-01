@@ -1626,7 +1626,7 @@ contains
     else if (dims(1:30) == 'longitude,latitude,time,olayer') then
       vtype = 'olayer'
       kk = ddm
-    else if (dims == 'longitude,latitude,time') then
+    else if (dims == 'longitude,latitude,time' .or.  dims == 'longitude,latitude') then
       vtype = '2d'
       kk = 1
     else if (dims == 'latitude,rho,basin,time') then

@@ -1,5 +1,5 @@
 &sys
- ibasedir      = '/nird/datalake/NS9560K/noresm3/cases',
+ ibasedir      = '/nird/datalake/NS9560K/masan'
  obasedir      = '/scratch/yanchun/cmorout',
  griddata      = '/projects/NS9560K/cmor/griddata',
  tabledir      = '/diagnostics/CMOR/esm2cmor/tables',

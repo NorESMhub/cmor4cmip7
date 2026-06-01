@@ -157,7 +157,8 @@ contains
           cycle
         end if
       else
-        allocate (vars(1), facs(1))
+        if (.not. allocated(vars)) allocate(vars(1))
+        if (.not. allocated(facs)) allocate(facs(1))
         vars(1) = trim(original_name)
         !call json_get_original_name(trim(mapfile), &
         !trim(cvnm), vars(1), lfound=found)
@@ -1626,7 +1627,8 @@ contains
     else if (dims(1:30) == 'longitude,latitude,time,olayer') then
       vtype = 'olayer'
       kk = ddm
-    else if (dims == 'longitude,latitude,time' .or.  dims == 'longitude,latitude') then
+    else if (dims == 'longitude,latitude,time' .or.  dims == 'longitude,latitude' .or. &
+             dims == 'longitude,latitude,time,deltasigt' ) then
       vtype = '2d'
       kk = 1
     else if (dims == 'latitude,rho,basin,time') then

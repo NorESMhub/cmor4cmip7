@@ -80,7 +80,20 @@
             "original_name": "mhflx"
         },
         "ocean.hfbasinpadv.tavg-u-hyb-sea.mon.glb": {
-            "original_name": "mhftd,mhfsm"
+            "original_name": "mhftd,mhfsm",
+            "sources": {
+                "vars": [
+                    "mhftd",
+                    "mhfsm"
+                ],
+                "facs": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "preprocs": {
+                "history": "formula:mhftd+mhfsm"
+            }
         },
         "ocean.hfbasinpmadv.tavg-u-hyb-sea.mon.glb": {
             "original_name": "mhftd"

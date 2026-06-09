@@ -111,9 +111,6 @@ contains
     pomon = ''
     fnm = pomon
 
-    !tabledir_mapfile='/diagnostics/CMOR/esm2cmor/recipes/template/'
-    mapfile = '/diagnostics/CMOR/esm2cmor/recipes/template/mapping.json'
-
     ! filter only ocean variables, facilitate parallisation
     n = count(realms == 'ocean' .or. realms == 'ocnBgchem')
     allocate (idx(n))

@@ -17,7 +17,8 @@ LD=$(FC)
 
 # Libraries
 CMOR=/diagnostics/CMOR/cmorlib/3.14.1/gnu
-JSONF=/diagnostics/CMOR/json-fortran/jsonfortran-gnu-9.2.1
+JSONF=/diagnostics/CMOR/json-fortran/9.2.1-gnu
+GSW=/diagnostics/CMOR/GSW-Fortran/v3.05-7-gnu
 NETCDFF=$(EBROOTNETCDFMINFORTRAN)
 #NETCDF=$(EBROOTNETCDF)
 #UDUNITS=$(EBROOTUDUNITS)
@@ -25,12 +26,17 @@ NETCDFF=$(EBROOTNETCDFMINFORTRAN)
 #HDF5=$(EBROOTHDF5)
 
 # Directory list to search for library files
-LIBS=-L$(CMOR)/lib -L$(JSONF)/lib -Wl,-rpath=$(JSONF)/lib -lcmor -lnetcdff -lnetcdf -luuid -ludunits2 -ljson-c -ljsonfortran
+LIBS=-L$(CMOR)/lib -L$(JSONF)/lib -L$(GSW)/lib64 -Wl,-rpath=$(JSONF)/lib -Wl,-rpath=$(GSW)/lib64 -lcmor -lnetcdff -lnetcdf -luuid -ludunits2 -ljson-c -ljsonfortran -lgsw
 
 # Compiler flags
-FFLAGS=-g -fdefault-real-8 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -DDEFLATE
+FFLAGS=-I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
+#FFLAGS:=$(FFLAGS) -fdefault-real-8
 # for debug
+FFLAGS:=$(FFLAGS) -g
+#FFLAGS:=$(FFLAGS) -Wunused
+#FFLAGS:=$(FFLAGS) -Wcompare-reals
 #FFLAGS:=$(FFLAGS) -g -Wall -Wextra -fcheck=all -fbacktrace -ffpe-trap=invalid,zero,overflow
+#FFLAGS:=$(FFLAGS) -fcheck=all -fbounds-check -fsanitize=address -fbacktrace
 
 # Linker flags
 LDFLAGS=$(LIBS)

@@ -7,13 +7,13 @@ compiler=gnu
 
 if [ $# == 1 ] && [ $1 == "-h" ]; then
   echo "Usage:"
-  echo "./build4esm2cmor.sh "
+  echo "./build.sh "
   echo "  -p --ifmpi=false|true"
   echo "  -c --compiler=gnu|intel"
-  echo "./build4esm2cmor.sh --ifmpi=true|false --compiler=intel|gnu"
-  echo "./build4esm2cmor.sh -p true|false -c intel|gnu"
+  echo "./build.sh --ifmpi=true|false --compiler=intel|gnu"
+  echo "./build.sh -p true|false -c intel|gnu"
   echo "Example:"
-  echo "./build4esm2cmor.sh --ifmpi=false --compiler=intel"
+  echo "./build.sh --ifmpi=false --compiler=intel"
   exit
 else
   while test $# -gt 0; do

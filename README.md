@@ -14,7 +14,7 @@
 ---
 Example steps to run cmorization for a `piControl` simulation by NorESM3-LM
 
-## clone and build
+## Clone and build
 ```bash
 cd ~/
 git clone git@github.com:NorESMhub/cmor4cmip7.git
@@ -22,7 +22,7 @@ cd ~/cmor4cmip7/build
 ./build.sh
 ```
 
-## update recipes
+## Update recipes
 update the information under `cmor4cmip7/recipes/test`, where find necessary
 * experiment.nml    : about the experiment
 * model.nml         : about the model
@@ -31,7 +31,7 @@ update the information under `cmor4cmip7/recipes/test`, where find necessary
 
 One particular part is to update the `obasedir` in the `system.nml` to a directory you will store the cmorized data, either temporarilly or permanentally
 
-## run the cmorization
+## Run the cmorization
 ```bash
 cd ~/cmor4cmip7/bin
 
@@ -39,24 +39,24 @@ pnml=$HOME/cmor4cmip7/recipes/test
 ./cmor ${pnml}/system.nml ${pnml}/model.nml ${pnml}/experiment.nml ${pnml}/variables.nml
 ```
 
-## check the data 
+## Check the data 
 The cmorized data will be located under e.g., `/scratch/$USER/cmorout`
 
-## technically validate the data
-### checkout 'cmip7validate'
+## Technically validate the data
+### Checkout 'cmip7validate'
 ```bash
 cd ~
 git clone git@github.com:NorESMhub/cmip7validate.git
 ```
-### update the configuration of the experiment
+### Update the configuration of the experiment
 update the value correspondingly to the cmorized experiment, in `params.yml`
 
-### build and execute the validation
+### Build and execute the validation
 ```bash
 cd ~/cmip7validate
 ./build.sh
 ```
-### check the result
+### Check the result
 find the generated book/webpage by default at:
 ```
 https://ns9560k.web.sigma2.no/datalake/diagnostics/cmip7validate

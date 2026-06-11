@@ -1,12 +1,64 @@
-# esm2cmor
+# cmor4cmip7
 
-**************************************************************************************************
+*************************************************************************************
 
-**This version is now under development for CMIP7, and the following documentation is out-dated**
+**This version is now under development for CMIP7, and the following documentation is prilemiary**
 
-**************************************************************************************************
+*************************************************************************************
 
-`esm2cmor` is a FORTRAN-based tool for post-processing NorESM3
-output for CMIP7 using the Climate Model Output Rewriter ([CMOR](https://github.com/PCMDI/cmor) library. It is built upon the previous [noresm2cmor](https://github.com/NorESMhub/noresm2cmor) for CMIP6.
+'A program to process NorESM3 output for CMIP7 with the Climate Model Output Rewriter (CMOR) interface.
 
+`cmor4cmip7` is a program to process NorESM3 output for CMIP7 with the Climate Model Output Rewriter (CMOR) interface ([CMOR](https://github.com/PCMDI/cmor) library.
+
+
+---
+Example steps to run cmorization for a `piControl` simulation by NorESM3-LM
+
+## clone and build
+```bash
+cd ~/
+git clone git@github.com:NorESMhub/cmor4cmip7.git
+cd ~/cmor4cmip7/build
+./build.sh
+```
+
+## update recipes
+update the information under `cmor4cmip7/recipes/test`, where find necessary
+* experiment.nml    : about the experiment
+* model.nml         : about the model
+* system.nml        : about data input/output
+* variables.nml     : activate/deactivate variables to be cmorized
+
+One particular part is to update the `obasedir` in the `system.nml` to a directory you will store the cmorized data, either temporarilly or permanentally
+
+## run the cmorization
+```bash
+cd ~/cmor4cmip7/bin
+
+pnml=$HOME/cmor4cmip7/recipes/test
+./cmor ${pnml}/system.nml ${pnml}/model.nml ${pnml}/experiment.nml ${pnml}/variables.nml
+```
+
+## check the data 
+The cmorized data will be located under e.g., `/scratch/$USER/cmorout`
+
+## technically validate the data
+### checkout 'cmip7validate'
+```bash
+cd ~
+git clone git@github.com:NorESMhub/cmip7validate.git
+```
+### update the configuration of the experiment
+update the value correspondingly to the cmorized experiment, in `params.yml`
+
+### build and execute the validation
+```bash
+cd ~/cmip7validate
+./build.sh
+```
+### check the result
+find the generated book/webpage by default at:
+```
+https://ns9560k.web.sigma2.no/datalake/diagnostics/cmip7validate
+```
 

@@ -1,6 +1,6 @@
 &experiment
  casename               = 'n1850.ne16pg3_tn14.noresm3_0_beta17.Run12-1.restartfromold.2026-05-21',
- osubdir                = 'DUMMY-MODEL/piControl/v20260609'
+ osubdir                = 'DUMMY-MODEL/piControl/v20260611'
  experiment_id          = 'piControl'
  sub_experiment_id      = 'none',
  parent_experiment_id   = 'piControl-spinup',

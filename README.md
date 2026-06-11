@@ -31,7 +31,7 @@ update the information under `cmor4cmip7/recipes/test`, where find necessary
 
 One particular part is to update the `obasedir` in the `system.nml` to a directory you will store the cmorized data, either temporarilly or permanentally. That is, replace the value of `obasedir` with e.g., `/scracht/<your_user_name>/cmorout`.
 
-Note, these are Fortran namelist files, so general Fortran rule applies when modify these namelists.
+Note, these are Fortran namelist files, so general Fortran rule applies when modifying these namelists.
 
 ## Run the cmorization
 ```bash

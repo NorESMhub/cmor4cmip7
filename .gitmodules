@@ -4,3 +4,6 @@
 [submodule "cmor"]
 	path = cmor
 	url = git@github.com:PCMDI/cmor.git
+[submodule "GSW-Fortran"]
+	path = GSW-Fortran
+	url = git@github.com:TEOS-10/GSW-Fortran.git

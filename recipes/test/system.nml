@@ -1,6 +1,6 @@
 &sys
  ibasedir      = '/nird/datalake/NS9560K/masan'
- obasedir      = '~/cmorout',
+ obasedir      = '/scratch/yanchun/cmorout',
  griddata      = '/diagnostics/CMOR/cmor4cmip7/griddata',
  tabledir      = '/diagnostics/CMOR/cmor4cmip7/tables',
  mapfile       = '../recipes/test/mapping.json',

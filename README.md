@@ -6,8 +6,6 @@
 
 *************************************************************************************
 
-'A program to process NorESM3 output for CMIP7 with the Climate Model Output Rewriter (CMOR) interface.
-
 `cmor4cmip7` is a program to process NorESM3 output for CMIP7 with the Climate Model Output Rewriter ([CMOR](https://github.com/PCMDI/cmor)) interface.
 
 

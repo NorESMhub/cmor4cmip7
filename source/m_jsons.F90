@@ -79,7 +79,7 @@ contains
                   '<variable_id><branding_suffix><grid_label><version>')
     call json%add(p, 'output_file_template', &
                   '<variable_id><branding_suffix><frequency><region><grid_label><source_id><experiment_id><variant_label>')
-    call json%add(p, 'license_id', 'CC-BY-4.0')
+    call json%add(p, 'license_id', 'CC-BY-4-0')
     call json%add(p, 'archive_id', 'WCRP')
 
     call json%add(p, 'frequency', trim(frequency))

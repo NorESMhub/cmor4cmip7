@@ -1,6 +1,6 @@
 [submodule "json-fortran"]
 	path = json-fortran
 	url = git@github.com:jacobwilliams/json-fortran.git
-[submodule "cmorlib"]
-	path = cmorlib
+[submodule "cmor"]
+	path = cmor
 	url = git@github.com:PCMDI/cmor.git

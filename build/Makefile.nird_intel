@@ -1,8 +1,8 @@
 # Targets 
-TARGET=esm2cmor
+TARGET=cmor
 
 # Objects
-OBJ=m_namelists.o m_utilities.o m_modelsice.o m_modelslnd.o m_modelsatm.o m_modelsocn.o esm2cmor.o
+OBJ=m_namelists.o m_utilities.o m_modelsice.o m_modelslnd.o m_modelsatm.o m_modelsocn.o cmor.o
 
 # Paths 
 SRCDIR=../source
@@ -47,8 +47,8 @@ $(TARGET): $(OBJ)
 	mv $(TARGET) $(BINDIR)
 	rm -f *.o *.h *.inc m_*.mod
 
-esm2cmor.o: $(SRCDIR)/esm2cmor.F90
-	$(FC) $(FFLAGS) -c $(SRCDIR)/esm2cmor.F90
+cmor.o: $(SRCDIR)/cmor.F90
+	$(FC) $(FFLAGS) -c $(SRCDIR)/cmor.F90
 
 m_modelsatm.o: $(SRCDIR)/m_modelsatm.F90
 	$(FC) $(FFLAGS) -c $(SRCDIR)/m_modelsatm.F90

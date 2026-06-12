@@ -18,7 +18,7 @@ cd ~/
 tag=v20260612-alpha
 git clone git@github.com:NorESMhub/cmor4cmip7.git
 git checkout -b $tag tags/$tag
-git switch -c v20260612-alpha
+git switch -c $tag
 cd ~/cmor4cmip7/build
 ./build.sh
 ```
@@ -30,7 +30,7 @@ update the information under `cmor4cmip7/recipes/test`, where find necessary
 * system.nml        : about data input/output
 * variables.nml     : activate/deactivate variables to be cmorized
 
-One particular part is to update the `obasedir` in the `system.nml` to a directory you will store the cmorized data, either temporarilly or permanentally. That is, replace the value of `obasedir` with e.g., `/scracht/<your_user_name>/cmorout`.
+As for a test, you will only need to replace `obasedir` in the `system.nml` with a directory you intent to store the CMOR output, e.g., `/scracht/<your_user_name>/cmorout`.
 
 Note, these are Fortran namelist files, so general Fortran rule applies when modifying these namelists.
 

@@ -35,9 +35,9 @@ compound_names    =
 !   'ocean.hfbasinpsmadv.tavg-u-hyb-sea.mon.glb'    ! done
 !   'ocean.hfds.tavg-u-hxy-sea.mon.glb'             ! done
 !   'ocean.hfx.tavg-ol-hxy-sea.mon.glb'             ! done
-!   'ocean.hfx.tavg-u-hxy-sea.mon.glb'              ! check:vint
+!   'ocean.hfx.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.hfy.tavg-ol-hxy-sea.mon.glb'             ! done
-!   'ocean.hfy.tavg-u-hxy-sea.mon.glb'              ! check:vint
+!   'ocean.hfy.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.masscello.tavg-ol-hxy-sea.mon.glb'       ! done
 !   'ocean.masso.tavg-u-hm-sea.mon.glb'             ! done
 !   'ocean.mfo.tavg-u-ht-sea.mon.glb'               ! done
@@ -60,9 +60,9 @@ compound_names    =
 !   'ocean.sfdsi.tavg-u-hxy-sea.mon.glb'            ! done
 !   'ocean.sftof.ti-u-hxy-u.fx.glb'                 ! done
 !   'ocean.sfx.tavg-ol-hxy-sea.mon.glb'             ! done
-!   'ocean.sfx.tavg-u-hxy-sea.mon.glb'              ! check:vint
+!   'ocean.sfx.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.sfy.tavg-ol-hxy-sea.mon.glb'             ! done
-!   'ocean.sfy.tavg-u-hxy-sea.mon.glb'              ! check:vint
+!   'ocean.sfy.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.siflfwbot.tavg-u-hxy-sea.mon.glb'        ! done
 !   'ocean.so.tavg-ol-hm-sea.mon.glb'               ! check: test with dreq v1.2.2.4
 !   'ocean.so.tavg-ol-hxy-sea.mon.glb'              ! done
@@ -102,7 +102,7 @@ compound_names    =
 !   'ocean.zos.tavg-u-hxy-sea.day.glb'              ! done
 !   'ocean.zos.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.zossq.tavg-u-hxy-sea.mon.glb'            ! done
-!   'ocean.zostoga.tavg-u-hm-sea.mon.glb'           ! done (check !!!)
+!   'ocean.zostoga.tavg-u-hm-sea.mon.glb'           ! done
 !
 !   'ocnBgchem.calc.tavg-ol-hxy-sea.mon.glb'
 !   'ocnBgchem.chl.tavg-ols-hxy-sea.day.glb'

@@ -965,20 +965,20 @@ contains
               fld(i, j, 1) = fld(i, j, 1)*fld2(i, j, 1)/9.806
             do k = 2, kk
               if (fld(i, j, k) /= 1e20) &
-                fld(i, j, k) = fld(i, j, k - 1) + fld(i, j, k)*fld2(i, j, k)/9.806
+                fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fld2(i, j, k)/9.806
             end do
           end do
         end do
 
         ! Average with respect to pressure
-      case ('dpavg')
+      case ('dp.avg')
         do j = 1, jj
           do i = 1, ii
             if (fld(i, j, 1) /= 1e20) &
               fld(i, j, 1) = fld(i, j, 1)*fld2(i, j, 1)
             do k = 2, kk
               if (fld(i, j, k) /= 1e20) then
-                fld(i, j, k) = fld(i, j, k - 1) + fld(i, j, k)*fld2(i, j, k)
+                fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fld2(i, j, k)
                 fld2(i, j, 1) = fld2(i, j, 1) + fld2(i, j, k)
               end if
             end do
@@ -1968,7 +1968,7 @@ contains
           .or. index(special, 'lvl2srf') > 0 &
           .or. index(special, 'locmin') > 0 &
           .or. index(special, 'dpint') > 0 &
-          .or. index(special, 'dpavg') > 0 &
+          .or. index(special, 'dp.avg') > 0 &
           .or. index(special, 'omega2z') > 0) then
         !write(*, *) 'case l2594'
         !write(*, *) 'vunits:',trim(vunits)
@@ -2195,7 +2195,7 @@ contains
     end if
 
     if (index(special, 'Dfield2') > 0 .or. &
-        index(special, 'dpavg') > 0) then
+        index(special, 'dp.avg') > 0) then
       fld = 0.
       call add_tslice(vars(2), facs(2), rec1, fid)
       fld2 = fld
@@ -2503,7 +2503,7 @@ contains
 !           .not. index(special, 'glbave') > 0 &
 !           .or. index(special, 'lvl2srf') > 0 &
 !           .or. index(special, 'dpint') > 0 &
-!           .or. index(special, 'dpavg') > 0 &
+!           .or. index(special, 'dp.avg') > 0 &
 !           .or. index(special, 'locmin') > 0 &
 !           .or. index(special, 'omega2z') > 0) then
 

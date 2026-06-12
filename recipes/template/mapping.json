@@ -117,13 +117,45 @@
             "original_name": "uhflxlvl"
         },
         "ocean.hfx.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "uhflx"
+            "original_name": "uhflx,dp",
+            "sources": {
+                "vars": [
+                    "uhflx",
+                    "dp"
+                ],
+                "facs": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "preprocs": {
+                "history": "formula:vertical average by dp, sum(uhflx*dp)/sum(dp)"
+            },
+            "postprocs": {
+                "dp.avg": true
+            }
         },
         "ocean.hfy.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "vhflxlvl"
         },
         "ocean.hfy.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "vhflx"
+            "original_name": "vhflx,dp",
+            "sources": {
+                "vars": [
+                    "vhflx",
+                    "dp"
+                ],
+                "facs": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "preprocs": {
+                "history": "formula:vertical average by dp, sum(vhflx*dp)/sum(dp)"
+            },
+            "postprocs": {
+                "dp.avg": true
+            }
         },
         "ocean.masscello.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "pbot,depth_bnds,pdepth",
@@ -211,13 +243,45 @@
             "original_name": "usflxlvl"
         },
         "ocean.sfx.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "usflx"
+            "original_name": "usflx,dp",
+            "sources": {
+                "vars": [
+                    "usflx",
+                    "dp"
+                ],
+                "facs": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "preprocs": {
+                "history": "formula:vertical average by dp, sum(usflx*dp)/sum(dp)"
+            },
+            "postprocs": {
+                "dp.avg": true
+            }
         },
         "ocean.sfy.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "vsflxlvl"
         },
         "ocean.sfy.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "vsflx"
+            "original_name": "vsflx,dp",
+            "sources": {
+                "vars": [
+                    "vsflx",
+                    "dp"
+                ],
+                "facs": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "preprocs": {
+                "history": "formula:vertical average by dp, sum(vsflx*dp)/sum(dp)"
+            },
+            "postprocs": {
+                "dp.avg": true
+            }
         },
         "ocean.siflfwbot.tavg-u-hxy-sea.mon.glb": {
             "original_name": "fmltfz"
@@ -337,7 +401,7 @@
                 "history": "formula: sum(temp*dp)/sum(dp)"
             },
             "postprocs": {
-                "dpavg": true
+                "dp.avg": true
             }
         },
         "ocean.thkcello.tavg-ol-hxy-sea.mon.glb": {

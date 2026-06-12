@@ -80,6 +80,7 @@ contains
     integer :: k, m, n
     integer :: romon = 365*10*2
     !character(len=slenmax) :: realm, frequency
+    character(len=slenmax), dimension(5) :: itags
 
     badrec = .false.
 
@@ -92,16 +93,21 @@ contains
       write (*, *)
     end if
 
-    itag = tagomon
-    call scan_files(reset=.true.)
+    itags = [tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday]
 
-    if (len_trim(fnm) == 0) then
-      if (verbose) write (*, *) &
-        'WARNING: no file found for case dir|tag|year1|month1|yearn|monthn: ', &
-        trim(ibasedir)//'/'//trim(casename), '|', trim(itag), '|', &
-        year1, '|', month1, '|', yearn, '|', monthn
-      !cycle
-    end if
+    do n = 1, size(itags)
+      itag = itags(n)
+      write(*,*) 'itag:',trim(itag)
+      call scan_files(reset=.true.)
+
+      if (len_trim(fnm) == 0) then
+        if (verbose) write (*, *) &
+          'WARNING: no file found for case dir|tag|year1|month1|yearn|monthn: ', &
+          trim(ibasedir)//'/'//trim(casename), '|', trim(itag), '|', &
+          year1, '|', month1, '|', yearn, '|', monthn
+        !cycle
+      end if
+    end do
 
     !write(*, *) 'Read grid information from input files'
     call read_gridinfo_ifile
@@ -116,15 +122,17 @@ contains
     allocate (idx(n))
     k = 1
     do n = 1, n_variables
-      if (trim(realms(n)) == 'ocean' .or. trim(realms(n)) == 'ocnBgchem') then
+      if (realms(n) == 'ocean' .or. realms(n) == 'ocnBgchem') then
         idx(k) = n
         k = k + 1
       end if
     end do
 
     main_loop: do n = 1, size(idx)
-      realm = trim(realms(idx(n)))
+
       if (skip_variable(n, n_variables)) cycle
+
+      realm = trim(realms(idx(n)))
 
 !     ! Map namelist variables
       bvnm = trim(branded_names(idx(n)))
@@ -140,6 +148,7 @@ contains
       zcoord = ''
 
       call select_ocn_ftag(realm, frequency, itag)
+      if (bvnm == 'sf6_tavg-ol-hxy-sea') call select_ocn_ftag('ocnBgchem', frequency, itag)
 
       call json_get_units(trim(tabledir)//trim(table), trim(ovnm), vunits)
 
@@ -603,11 +612,8 @@ contains
       key = keys(n)
       call json_get_postproc_val(trim(mapfile), &
                                  trim(cvnm), trim(key), val, lfound=found)
-      if (found) then
-        write (*, *) trim(key), ":", trim(val)
-      else
-        cycle
-      end if
+
+      if (.not. found .or. val/='false')  cycle
 
       select case (key)
 
@@ -2561,13 +2567,15 @@ contains
     select case (frequency)
     case ('mon')
       if (realm == 'ocean') itag = tagomon
-      if (realm == 'oceBgchem') itag = tagomonbgc
+      if (realm == 'ocnBgchem') itag = tagomonbgc
     case ('day')
       if (realm == 'ocean') itag = tagoday
-      if (realm == 'oceBgchem') itag = tagodaybgc
+      if (realm == 'ocnBgchem') itag = tagodaybgc
     case ('yr')
       if (realm == 'ocean') itag = tagoyr
-      if (realm == 'oceBgchem') itag = tagoyrbgc
+      if (realm == 'ocnBgchem') itag = tagoyrbgc
+    case default
+      write(*,*) 'Error: Unknown realm: ',trim(realm)
     end select
 
   end subroutine select_ocn_ftag

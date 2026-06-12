@@ -55,7 +55,7 @@ compound_names    =
 !   'ocean.obvfsq.tavg-ol-hxy-sea.mon.glb'          ! done
 !   'ocean.pbo.tavg-u-hxy-sea.mon.glb'              ! done
 !   'ocean.pso.tavg-u-hxy-sea.mon.glb'              ! done
-!   'ocean.sf6.tavg-ol-hxy-sea.mon.glb'             ! check:bgc
+!   'ocean.sf6.tavg-ol-hxy-sea.mon.glb'             ! n/a
 !   'ocean.sfacrossline.tavg-u-ht-sea.mon.glb'      ! done
 !   'ocean.sfdsi.tavg-u-hxy-sea.mon.glb'            ! done
 !   'ocean.sftof.ti-u-hxy-u.fx.glb'                 ! done

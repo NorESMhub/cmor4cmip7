@@ -29,7 +29,7 @@ compound_names    =
 !   'ocean.friver.tavg-u-hxy-sea.mon.glb'           ! done
 !   'ocean.hfacrossline.tavg-u-ht-sea.mon.glb'      ! done
 !   'ocean.hfbasin.tavg-u-hyb-sea.mon.glb'          ! done
-!   'ocean.hfbasinpadv.tavg-u-hyb-sea.mon.glb'      ! done,check
+!   'ocean.hfbasinpadv.tavg-u-hyb-sea.mon.glb'      ! done
 !   'ocean.hfbasinpmadv.tavg-u-hyb-sea.mon.glb'     ! done
 !   'ocean.hfbasinpmdiff.tavg-u-hyb-sea.mon.glb'    ! done
 !   'ocean.hfbasinpsmadv.tavg-u-hyb-sea.mon.glb'    ! done

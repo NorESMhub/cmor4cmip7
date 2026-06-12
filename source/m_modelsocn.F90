@@ -751,7 +751,7 @@ contains
         end do
 
         ! Devide by gravity constant
-      case ('xginv')
+      case ('divide.g')
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii

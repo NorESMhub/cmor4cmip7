@@ -140,7 +140,7 @@
             },
             "postprocs": {
                 "pbot2dp": true,
-                "xginv": true
+                "divide.g": true
             }
         },
 

@@ -274,8 +274,9 @@ contains
     found = .false.
     pdm = size(cval)
     do k = 1, pdm
-      if (cval(k) == 'alevel' .or. cval(k) (1:4) == 'plev' .or. &
-          cval(k) == 'olevel') then
+      if (cval(k) == 'olevel' .or. cval(k)(1:6) == 'olayer' .or. &
+          cval(k) == 'deltasigt' .or. cval(k) == 'oplayer4' .or. &
+          cval(k) == 'rho') then
         str = cval(k)
         found = .true.
         exit
@@ -356,7 +357,7 @@ contains
 
   end subroutine json_get_units
 
-! -----------------------------------------------------------------
+  ! -----------------------------------------------------------------
   subroutine json_get_vars(fnm, vnm, array, lfound)
 
     character(len=*), intent(in)  :: fnm, vnm
@@ -368,7 +369,7 @@ contains
 
   end subroutine json_get_vars
 
-! -----------------------------------------------------------------
+  ! -----------------------------------------------------------------
   subroutine json_get_facs(fnm, vnm, array, lfound)
 
     character(len=*), intent(in)  :: fnm, vnm
@@ -381,7 +382,7 @@ contains
 
   end subroutine json_get_facs
 
-! -----------------------------------------------------------------
+  ! -----------------------------------------------------------------
   subroutine json_get_preproc_keys(fnm, vnm, keys, lfound)
 
     character(len=*), intent(in)  :: fnm, vnm

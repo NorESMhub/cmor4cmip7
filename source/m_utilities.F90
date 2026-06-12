@@ -535,12 +535,12 @@ contains
 
   ! -----------------------------------------------------------------
 
-  real(r4) function transifs(seclen, iind, jind, iflg, jflg, fldx, fldy)
+  real(r8) function transifs(seclen, iind, jind, iflg, jflg, fldx, fldy)
 
     implicit none
 
     integer, intent(in) :: iind(*), jind(*), iflg(*), jflg(*), seclen
-    real(r4), dimension(:, :), intent(in) :: fldx, fldy
+    real(r8), dimension(:, :), intent(in) :: fldx, fldy
 
     integer :: n
 
@@ -564,8 +564,8 @@ contains
     implicit none
 
     integer, intent(in) :: idm, jdm, kdm
-    real(r4), dimension(idm, jdm, kdm), intent(inout) :: umflx, vmflx
-    real(r4), dimension(idm, jdm, kdm), intent(out) :: strmf
+    real(r8), dimension(idm, jdm, kdm), intent(inout) :: umflx, vmflx
+    real(r8), dimension(idm, jdm, kdm), intent(out) :: strmf
 
     integer :: i, j, ip1, jp1
 
@@ -619,10 +619,10 @@ contains
 
     integer, intent(in) :: idm, jdm
     real(r8), dimension(idm, jdm), intent(in) :: angle
-    real(r4), dimension(idm, jdm), intent(inout) :: u, v
+    real(r8), dimension(idm, jdm), intent(inout) :: u, v
 
     integer :: i, j
-    real(r4) :: urot
+    real(r8) :: urot
 
     do j = 1, jdm
       do i = 1, idm
@@ -636,36 +636,82 @@ contains
 
   ! -----------------------------------------------------------------
 
-  real(r4) function rho(p, th, s)
-
-    ! Description: computes in-situ density from potential temperature
-    !              and salinity
-    ! Comment: units are in cgs
+  subroutine calc_rho_glb(dp, temp, sref, rhoglb)
+    ! Description: computes global averaged density 
+    !  dp   =  sea pressure                                 [ pascal  ]
+    !  sref =  Practical Salinity of reference              [ PSU   ]
+    !  temp =  Potential Temperature                        [ deg C ]
+    !
+    !  rhoglb  =  global averaged density by layer pressure [ kg/m^3]
 
     implicit none
 
-    real(r4), intent(in) :: p
-    real(r4), intent(in) :: th, s
+    real(r8), dimension(:, :, :), intent(in) :: dp, temp
+    real(r8), intent(in)  :: sref
+    real(r8), intent(out) :: rhoglb
 
-    real(r8), parameter :: &
-      a11 = 9.9985372432159340e-01_r8, a12 = 1.0380621928183473e-02_r8, &
-      a13 = 1.7073577195684715e-03_r8, a14 = -3.6570490496333680e-05_r8, &
-      a15 = -7.3677944503527477e-06_r8, a16 = -3.5529175999643348e-06_r8, &
-      b11 = 1.7083494994335439e-10_r8, b12 = 7.1567921402953455e-13_r8, &
-      b13 = 1.2821026080049485e-13_r8, a21 = 1.0, &
-      a22 = 1.0316374535350838e-02_r8, a23 = 8.9521792365142522e-04_r8, &
-      a24 = -2.8438341552142710e-05_r8, a25 = -1.1887778959461776e-05_r8, &
-      a26 = -4.0163964812921489e-06_r8, b21 = 1.1995545126831476e-10_r8, &
-      b22 = 5.5234008384648383e-13_r8, b23 = 8.4310335919950873e-14_r8
+    integer :: i, j, k
+    integer :: idm, jdm, kdm
+    integer, dimension(3) :: dims
 
-    rho = (a11 + (a12 + a14*th + a15*s)*th + (a13 + a16*s)*s &
-           + (b11 + b12*th + b13*s)*p) &
-          /(a21 + (a22 + a24*th + a25*s)*th + (a23 + a26*s)*s &
-            + (b21 + b22*th + b23*s)*p)
+    real(r8):: dpacc, pacc
+
+    dims = shape(dp)
+    idm  = dims(1)
+    jdm  = dims(2)
+    kdm  = dims(3)
+
+    rhoglb = 0.
+    pacc   = 0.
+    
+    do j = 1, jdm
+      do i = 1, idm
+        if (dp(i,j,k) == 1.e20) cycle
+        dpacc = 0.
+        do k = 1, kdm
+          dpacc  = dpacc+0.5*dp(i,j,k)
+          rhoglb = rhoglb + dp(i,j,k)*rho(dpacc, temp(i,j,k), sref)
+          pacc = pacc + dp(i,j,k)
+        end do
+      end do
+    end do
+    rhoglb = rhoglb/pacc
+
+  end subroutine calc_rho_glb
+
+  ! -----------------------------------------------------------------
+
+  function rho(p, pt, sp)
+
+    ! Description: computes in-situ density
+    !  p    =  sea pressure                                 [ dbar  ]
+    !         ( i.e. absolute pressure - 10.1325 dbar )
+    !  sp   =  Practical Salinity                           [ PSU   ]
+    !  pt   =  Potential Temperature                        [ deg C ]
+    !
+    !  rho  =  in-situ density                              [ kg/m^3]
+
+    use gsw_mod_toolbox, only: gsw_sa_from_sp, gsw_ct_from_pt, gsw_rho
+
+    implicit none
+
+    real(r8), intent(in) :: p
+    real(r8), intent(in) :: pt, sp
+
+    real(r8)    :: sa, ct, rho
+
+    ! Convert practical salinity to Absolute Salinity (g/kg)
+    sa = gsw_sa_from_sp(sp, p, 0.0_8, 0.0_8)
+
+    ! Convert potential temperature to Conservative Temperature (deg C)
+    ct = gsw_ct_from_pt(sa, pt)
+
+    ! Compute in-situ density (kg/m^3)
+    rho = gsw_rho(sa, ct, p)
 
   end function rho
 
-  ! -----------------------------------------------------------------
+  !-------------------------------------------------------------------------- 
 
   real(r8) function p_alpha(p1, p2, th, s)
 
@@ -674,7 +720,7 @@ contains
 
     implicit none
 
-    real(r4), intent(in) :: p1, p2, th, s
+    real(r8), intent(in) :: p1, p2, th, s
 
     real(r8), parameter :: &
       a11 = 9.9985372432159340e-01_r8, a12 = 1.0380621928183473e-02_r8, &
@@ -715,7 +761,7 @@ contains
 
   ! -----------------------------------------------------------------
 
-  real(r4) function getlpi(temp, saln, phiu, phil, pu)
+  real(r8) function getlpi(temp, saln, phiu, phil, pu)
 
     ! get lower pressure interface of a layer knowing the temperature,
     ! salinity of the layer and the geopotential at upper and lower
@@ -723,9 +769,9 @@ contains
 
     implicit none
 
-    real(r4), intent(in) :: temp, saln, phiu, phil, pu
+    real(r8), intent(in) :: temp, saln, phiu, phil, pu
 
-    real(r4) :: pl, q, dphi, alpu, alpl
+    real(r8) :: pl, q, dphi, alpu, alpl
 
     ! first guess on pressure interface
     pl = pu - rho(pu, temp, saln)*(phil - phiu)
@@ -752,8 +798,8 @@ contains
 
     implicit none
 
-    real(r4), intent(in) :: p1, p2, th, s
-    real(r4), intent(out) :: dphi, alp1, alp2
+    real(r8), intent(in) :: p1, p2, th, s
+    real(r8), intent(out) :: dphi, alp1, alp2
 
     real(r8), parameter :: &
       a11 = 9.9985372432159340e-01_r8, a12 = 1.0380621928183473e-02_r8, &

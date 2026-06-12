@@ -1,8 +1,10 @@
 module m_namelists
 
   use, intrinsic        :: iso_fortran_env, only: r4 => real32, r8 => real64
-
   implicit none
+
+! integer, parameter :: r4 = selected_real_kind(6,30)
+! integer, parameter :: r8 = selected_real_kind(14,30)
 
   ! Namelist limits
   integer, parameter :: rowmax = 200, slenmax = 1024

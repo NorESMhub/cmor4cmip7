@@ -2,11 +2,11 @@
     "Header": {
         "description": "mapping of NorESM3 model output to CMIP7 data request v1.2.2.3",
         "entry": "a list of variables as CMIP7 compound names",
-        "original_name": "the orginal name of the model output or a simple derivation formula for the requested variable",
+        "original_name": "the orginal name of the model output or a simple derivation for the requested variable",
         "sources": {
             "description": [
-                "if it requires deviation, a list of variables and factors are given",
-                "derivation formula: vars(1)*facs(1)+vars(2)*facs(2)+...+vars(n)*facs(n)",
+                "if it requires derivation, a list of variables and factors are given",
+                "derivation: vars(1)*facs(1)+vars(2)*facs(2)+...+vars(n)*facs(n)",
                 "factors will be set to one if not explicitly specified here"
             ],
             "vars": "list of variables which are used to derive the requested CMIP7 variable",
@@ -95,7 +95,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula:mhftd+mhfsm"
+                "history": "derivation: mhftd+mhfsm"
             }
         },
         "ocean.hfbasinpmadv.tavg-u-hyb-sea.mon.glb": {
@@ -129,7 +129,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula:vertical average by dp, sum(uhflx*dp)/sum(dp)"
+                "history": "derivation: vertical average by dp, sum(uhflx*dp)/sum(dp)"
             },
             "postprocs": {
                 "dp.avg": true
@@ -151,7 +151,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula:vertical average by dp, sum(vhflx*dp)/sum(dp)"
+                "history": "derivation: vertical average by dp, sum(vhflx*dp)/sum(dp)"
             },
             "postprocs": {
                 "dp.avg": true
@@ -168,7 +168,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula:pbot(i,j)*(min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth_bnds(k,1)))/pdepth(i,j)/g"
+                "history": "derivation: pbot(i,j)*(min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth_bnds(k,1)))/pdepth(i,j)/g"
             },
             "postprocs": {
                 "pbot2dp": true,
@@ -255,7 +255,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula:vertical average by dp, sum(usflx*dp)/sum(dp)"
+                "history": "derivation: vertical average by dp, sum(usflx*dp)/sum(dp)"
             },
             "postprocs": {
                 "dp.avg": true
@@ -277,7 +277,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula:vertical average by dp, sum(vsflx*dp)/sum(dp)"
+                "history": "derivation: vertical average by dp, sum(vsflx*dp)/sum(dp)"
             },
             "postprocs": {
                 "dp.avg": true
@@ -339,7 +339,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula:sum(templvl(i,j,k)*(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))/sum(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))"
+                "history": "derivation: sum(templvl(i,j,k)*(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))/sum(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))"
             },
             "postprocs": {
                 "dzavg2000m": true
@@ -356,7 +356,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula:sum(templvl(i,j,k)*(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))/sum(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))"
+                "history": "derivation: sum(templvl(i,j,k)*(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))/sum(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))"
             },
             "postprocs": {
                 "dzavg300m": true
@@ -373,7 +373,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula:sum(templvl(i,j,k)*(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))/sum(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))"
+                "history": "derivation: sum(templvl(i,j,k)*(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))/sum(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))"
             },
             "postprocs": {
                 "dzavg700m": true
@@ -398,7 +398,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula: sum(temp*dp)/sum(dp)"
+                "history": "derivation: sum(temp*dp)/sum(dp)"
             },
             "postprocs": {
                 "dp.avg": true
@@ -418,7 +418,7 @@
                 ]
             },
             "preprocs":{
-              "history": "formula: min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j), depth(k,1))"
+              "history": "derivation: min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j), depth(k,1))"
             },
             "postprocs":{
               "thkcello": true
@@ -471,7 +471,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula: (min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth(k,1)))*parea(i,j)"
+                "history": "derivation: (min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth(k,1)))*parea(i,j)"
             },
             "postprocs": {
                 "volcello": true
@@ -505,7 +505,7 @@
             },
             "preprocs": {
                 "units": "kg m-2 s-1",
-                "history": "formula: lip+sop+eva+rnf+rfi+fmltfz"
+                "history": "derivation: lip+sop+eva+rnf+rfi+fmltfz"
             }
         },
         "ocean.wmo.tavg-ol-hxy-sea.mon.glb": {
@@ -548,7 +548,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula: thermo-steric sea level change due to ocean temperature change with reference salinity as 35.0"
+                "history": "derivation: thermo-steric sea level change due to ocean temperature change with reference salinity as 35.0"
             },
             "postprocs": {
                 "t2zostoga": true
@@ -568,7 +568,7 @@
                 ]
             },
             "preprocs": {
-                "history":"formula: srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)",
+                "history":"derivation: srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)",
                 "comment": "conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
             }
         },
@@ -583,7 +583,7 @@
                 ]
             },
             "preprocs": {
-                "history":"formula: srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)",
+                "history":"derivation: srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)",
                 "comment": "conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
             }
         },
@@ -603,7 +603,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula: (pco2-atmco2)*muatm2pa, where muatm2pa=0.101325"
+                "history": "derivation: (pco2-atmco2)*muatm2pa, where muatm2pa=0.101325"
             }
         },
         "ocnBgchem.frn.tavg-u-hxy-sea.mon.glb": {
@@ -619,7 +619,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula: carflx_bot/122*16+dnitint, where 0.13114754098360656 is the conversion factor from [mol C/m2/s] to [mol N/m2/s] using Redfield ratio of 122:16"
+                "history": "derivation: carflx_bot/122*16+dnitint, where 0.13114754098360656 is the conversion factor from [mol C/m2/s] to [mol N/m2/s] using Redfield ratio of 122:16"
             }
         },
         "ocnBgchem.intpoc.tavg-u-hxy-sea.mon.30S-90S": {
@@ -633,7 +633,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula: vertical integration of detoclvl*122*12/1000 (detoclvl*1.464)",
+                "history": "derivation: vertical integration of detoclvl*122*12/1000 (detoclvl*1.464)",
                 "comment": "Integrate from surface to seafloor, where 1.464 is the conversion factor from [mol C/m3] to [kg C/m2] using 122 mol C/mol P and 12 g C/mol C and 1000 g/kg"
             },
             "postprocs": {
@@ -652,7 +652,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula: pco2*muatm2pa, where muatm2pa is 0.101325"
+                "history": "derivation: pco2*muatm2pa, where muatm2pa is 0.101325"
             }
         },
         "seaIce.siconc.tavg-u-hxy-u.mon.glb": {
@@ -672,7 +672,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula: aicen*100, where 100 is the conversion factor from [fraction] to [%]"
+                "history": "derivation: aicen*100, where 100 is the conversion factor from [fraction] to [%]"
             }
         },
         "seaIce.simpconc.tavg-u-hxy-si.mon.glb": {
@@ -686,7 +686,7 @@
                 ]
             },
             "preprocs": {
-                "history": "formula: apeff_ai/aice"
+                "history": "derivation: apeff_ai/aice"
             },
             "postprocs": {
                 "divided by": "aice"

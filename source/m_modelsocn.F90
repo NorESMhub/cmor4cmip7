@@ -110,6 +110,8 @@ contains
     end do
 
     !write(*, *) 'Read grid information from input files'
+    itag=tagomon    ! ensure read grid info from monthly output
+    call scan_files(reset=.true.)
     call read_gridinfo_ifile
 
 !   ! Process table Omon
@@ -1904,7 +1906,7 @@ contains
               coord_vals=tmp1d, &
               cell_bounds=tmp2d)
       deallocate (tmp1d, tmp2d)
-    else if (vtype(1:3) == 'sec') then
+    else if (vtype(1:4) == 'sect') then
       saxid = cmor_axis( &
               table=trim(tablepath), &
               table_entry='oline', &

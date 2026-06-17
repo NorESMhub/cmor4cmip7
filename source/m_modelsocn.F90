@@ -620,7 +620,7 @@ contains
       call json_get_postproc_val(trim(mapfile), &
                                  trim(cvnm), trim(key), val, lfound=found)
 
-      if (.not. found .or. val/='false')  cycle
+      if (.not. found .or. val=='false')  cycle
 
       select case (key)
 
@@ -849,6 +849,10 @@ contains
         end do
         rhoglb = rhoglb/ptmp
 
+!       write(*,*) 'voglb:',voglb
+!       write(*,*) 'aoglb:',aoglb
+!       write(*,*) 'rhoglb0:',rhoglb0
+!       write(*,*) 'rhoglb:',rhoglb
         fld(1, 1, 1) = voglb/aoglb*(1-rhoglb/rhoglb0)
 
 

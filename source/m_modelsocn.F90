@@ -145,6 +145,8 @@ contains
 
       write (*, *) 'cvnm:', trim(cvnm)
       vpositive = ''
+      vcomment = ''
+      vhistory = ''
       special = ''
       tcoord = ''
       zcoord = ''
@@ -1630,6 +1632,7 @@ contains
     jj = jdm
     kk = kdm
     write (*, *) 'ivm:', trim(ivnm)
+    write (*, *) 'ovnm:', trim(ovnm)
     write (*, *) 'dimlens(3):', dimlens(3)
     !write(*, *) 'kdm:', kdm
     if (dims(1:25) == 'longitude,latitude,olevel') then
@@ -1653,6 +1656,7 @@ contains
       ii = ldm
       jj = kdm
       kk = rdm
+    else if (dims == 'latitude,olevel,basin,time') then
       vtype = 'merd'
       ii = ldm
       jj = ddm

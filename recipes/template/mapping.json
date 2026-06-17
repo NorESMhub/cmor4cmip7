@@ -5,15 +5,13 @@
         "original_name": "the orginal name of the model output or a simple derivation for the requested variable",
         "sources": {
             "description": [
-                "if it requires derivation, a list of variables and factors are given",
-                "derivation: vars(1)*facs(1)+vars(2)*facs(2)+...+vars(n)*facs(n)",
-                "factors will be set to one if not explicitly specified here"
-            ],
-            "vars": "list of variables which are used to derive the requested CMIP7 variable",
-            "facs": "factors that apply to each of the variable"
+                "a list of variable:scale_factor variables and factors are given",
+                "derivation: variable(1)*factor(1) + ... + variable(n)*factor(n)"
+            ]
         },
         "preprocs": "special preprocess before reading data from file",
-        "postprocs": "special postprocess beore writting data to file"
+        "postprocs": "special postprocess beore writting data to file",
+        "history": "description of how the requested variable is derived from NorESM3 output"
     },
     "variable_entry": {
         "atmos.ta.tavg-al-hxy-u.mon.glb": {
@@ -83,20 +81,12 @@
             "original_name": "mhflx"
         },
         "ocean.hfbasinpadv.tavg-u-hyb-sea.mon.glb": {
-            "original_name": "mhftd,mhfsm",
+            "original_name": "mhftd, mhfsm",
             "sources": {
-                "vars": [
-                    "mhftd",
-                    "mhfsm"
-                ],
-                "facs": [
-                    1.0,
-                    1.0
-                ]
+                "mhftd": 1.0,
+                "mhfsm": 1.0
             },
-            "preprocs": {
-                "history": "derivation: mhftd+mhfsm"
-            }
+            "history": "hfbasinpadv = mhftd + mhfsm"
         },
         "ocean.hfbasinpmadv.tavg-u-hyb-sea.mon.glb": {
             "original_name": "mhftd"
@@ -117,65 +107,41 @@
             "original_name": "uhflxlvl"
         },
         "ocean.hfx.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "uhflx,dp",
+            "original_name": "uhflx, dp",
             "sources": {
-                "vars": [
-                    "uhflx",
-                    "dp"
-                ],
-                "facs": [
-                    1.0,
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: vertical average by dp, sum(uhflx*dp)/sum(dp)"
+                "uhflx": 1.0,
+                "dp": 1.0
             },
             "postprocs": {
                 "dp.avg": true
-            }
+            },
+            "history": "hfx = vertical average by dp, sum(uhflx*dp)/sum(dp)"
         },
         "ocean.hfy.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "vhflxlvl"
         },
         "ocean.hfy.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "vhflx,dp",
+            "original_name": "vhflx, dp",
             "sources": {
-                "vars": [
-                    "vhflx",
-                    "dp"
-                ],
-                "facs": [
-                    1.0,
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: vertical average by dp, sum(vhflx*dp)/sum(dp)"
+                "vhflx": 1.0,
+                "dp": 1.0
             },
             "postprocs": {
                 "dp.avg": true
-            }
+            },
+            "history": "hfy = vertical average by dp, sum(vhflx*dp)/sum(dp)"
         },
         "ocean.masscello.tavg-ol-hxy-sea.mon.glb": {
-            "original_name": "pbot,depth_bnds,pdepth",
+            "original_name": "pbot, depth_bnds, pdepth",
             "sources": {
-                "vars": [
-                    "dzlvl"
-                ],
-                "facs": [
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: pbot(i,j)*(min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth_bnds(k,1)))/pdepth(i,j)/g"
+                "dzlvl": 1.0
             },
             "postprocs": {
                 "pbot2dp": true,
                 "divide.g": true
-            }
+            },
+            "history": "masscello = pbot(i,j)*(min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth_bnds(k,1)))/pdepth(i,j)/g"
         },
-
         "ocean.masso.tavg-u-hm-sea.mon.glb": {
             "original_name": "massgs"
         },
@@ -243,45 +209,29 @@
             "original_name": "usflxlvl"
         },
         "ocean.sfx.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "usflx,dp",
+            "original_name": "usflx, dp",
             "sources": {
-                "vars": [
-                    "usflx",
-                    "dp"
-                ],
-                "facs": [
-                    1.0,
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: vertical average by dp, sum(usflx*dp)/sum(dp)"
+                "usflx": 1.0,
+                "dp": 1.0
             },
             "postprocs": {
                 "dp.avg": true
-            }
+            },
+            "history": "sfx = vertical average by dp, sum(usflx*dp)/sum(dp)"
         },
         "ocean.sfy.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "vsflxlvl"
         },
         "ocean.sfy.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "vsflx,dp",
+            "original_name": "vsflx, dp",
             "sources": {
-                "vars": [
-                    "vsflx",
-                    "dp"
-                ],
-                "facs": [
-                    1.0,
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: vertical average by dp, sum(vsflx*dp)/sum(dp)"
+                "vsflx": 1.0,
+                "dp": 1.0
             },
             "postprocs": {
                 "dp.avg": true
-            }
+            },
+            "history": "sfy = vertical average by dp, sum(vsflx*dp)/sum(dp)"
         },
         "ocean.siflfwbot.tavg-u-hxy-sea.mon.glb": {
             "original_name": "fmltfz"
@@ -329,55 +279,34 @@
             }
         },
         "ocean.thetao.tavg-d2000m-hxy-sea.mon.glb": {
-            "original_name": "templvl,depth_bnds,pdepth",
+            "original_name": "templvl, depth_bnds, pdepth",
             "sources": {
-                "vars": [
-                    "templvl"
-                ],
-                "facs": [
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: sum(templvl(i,j,k)*(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))/sum(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))"
+                "templvl": 1.0
             },
             "postprocs": {
                 "dzavg2000m": true
-            }
+            },
+            "history": "thetao = sum(templvl(i,j,k)*(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))/sum(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))"
         },
         "ocean.thetao.tavg-d300m-hxy-sea.mon.glb": {
             "original_name": "templvl;depth_bnds;pdepth",
             "sources": {
-                "vars": [
-                    "templvl"
-                ],
-                "facs": [
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: sum(templvl(i,j,k)*(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))/sum(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))"
+                "templvl": 1.0
             },
             "postprocs": {
                 "dzavg300m": true
-            }
+            },
+            "history": "thetao = sum(templvl(i,j,k)*(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))/sum(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))"
         },
         "ocean.thetao.tavg-d700m-hxy-sea.mon.glb": {
             "original_name": "templvl;depth_bnds;pdepth;pbot",
             "sources": {
-                "vars": [
-                    "templvl"
-                ],
-                "facs": [
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: sum(templvl(i,j,k)*(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))/sum(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))"
+                "templvl": 1.0
             },
             "postprocs": {
                 "dzavg700m": true
-            }
+            },
+            "history": "thetao = sum(templvl(i,j,k)*(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))/sum(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))"
         },
         "ocean.thetao.tavg-ol-hm-sea.mon.glb": {
             "original_name": "tempga"
@@ -386,43 +315,28 @@
             "original_name": "templvl"
         },
         "ocean.thetaot.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "temp,dp",
+            "original_name": "temp, dp",
             "sources": {
-                "vars": [
-                    "temp",
-                    "dp"
-                ],
-                "facs": [
-                    1.0,
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: sum(temp*dp)/sum(dp)"
+                "temp": 1.0,
+                "dp": 1.0
             },
             "postprocs": {
                 "dp.avg": true
-            }
+            },
+            "history": "thetaot = sum(temp*dp)/sum(dp)"
         },
         "ocean.thkcello.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "depth_bnds"
         },
         "ocean.thkcello.ti-ol-hxy-sea.fx.glb": {
-            "original_name": "pdepth,depth_bnds",
+            "original_name": "pdepth, depth_bnds",
             "sources": {
-                "vars": [
-                    "pdepth"
-                ],
-                "facs": [
-                    1.0
-                ]
+                "pdepth": 1.0
             },
-            "preprocs":{
-              "history": "derivation: min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j), depth(k,1))"
+            "postprocs": {
+                "thkcello": true
             },
-            "postprocs":{
-              "thkcello": true
-            }
+            "history": "thkcello = min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j), depth(k,1))"
         },
         "ocean.tob.tavg-u-hxy-sea.mon.glb": {
             "original_name": "tbot"
@@ -455,27 +369,20 @@
             "original_name": "vvellvl"
         },
         "ocean.volcello.tavg-ol-hxy-sea.mon.glb": {
-            "original_name": "depth_bnds,parea"
+            "original_name": "depth_bnds, parea"
         },
         "ocean.volcello.tavg-ol-hxy-sea.yr.glb": {
-            "original_name": "depth_bnds,parea"
+            "original_name": "depth_bnds, parea"
         },
         "ocean.volcello.ti-ol-hxy-sea.fx.glb": {
-            "original_name": "depth_bnds,pdepth,parea",
+            "original_name": "depth_bnds, pdepth, parea",
             "sources": {
-                "vars": [
-                    "pdepth"
-                ],
-                "facs": [
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: (min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth(k,1)))*parea(i,j)"
+                "pdepth": 1.0
             },
             "postprocs": {
                 "volcello": true
-            }
+            },
+            "history": "volcello = (min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth(k,1)))*parea(i,j)"
         },
         "ocean.volo.tavg-u-hm-sea.mon.glb": {
             "original_name": "volgs"
@@ -484,29 +391,19 @@
             "original_name": "sflx"
         },
         "ocean.wfo.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "lip,sop,eva,rnf,rfi,fmltfz",
+            "original_name": "lip, sop, eva, rnf, rfi, fmltfz",
             "sources": {
-                "vars": [
-                    "lip",
-                    "sop",
-                    "eva",
-                    "rnf",
-                    "rfi",
-                    "fmltfz"
-                ],
-                "facs": [
-                    1.0,
-                    1.0,
-                    1.0,
-                    1.0,
-                    1.0,
-                    1.0
-                ]
+                "lip": 1.0,
+                "sop": 1.0,
+                "eva": 1.0,
+                "rnf": 1.0,
+                "rfi": 1.0,
+                "fmltfz": 1.0
             },
             "preprocs": {
-                "units": "kg m-2 s-1",
-                "history": "derivation: lip+sop+eva+rnf+rfi+fmltfz"
-            }
+                "units": "kg m-2 s-1"
+            },
+            "history": "wfo = lip+sop+eva+rnf+rfi+fmltfz"
         },
         "ocean.wmo.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "wflxlvl"
@@ -514,19 +411,14 @@
         "ocean.wo.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "wflxlvl/(1035.*parea)",
             "sources": {
-                "vars": [
-                    "wflxlvl"
-                ],
-                "facs": [
-                    1.0
-                ]
+                "wflxlvl": 1.0
             },
             "postprocs": {
-              "wflx2wo": true
+                "wflx2wo": true
             }
         },
         "ocean.zfullo.tavg-ol-hxy-sea.yr.glb": {
-            "original_name": "dz,sealv"
+            "original_name": "dz, sealv"
         },
         "ocean.zos.tavg-u-hxy-sea.day.glb": {
             "original_name": "sealv"
@@ -538,21 +430,14 @@
             "original_name": "slvsq"
         },
         "ocean.zostoga.tavg-u-hm-sea.mon.glb": {
-            "original_name": "temp,dp,parea",
+            "original_name": "temp, dp, parea",
             "sources": {
-                "vars": [
-                  "temp"
-                ],
-                "facs": [
-                  1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: thermo-steric sea level change due to ocean temperature change with reference salinity as 35.0"
+                "temp": 1.0
             },
             "postprocs": {
                 "t2zostoga": true
-            }
+            },
+            "history": "zostoga = thermo-steric sea level change due to ocean temperature change with reference salinity as 35.0 following Griffies et al., 2016, GMD"
         },
         "ocnBgchem.calc.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "calclvl"
@@ -560,100 +445,61 @@
         "ocnBgchem.chl.tavg-ols-hxy-sea.day.glb": {
             "original_name": "srfphyc",
             "sources": {
-                "vars": [
-                    "srfphyc"
-                ],
-                "facs": [
-                    0.024399999999999998
-                ]
+                "srfphyc": 0.024399999999999998
             },
             "preprocs": {
-                "history":"derivation: srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)",
                 "comment": "conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
-            }
+            },
+            "history": "chl = srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)"
         },
         "ocnBgchem.chl.tavg-ols-hxy-sea.mon.glb": {
             "original_name": "srfphyc",
             "sources": {
-                "vars": [
-                    "srfphyc"
-                ],
-                "facs": [
-                    0.024399999999999998
-                ]
+                "srfphyc": 0.024399999999999998
             },
             "preprocs": {
-                "history":"derivation: srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)",
                 "comment": "conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
-            }
+            },
+            "history": "chl = srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)"
         },
         "ocnBgchem.dmso.tavg-ols-hxy-sea.mon.glb": {
             "original_name": "dms"
         },
         "ocnBgchem.dpco2.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "pco2,atmco2",
+            "original_name": "pco2, atmco2",
             "sources": {
-                "vars": [
-                    "pco2",
-                    "atmco2"
-                ],
-                "facs": [
-                    0.101325,
-                    -0.101325
-                ]
+                "pco2": 0.101325,
+                "atmco2": -0.101325
             },
-            "preprocs": {
-                "history": "derivation: (pco2-atmco2)*muatm2pa, where muatm2pa=0.101325"
-            }
+            "history": "dpco2 = (pco2-atmco2)*muatm2pa, where muatm2pa=0.101325"
         },
         "ocnBgchem.frn.tavg-u-hxy-sea.mon.glb": {
             "original_name": "carflx_bot/122*16+dnitint",
             "sources": {
-                "vars": [
-                    "carflx_bot",
-                    "dnitint"
-                ],
-                "facs": [
-                    0.13114754098360656,
-                    1.0
-                ]
+                "carflx_bot": 0.13114754098360656,
+                "dnitint": 1.0
             },
-            "preprocs": {
-                "history": "derivation: carflx_bot/122*16+dnitint, where 0.13114754098360656 is the conversion factor from [mol C/m2/s] to [mol N/m2/s] using Redfield ratio of 122:16"
-            }
+            "history": "frn = carflx_bot/122*16+dnitint, where 0.13114754098360656 is the conversion factor from [mol C/m2/s] to [mol N/m2/s] using Redfield ratio of 122:16"
         },
         "ocnBgchem.intpoc.tavg-u-hxy-sea.mon.30S-90S": {
             "original_name": "detoclvl",
             "sources": {
-                "vars": [
-                    "detoclvl"
-                ],
-                "facs": [
-                    1.464
-                ]
+                "detoclvl": 1.464
             },
             "preprocs": {
-                "history": "derivation: vertical integration of detoclvl*122*12/1000 (detoclvl*1.464)",
                 "comment": "Integrate from surface to seafloor, where 1.464 is the conversion factor from [mol C/m3] to [kg C/m2] using 122 mol C/mol P and 12 g C/mol C and 1000 g/kg"
             },
             "postprocs": {
                 "sumz": true
             },
-            "history": ""
+            "history": "intpoc = vertical integration of detoclvl*122*12/1000 (detoclvl*1.464)"
         },
         "ocnBgchem.spco2.tavg-u-hxy-sea.mon.glb": {
             "original_name": "pco2",
             "sources": {
-                "vars": [
-                    "pco2"
-                ],
-                "facs": [
-                    0.101325
-                ]
+                "pco2": 0.101325
             },
-            "preprocs": {
-                "history": "derivation: pco2*muatm2pa, where muatm2pa is 0.101325"
-            }
+            "history": "spco2 = pco2*muatm2pa, where muatm2pa is 0.101325"
         },
         "seaIce.siconc.tavg-u-hxy-u.mon.glb": {
             "original_name": "aice"
@@ -664,33 +510,19 @@
         "seaIce.siitdconc.tavg-u-hxy-si.mon.glb": {
             "orginal_name": "aicen*100",
             "sources": {
-                "vars": [
-                    "aicen"
-                ],
-                "facs": [
-                    100.0
-                ]
+                "aicen": 100.0
             },
-            "preprocs": {
-                "history": "derivation: aicen*100, where 100 is the conversion factor from [fraction] to [%]"
-            }
+            "history": "siitdconc = aicen*100, where 100 is the conversion factor from [fraction] to [%]"
         },
         "seaIce.simpconc.tavg-u-hxy-si.mon.glb": {
             "orginal_name": "apeff_ai/aice",
             "sources": {
-                "vars": [
-                    "apeff_ai"
-                ],
-                "facs": [
-                    1.0
-                ]
-            },
-            "preprocs": {
-                "history": "derivation: apeff_ai/aice"
+                "apeff_ai": 1.0
             },
             "postprocs": {
                 "divided by": "aice"
-            }
+            },
+            "history": "simpconc = apeff_ai/aice"
         },
         "seaIce.sithick.tavg-u-hxy-si.mon.glb": {
             "original_name": "hi"

@@ -217,6 +217,31 @@ contains
   end subroutine json_get_array_string
 
   ! -----------------------------------------------------------------
+  subroutine json_get_scalar_real(fnm, path, scalar, separator, lfound)
+
+    character(len=*), intent(in)    :: fnm, path
+    real(kind=8)                    :: scalar
+    logical, intent(out), optional  :: lfound
+    character(len=*), intent(in), optional :: separator
+
+    type(json_file) :: json
+
+    logical :: found
+
+    if (present(separator)) then
+      call json%initialize(path_separator=trim(separator))
+    else
+      call json%initialize()
+    end if
+    call json%load_file(filename=trim(fnm))
+    if (json%failed()) stop "Error: Could not load JSON file: "//fnm
+    call json%get(path, scalar, found)
+    call json%destroy()
+
+    if (present(lfound)) lfound = found
+
+  end subroutine json_get_scalar_real
+  ! -----------------------------------------------------------------
   subroutine json_get_array_real(fnm, path, array, separator, lfound)
 
     character(len=*), intent(in)  :: fnm, path
@@ -345,6 +370,19 @@ contains
   end subroutine json_get_original_name
 
   ! -----------------------------------------------------------------
+  subroutine json_get_history(tnm, vnm, str, lfound)
+
+    character(len=*), intent(in)  :: tnm, vnm
+    character(len=*), intent(out) :: str
+    logical, intent(out), optional :: lfound
+    !character(len=*), intent(in), optional :: separator
+
+    call json_get_val_str(trim(tnm), 'variable_entry:'//trim(vnm)// &
+                          ':history', str, separator=':', lfound=lfound)
+
+  end subroutine json_get_history
+
+  ! -----------------------------------------------------------------
   subroutine json_get_units(tnm, vnm, str, lfound)
 
     character(len=*), intent(in)  :: tnm, vnm
@@ -358,29 +396,28 @@ contains
   end subroutine json_get_units
 
   ! -----------------------------------------------------------------
-  subroutine json_get_vars(fnm, vnm, array, lfound)
+  subroutine json_get_sources(fnm, vnm, keys, lfound)
 
     character(len=*), intent(in)  :: fnm, vnm
-    character(len=slenmax), dimension(:), allocatable, intent(out) :: array
+    character(len=slenmax), dimension(:), allocatable, intent(out) :: keys
     logical, intent(out), optional :: lfound
 
-    call json_get_array_string(trim(fnm), 'variable_entry:'//trim(vnm)// &
-                               ':sources:vars', array, separator=':', lfound=lfound)
+    call json_get_keys(trim(fnm), 'variable_entry:'//trim(vnm)// &
+                               ':sources', keys, separator=':', lfound=lfound)
 
-  end subroutine json_get_vars
+  end subroutine json_get_sources
 
   ! -----------------------------------------------------------------
-  subroutine json_get_facs(fnm, vnm, array, lfound)
+  subroutine json_get_factor(fnm, vnm, source, factor, lfound)
 
-    character(len=*), intent(in)  :: fnm, vnm
-    !character(len=slenmax), dimension(:), allocatable, intent(out) :: array
-    real(kind=8), dimension(:), allocatable, intent(out) :: array
-    logical, intent(out), optional :: lfound
+    character(len=*), intent(in)    :: fnm, vnm, source
+    real(kind=8), intent(out)       :: factor
+    logical, intent(out), optional  :: lfound
 
-    call json_get_array_real(trim(fnm), 'variable_entry:'//trim(vnm)// &
-                             ':sources:facs', array, separator=':', lfound=lfound)
+    call json_get_scalar_real(trim(fnm), 'variable_entry:'//trim(vnm)// &
+                             ':sources:'//trim(source), factor, separator=':', lfound=lfound)
 
-  end subroutine json_get_facs
+  end subroutine json_get_factor
 
   ! -----------------------------------------------------------------
   subroutine json_get_preproc_keys(fnm, vnm, keys, lfound)

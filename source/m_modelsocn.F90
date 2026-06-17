@@ -62,9 +62,9 @@ module m_modelsocn
   ! Auxillary variables for special operations
   character(len=slenmax), save                          :: str1, str2, dims
 
-  character(len=slenmax), dimension(:), allocatable     :: vars, dimensions
-  integer, dimension(:), allocatable                    :: idx
-  real(r8), dimension(:), allocatable                   :: facs
+  character(len=slenmax), allocatable, save, dimension(:)     :: sources, dimensions
+  integer, allocatable, save, dimension(:)                    :: idx
+  real(r8), allocatable, save, dimension(:)                   :: factors
 
 contains
 
@@ -123,7 +123,7 @@ contains
     n = count(realms == 'ocean' .or. realms == 'ocnBgchem')
     allocate (idx(n))
     k = 1
-    do n = 1, n_variables
+    do n = 1, n_datasets
       if (realms(n) == 'ocean' .or. realms(n) == 'ocnBgchem') then
         idx(k) = n
         k = k + 1
@@ -132,7 +132,7 @@ contains
 
     main_loop: do n = 1, size(idx)
 
-      if (skip_variable(n, n_variables)) cycle
+      if (skip_dataset(n, n_datasets)) cycle
 
       realm = trim(realms(idx(n)))
 
@@ -157,27 +157,26 @@ contains
       call json_get_vertcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
 
       call json_get_original_name(trim(mapfile), trim(cvnm), original_name)
-      call json_get_vars(trim(mapfile), trim(cvnm), vars, lfound=found)
+      call json_get_sources(trim(mapfile), trim(cvnm), sources, lfound=found)
       if (found) then
-        call json_get_facs(trim(mapfile), trim(cvnm), facs, lfound=found)
-        if (.not. found .or. size(vars) /= size(facs)) then
-          write (*, *) "ERROR: facs not found or sizes of vars and facs are not equal"
-          cycle
-        end if
+        allocate(factors(size(sources)))
+        do k = 1, size(sources)
+          call json_get_factor(trim(mapfile), trim(cvnm), sources(k), factors(k), lfound=found)
+        end do
       else
-        if (.not. allocated(vars)) allocate(vars(1))
-        if (.not. allocated(facs)) allocate(facs(1))
-        vars(1) = trim(original_name)
+        if (.not. allocated(sources)) allocate(sources(1))
+        if (.not. allocated(factors)) allocate(factors(1))
+        sources(1) = trim(original_name)
         !call json_get_original_name(trim(mapfile), &
-        !trim(cvnm), vars(1), lfound=found)
+        !trim(cvnm), sources(1), lfound=found)
 !       if (.not. found) then
 !           write(*,*) "ERROR: "//trim(cvnm)//" not found in "//trim(mapfile)
 !           cycle
 !       else
-        facs(1) = 1.0
+        factors(1) = 1.0
 !       end if
       end if
-      ivnm = vars(1)
+      ivnm = sources(1)
 
       call json_get_array_string(trim(tabledir)//trim(table), 'variable_entry.'//trim(bvnm)// &
                                  '.dimensions', dimensions, lfound=found)
@@ -208,10 +207,10 @@ contains
           fnm = TRIM(griddata)//TRIM(ocngridfile)
         end if
 
-        do k = 1, size(vars)
-          if (.not. var_in_file(fnm, vars(k))) cycle main_loop
+        do k = 1, size(sources)
+          if (.not. var_in_file(fnm, sources(k))) cycle main_loop
         end do
-!       ivnm = vars(1)
+!       ivnm = sources(1)
 
         CALL open_ofile(ivnm, ovnm, fx=.TRUE.)
 
@@ -240,10 +239,10 @@ contains
         end if
 
         ! check if variable(s) in file
-        do k = 1, size(vars)
-          if (.not. var_in_file(fnm, vars(k))) cycle main_loop
+        do k = 1, size(sources)
+          if (.not. var_in_file(fnm, sources(k))) cycle main_loop
         end do
-!       ivnm = vars(1)
+!       ivnm = sources(1)
 
         !else
         !if (.not. var_in_file(fnm, ivnm)) cycle main_loop
@@ -294,8 +293,8 @@ contains
 
       end if
 
-      if (allocated(vars)) deallocate (vars)
-      if (allocated(facs)) deallocate (facs)
+      if (allocated(sources)) deallocate (sources)
+      if (allocated(factors)) deallocate (factors)
 
     end do main_loop
 
@@ -390,6 +389,10 @@ contains
     character(len=slenmax), dimension(:), allocatable  :: keys
     character(len=slenmax)        :: key, val
 
+    ! get variable history
+    call json_get_history(trim(mapfile), trim(cvnm), val, lfound=found)
+    if (found) vhistory = val
+
     lsumz = .false.
     call json_get_preproc_keys(trim(mapfile), &
                                trim(cvnm), keys, lfound=found)
@@ -410,8 +413,8 @@ contains
 
       select case (key)
 
-      case ('history')
-        vhistory = val
+!     case ('history')
+!       vhistory = val
 
         ! atm to Pa
       case ('atm2Pa')
@@ -2127,9 +2130,9 @@ contains
 
     fld = 0.
 
-    if (allocated(vars)) then
-      do k = 1, size(vars)
-        call add_fixed(vars(k), facs(k), ncid)
+    if (allocated(sources)) then
+      do k = 1, size(sources)
+        call add_fixed(sources(k), factors(k), ncid)
       end do
     else
       call add_fixed(ivnm, 1.0_r8, ncid)
@@ -2205,16 +2208,16 @@ contains
     if (index(special, 'Dfield2') > 0 .or. &
         index(special, 'dp.avg') > 0) then
       fld = 0.
-      call add_tslice(vars(2), facs(2), rec1, fid)
+      call add_tslice(sources(2), factors(2), rec1, fid)
       fld2 = fld
       fld = 0.
-      call add_tslice(vars(1), facs(1), rec1, fid)
+      call add_tslice(sources(1), factors(1), rec1, fid)
 !   else if (index(special, 'pbot2dp') > 0) then
 !     fld = 0.
     else
       fld = 0.
-      do k = 1, size(vars)
-        call add_tslice(vars(k), facs(k), rec1, fid)
+      do k = 1, size(sources)
+        call add_tslice(sources(k), factors(k), rec1, fid)
       end do
     end if
 

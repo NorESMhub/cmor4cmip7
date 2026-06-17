@@ -69,7 +69,7 @@ module m_namelists
 
   ! Variables
   character(len=slenmax), save  :: pomon
-  integer, save                 :: n_variables
+  integer, save                 :: n_datasets
   character(len=slenmax), dimension(rowmax), save :: compound_names, branded_names, &
                                                      realms, frequencies, regions
   character(len=slenmax) :: realm, frequency
@@ -243,7 +243,7 @@ contains
       'WARNING: compound_names not in namelist file.'
     close (funit)
 
-    n_variables = 0
+    n_datasets = 0
     do n = 1, rowmax
       nstr = len_trim(compound_names(n))
       if (nstr /= 0) then
@@ -260,7 +260,7 @@ contains
         pos = index(substr, '.')
         frequencies(n) = substr(1:pos - 1)
         regions(n) = substr(pos + 1:nstr)
-        n_variables = n_variables + 1
+        n_datasets = n_datasets + 1
       else
         exit
       end if
@@ -344,7 +344,7 @@ contains
 
     write (*, *)
     print *, 'Variable list:'
-    do n = 1, n_variables
+    do n = 1, n_datasets
       print *, trim(compound_names(n))
     end do
 

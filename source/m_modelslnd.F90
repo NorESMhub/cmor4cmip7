@@ -67,7 +67,7 @@ contains
     table = tfx
     linstant = .false.
     do n = 1, nfx
-      if (skip_variable(n, nfx, dfx)) cycle
+      if (skip_dataset(n, nfx, dfx)) cycle
 
       ! Map namelist variables
       ovnm = vfx(ovnmpos, n)
@@ -112,7 +112,7 @@ contains
     table = tEyr
     linstant = .false.
     do n = 1, nEyr
-      if (skip_variable(n, nEyr, dEyr)) cycle
+      if (skip_dataset(n, nEyr, dEyr)) cycle
 
       ! Map namelist variables
       ovnm = vEyr(ovnmpos, n)
@@ -186,7 +186,7 @@ contains
     table = tlmon
     linstant = .false.
     do n = 1, nlmon
-      if (skip_variable(n, nlmon, dlmon)) cycle
+      if (skip_dataset(n, nlmon, dlmon)) cycle
 
       ! Map namelist variables
       ovnm = vlmon(ovnmpos, n)
@@ -271,7 +271,7 @@ contains
     table = tEmon
     linstant = .false.
     do n = 1, nEmon
-      if (skip_variable(n, nEmon, dEmon)) cycle
+      if (skip_dataset(n, nEmon, dEmon)) cycle
 
       ! Map namelist variables
       ovnm = vEmon(ovnmpos, n)
@@ -356,7 +356,7 @@ contains
     table = tlimon
     linstant = .false.
     do n = 1, nlimon
-      if (skip_variable(n, nlimon, dlimon)) cycle
+      if (skip_dataset(n, nlimon, dlimon)) cycle
 
       ! Map namelist variables
       ovnm = vlimon(ovnmpos, n)
@@ -441,7 +441,7 @@ contains
     table = tday
     linstant = .false.
     do n = 1, nday
-      if (skip_variable(n, nday, dday)) cycle
+      if (skip_dataset(n, nday, dday)) cycle
 
       ! Map namelist variables
       ovnm = vday(ovnmpos, n)
@@ -508,7 +508,7 @@ contains
     table = tEday
     linstant = .false.
     do n = 1, nEday
-      if (skip_variable(n, nEday, dEday)) cycle
+      if (skip_dataset(n, nEday, dEday)) cycle
 
       ! Map namelist variables
       ovnm = vEday(ovnmpos, n)
@@ -575,7 +575,7 @@ contains
     table = t3hr
     linstant = .false.
     do n = 1, n3hr
-      if (skip_variable(n, n3hr, d3hr)) cycle
+      if (skip_dataset(n, n3hr, d3hr)) cycle
 
       ! Map namelist variables
       ovnm = v3hr(ovnmpos, n)
@@ -642,7 +642,7 @@ contains
     table = t3hri
     linstant = .true.
     do n = 1, n3hri
-      if (skip_variable(n, n3hri, d3hri)) cycle
+      if (skip_dataset(n, n3hri, d3hri)) cycle
 
       ! Map namelist variables
       ovnm = v3hri(ovnmpos, n)
@@ -710,7 +710,7 @@ contains
     table = tE3hr
     linstant = .false.
     do n = 1, nE3hr
-      if (skip_variable(n, nE3hr, dE3hr)) cycle
+      if (skip_dataset(n, nE3hr, dE3hr)) cycle
 
       ! Map namelist variables
       ovnm = vE3hr(ovnmpos, n)

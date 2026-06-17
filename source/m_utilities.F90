@@ -1164,7 +1164,7 @@ contains
 
   ! -----------------------------------------------------------------
 
-  logical function skip_variable(n, nmax)
+  logical function skip_dataset(n, nmax)
 
     implicit none
 #ifdef MPI
@@ -1183,11 +1183,11 @@ contains
 #endif
 
     if (mod(n - 1, mpisize) == mpirank) then
-      skip_variable = .false.
+      skip_dataset = .false.
     else
-      skip_variable = .true.
+      skip_dataset = .true.
     end if
 
-  end function skip_variable
+  end function skip_dataset
 
 end module m_utilities

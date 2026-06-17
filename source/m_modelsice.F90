@@ -88,7 +88,7 @@ contains
     fnm = pfx
     table = tfx
     do n = 1, nfx
-      if (skip_variable(n, nfx, dfx)) cycle
+      if (skip_dataset(n, nfx, dfx)) cycle
 
       ! Map namelist variables
       ovnm = vfx(ovnmpos, n)
@@ -131,7 +131,7 @@ contains
     fnm = pomon
     table = tomon
     do n = 1, nomon
-      if (skip_variable(n, nomon, domon)) cycle
+      if (skip_dataset(n, nomon, domon)) cycle
 
       ! Map namelist variables
       ovnm = vomon(ovnmpos, n)
@@ -220,7 +220,7 @@ contains
     fnm = poimon
     table = toimon
     do n = 1, noimon
-      if (skip_variable(n, noimon, doimon)) cycle
+      if (skip_dataset(n, noimon, doimon)) cycle
 
       ! Map namelist variables
       ovnm = voimon(ovnmpos, n)
@@ -306,7 +306,7 @@ contains
     fnm = pday
     table = tday
     do n = 1, nday
-      if (skip_variable(n, nday, dday)) cycle
+      if (skip_dataset(n, nday, dday)) cycle
 
       ! Map namelist variables
       ovnm = vday(ovnmpos, n)
@@ -368,7 +368,7 @@ contains
     fnm = pSIday
     table = tSIday
     do n = 1, nSIday
-      if (skip_variable(n, nSIday, dSIday)) cycle
+      if (skip_dataset(n, nSIday, dSIday)) cycle
 
       ! Map namelist variables
       ovnm = vSIday(ovnmpos, n)

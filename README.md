@@ -15,7 +15,7 @@ Example steps to run cmorization for a `piControl` simulation by NorESM3-LM
 ## Clone and build
 ```bash
 cd ~/
-tag=v20260617-alpha
+tag=v20260618-alpha
 git clone git@github.com:NorESMhub/cmor4cmip7.git
 git checkout -b $tag tags/$tag
 git switch -c $tag

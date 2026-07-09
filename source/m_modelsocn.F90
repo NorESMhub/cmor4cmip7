@@ -140,6 +140,7 @@ contains
       bvnm = trim(branded_names(idx(n)))
       cvnm = trim(compound_names(idx(n)))
       frequency = trim(frequencies(idx(n)))
+      region_label = trim(regions(idx(n)))
       ovnm = bvnm
       table = 'CMIP7_'//trim(realm)//'.json'
 
@@ -158,6 +159,8 @@ contains
 
       call json_get_vertcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
 
+      if (allocated(sources)) deallocate(sources)
+      if (allocated(factors)) deallocate(factors)
       call json_get_original_name(trim(mapfile), trim(cvnm), original_name)
       call json_get_sources(trim(mapfile), trim(cvnm), sources, lfound=found)
       if (found) then
@@ -166,8 +169,8 @@ contains
           call json_get_factor(trim(mapfile), trim(cvnm), sources(k), factors(k), lfound=found)
         end do
       else
-        if (.not. allocated(sources)) allocate(sources(1))
-        if (.not. allocated(factors)) allocate(factors(1))
+        allocate(sources(1))
+        allocate(factors(1))
         sources(1) = trim(original_name)
         !call json_get_original_name(trim(mapfile), &
         !trim(cvnm), sources(1), lfound=found)
@@ -987,6 +990,16 @@ contains
           end do
         end do
 
+        ! Extract surface value from field on depth levels
+      ! if output field is 2D while the input is 3D,
+      ! the output will use the first level (k) of the input field by default
+!     case ('lvl2srf') 
+!       do j = 1, jj
+!         do i = 1, ii
+!           fld(i, j, 1) = fld(i, j, 1)
+!         end do
+!       end do
+
         ! Average with respect to pressure
       case ('dp.avg')
         do j = 1, jj
@@ -1107,7 +1120,7 @@ contains
         end do
 
         ! uatm to Pa
-      case ('uatm2Pa')
+      case ('muatm2Pa')
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
@@ -1637,7 +1650,7 @@ contains
     kk = kdm
     write (*, *) 'ivm:', trim(ivnm)
     write (*, *) 'ovnm:', trim(ovnm)
-    write (*, *) 'dimlens(3):', dimlens(3)
+    write (*, *) 'dimlens:', dimlens
     !write(*, *) 'kdm:', kdm
     if (dims(1:25) == 'longitude,latitude,olevel') then
       vtype = 'level'
@@ -1647,7 +1660,10 @@ contains
 !     else
 !       kk  = kko
 !     end if
-    else if (dims(1:23) == 'longitude,latitude,time' .or. dims == 'longitude,latitude') then
+    else if (dims == 'longitude,latitude,time' .or. dims == 'longitude,latitude' .or. &
+             dims(1:30) == 'longitude,latitude,time,olayer' .or. &
+             dims(1:29) == 'longitude,latitude,time,depth' .or. &
+             dims       == 'longitude,latitude,time,deltasigt') then
       vtype = '2d'
       kk = 1
       if (dimlens(3) .eq. kdm .and. kdm>0) THEN
@@ -1655,6 +1671,12 @@ contains
       else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
         kk = ddm
       end if
+    else if (dims == 'longitude,latitude,time,op20bar') then
+      vtype = 'op20bar'
+      kk = 1
+    else if (dims == 'longitude,latitude,time,osurf') then
+      vtype = 'ols'
+      kk = 1
     else if (dims == 'latitude,rho,basin,time') then
       vtype = 'merk'
       ii = ldm
@@ -1835,6 +1857,7 @@ contains
     end if
 
     ! Define vertical axis
+    !write(*,*) 'vtype:',vtype
     if (trim(vtype) == 'layer' .and. .not. &
         (lsumz .or. index(special, 'glbave') > 0 &
          .or. index(special, '2zos') > 0 &
@@ -1889,6 +1912,24 @@ contains
               length=1, &
               coord_vals=(/1000./), &
               cell_bounds=(/0., 2000./))
+    else if (vtype == 'op20bar') then
+      write(*,*) 'tablepath:',trim(tablepath)
+      kaxid = cmor_axis( &
+              table=trim(tablepath), &
+              table_entry='op20bar', &
+              units='bar', &
+              length=1, &
+              coord_vals=(/20./), &
+              cell_bounds=(/20., 20./))
+    else if (vtype == 'ols') then
+      write(*,*) 'tablepath:',trim(tablepath)
+      kaxid = cmor_axis( &
+              table=trim(tablepath), &
+              table_entry='osurf', &
+              units='', &
+              length=1, &
+              coord_vals=(/0./), &
+              cell_bounds=(/0., 0./))
     else if (trim(vtype) == 'level' .or. vtype(1:4) == 'merd') then
       kaxid = cmor_axis( &
               table=trim(tablepath), &
@@ -2530,6 +2571,13 @@ contains
 !         print *, lbound(fld), ubound(fld)
 
         if (vtype == '2d' ) then
+          error_flag = cmor_write( &
+                       var_id=varid, &
+                       data=fld(:, :, 1), &
+                       ntimes_passed=1, &
+                       time_vals=tval, &
+                       time_bnds=tbnds)
+        else if (vtype == 'op20bar' ) then
           error_flag = cmor_write( &
                        var_id=varid, &
                        data=fld(:, :, 1), &

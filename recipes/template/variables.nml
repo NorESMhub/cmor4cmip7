@@ -29,7 +29,7 @@ compound_names    =
     'ocean.friver.tavg-u-hxy-sea.mon.glb'           ! done
     'ocean.hfacrossline.tavg-u-ht-sea.mon.glb'      ! done
     'ocean.hfbasin.tavg-u-hyb-sea.mon.glb'          ! done
-    'ocean.hfbasinpadv.tavg-u-hyb-sea.mon.glb'      ! done, check derivation
+    'ocean.hfbasinpadv.tavg-u-hyb-sea.mon.glb'      ! done
     'ocean.hfbasinpmadv.tavg-u-hyb-sea.mon.glb'     ! done
     'ocean.hfbasinpmdiff.tavg-u-hyb-sea.mon.glb'    ! done
     'ocean.hfbasinpsmadv.tavg-u-hyb-sea.mon.glb'    ! done
@@ -104,13 +104,82 @@ compound_names    =
     'ocean.zossq.tavg-u-hxy-sea.mon.glb'            ! done
     'ocean.zostoga.tavg-u-hm-sea.mon.glb'           ! done
 !
-!   'ocnBgchem.calc.tavg-ol-hxy-sea.mon.glb'
-!   'ocnBgchem.chl.tavg-ols-hxy-sea.day.glb'
-!   'ocnBgchem.chl.tavg-ols-hxy-sea.mon.glb'
-!   'ocnBgchem.dmso.tavg-ols-hxy-sea.mon.glb'
-!   'ocnBgchem.frn.tavg-u-hxy-sea.mon.glb'
-!   'ocnBgchem.intpoc.tavg-u-hxy-sea.mon.30S-90S'
-!   'ocnBgchem.spco2.tavg-u-hxy-sea.mon.glb'
+    'ocnBgchem.calc.tavg-ols-hxy-sea.mon.glb'           ! done
+    'ocnBgchem.calc.tavg-ol-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.chl.tavg-ols-hxy-sea.day.glb'            ! done
+    'ocnBgchem.chl.tavg-ols-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.chl.tavg-ol-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.chl.tavg-op20bar-hxy-sea.day.glb'        ! done, bounds?, 18-22?
+    'ocnBgchem.co3.tavg-ols-hxy-sea.day.glb'            ! done
+    'ocnBgchem.co3.tavg-op20bar-hxy-sea.day.glb'        ! done
+    'ocnBgchem.co3satarag.tavg-ols-hxy-sea.day.glb'     ! done
+    'ocnBgchem.co3satarag.tavg-op20bar-hxy-sea.day.glb' ! done
+    'ocnBgchem.detoc.tavg-ol-hxy-sea.mon.glb'           ! done
+    'ocnBgchem.dfe.tavg-ols-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.dfe.tavg-ol-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.dissi13c.tavg-ols-hxy-sea.mon.glb'       ! n/a
+    'ocnBgchem.dissi13c.tavg-ol-hxy-sea.mon.glb'        ! n/a
+    'ocnBgchem.dissic.tavg-ols-hxy-sea.mon.30S-90S'     ! done
+    'ocnBgchem.dissic.tavg-ol-hxy-sea.mon.glb'          ! done
+    'ocnBgchem.dissoc.tavg-ol-hxy-sea.mon.glb'          ! done
+    'ocnBgchem.dmso.tavg-ols-hxy-sea.mon.glb'           ! done
+    'ocnBgchem.dpco2.tavg-u-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.epn.tavg-d100m-hxy-sea.mon.glb'          ! done
+    'ocnBgchem.epp.tavg-d100m-hxy-sea.mon.glb'          ! done
+    'ocnBgchem.epsi.tavg-d100m-hxy-sea.mon.glb'         ! done
+    'ocnBgchem.expc.tavg-d1000m-hxy-sea.mon.glb'        ! done
+    'ocnBgchem.expc.tavg-d100m-hxy-sea.mon.glb'         ! done
+    'ocnBgchem.expcalc.tavg-d1000m-hxy-sea.mon.glb'     ! done
+    'ocnBgchem.expcalc.tavg-d100m-hxy-sea.mon.glb'      ! done
+    'ocnBgchem.expcalcob.tavg-u-hxy-sea.mon.glb'        ! done
+    'ocnBgchem.expcob.tavg-u-hxy-sea.mon.glb'           ! done
+    'ocnBgchem.expfeob.tavg-u-hxy-sea.mon.glb'          ! done
+    'ocnBgchem.expnob.tavg-u-hxy-sea.mon.glb'           ! done
+    'ocnBgchem.exppob.tavg-u-hxy-sea.mon.glb'           ! done
+    'ocnBgchem.expsiob.tavg-u-hxy-sea.mon.glb'          ! done
+    'ocnBgchem.fg13co2.tavg-u-hxy-sea.mon.glb'          ! n/a
+    'ocnBgchem.fgco2.tavg-u-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.fgdms.tavg-u-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.frfe.tavg-u-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.fric.tavg-u-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.frn.tavg-u-hxy-sea.mon.glb'              ! n/a dnitint
+    'ocnBgchem.froc.tavg-u-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.fsfe.tavg-u-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.fsn.tavg-u-hxy-sea.mon.glb'              ! done
+    'ocnBgchem.intdic.tavg-u-hxy-sea.mon.30S-90S'       ! done
+    'ocnBgchem.intdoc.tavg-u-hxy-sea.mon.30S-90S'       ! done
+    'ocnBgchem.intpn2.tavg-u-hxy-sea.mon.30S-90S'       ! done
+    'ocnBgchem.intpoc.tavg-u-hxy-sea.day.glb'           ! done
+    'ocnBgchem.intpoc.tavg-u-hxy-sea.mon.30S-90S'       ! done
+    'ocnBgchem.intpp.tavg-u-hxy-sea.day.glb'            ! done
+    'ocnBgchem.intpp.tavg-u-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.nh4.tavg-ol-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.no3.tavg-ols-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.no3.tavg-ol-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.o2.tavg-ols-hxy-sea.day.glb'             ! done
+    'ocnBgchem.o2.tavg-ols-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.o2.tavg-ol-hxy-sea.mon.glb'              ! done
+    'ocnBgchem.o2.tavg-op20bar-hxy-sea.day.glb'         ! done
+    'ocnBgchem.o2min.tavg-u-hxy-sea.day.glb'            ! done
+    'ocnBgchem.o2sat.tavg-ol-hxy-sea.mon.glb'           ! done
+    'ocnBgchem.ph.tavg-ols-hxy-sea.day.glb'             ! done
+    'ocnBgchem.ph.tavg-ols-hxy-sea.mon.30S-90S'         ! done
+    'ocnBgchem.ph.tavg-ol-hxy-sea.mon.glb'              ! done
+    'ocnBgchem.ph.tavg-op20bar-hxy-sea.day.glb'         ! done
+    'ocnBgchem.phyc.tavg-ols-hxy-sea.day.glb'           ! done
+    'ocnBgchem.phyc.tavg-ols-hxy-sea.mon.glb'           ! done
+    'ocnBgchem.phyc.tavg-ol-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.phyc.tavg-op20bar-hxy-sea.day.glb'       ! done
+    'ocnBgchem.po4.tavg-ol-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.pp.tavg-ols-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.pp.tavg-ol-hxy-sea.mon.glb'              ! done
+    'ocnBgchem.si.tavg-ols-hxy-sea.mon.glb'             ! done
+    'ocnBgchem.si.tavg-ol-hxy-sea.mon.glb'              ! done
+    'ocnBgchem.spco2.tavg-u-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.talk.tavg-ol-hxy-sea.mon.glb'            ! done
+    'ocnBgchem.zooc.tavg-ols-hxy-sea.mon.30S-90S'       ! done
+    'ocnBgchem.zooc.tavg-ol-hxy-sea.mon.glb'            ! done
+
 !
 !   'seaIce.siconc.tavg-u-hxy-u.mon.glb'
 !   'seaIce.sidmasstranx.tavg-u-hxy-u.mon.glb'

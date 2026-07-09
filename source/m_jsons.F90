@@ -83,7 +83,7 @@ contains
     call json%add(p, 'archive_id', 'WCRP')
 
     call json%add(p, 'frequency', trim(frequency))
-    call json%add(p, 'region', 'glb')
+    call json%add(p, 'region', trim(region_label))
     call json%add(p, 'branded_variable', trim(varname))
     call json%add(p, 'drs_specs', 'MIP-DRS7')
 

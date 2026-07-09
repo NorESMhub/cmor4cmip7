@@ -72,7 +72,7 @@ module m_namelists
   integer, save                 :: n_datasets
   character(len=slenmax), dimension(rowmax), save :: compound_names, branded_names, &
                                                      realms, frequencies, regions
-  character(len=slenmax) :: realm, frequency
+  character(len=slenmax) :: realm, frequency, region_label
 
   namelist /variables/ compound_names
 

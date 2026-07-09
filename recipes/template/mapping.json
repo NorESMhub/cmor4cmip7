@@ -439,6 +439,14 @@
             },
             "history": "zostoga = thermo-steric sea level change due to ocean temperature change with reference salinity as 35.0 following Griffies et al., 2016, GMD"
         },
+        "ocnBgchem.calc.tavg-ols-hxy-sea.mon.glb": {
+            "original_name": "calclvl",
+            "postprocs": {
+                "lvl2srf": true
+            },
+            "history": "calc = calclvl[:,:,1]",
+            "comment": "Surface value of calclvl"
+        },
         "ocnBgchem.calc.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "calclvl"
         },
@@ -447,59 +455,387 @@
             "sources": {
                 "srfphyc": 0.024399999999999998
             },
-            "preprocs": {
-                "comment": "conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
-            },
-            "history": "chl = srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)"
+            "history": "chl = srfphyc*122*12/60/1000",
+            "comment": "Conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
         },
         "ocnBgchem.chl.tavg-ols-hxy-sea.mon.glb": {
             "original_name": "srfphyc",
             "sources": {
                 "srfphyc": 0.024399999999999998
             },
-            "preprocs": {
-                "comment": "conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
+            "history": "chl = srfphyc*122*12/60/1000",
+            "comment": "Conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
+        },
+        "ocnBgchem.chl.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "phyclvl",
+            "sources": {
+                "phyclvl": 0.024399999999999998
             },
-            "history": "chl = srfphyc*122*12/60/1000 (srfphyc*0.024399999999999998)"
+            "history": "chl = phyclvl*122*12/60/1000",
+            "comment": "Conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
+        },
+        "ocnBgchem.chl.tavg-op20bar-hxy-sea.day.glb": {
+            "original_name": "phyc_200",
+            "sources": {
+                "phyc_200": 0.024399999999999998
+            },
+            "history": "chl = phy_200*122*12/60/1000",
+            "comment": "Conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
+        },
+        "ocnBgchem.co3.tavg-ols-hxy-sea.day.glb": {
+            "original_name": "srfco3"
+        },
+        "ocnBgchem.co3.tavg-op20bar-hxy-sea.day.glb": {
+            "original_name": "co3_200"
+        },
+        "ocnBgchem.co3satarag.tavg-ols-hxy-sea.day.glb": {
+            "original_name": "srfco3satarag"
+        },
+        "ocnBgchem.co3satarag.tavg-op20bar-hxy-sea.day.glb": {
+            "original_name": "co3satarag_200"
+        },
+        "ocnBgchem.detoc.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "detoclvl",
+            "sources": {
+                "detoclvl": 122.0
+            },
+            "history": "detoc = detoclvl*122"
+        },
+        "ocnBgchem.dfe.tavg-ols-hxy-sea.mon.glb": {
+            "original_name": "srfdfe"
+        },
+        "ocnBgchem.dfe.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "dfelvl"
+        },
+        "ocnBgchem.dissi13c.tavg-ols-hxy-sea.mon.glb": {
+            "original_name": "dissic13lvl",
+            "postprocs": {
+                "lvl2srf": true
+            },
+            "history": "dissi13c = dissic13lvl[:,:,1]",
+            "comment": "Surface value of dissic13lvl"
+        },
+        "ocnBgchem.dissi13c.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "dissic13lvl"
+        },
+        "ocnBgchem.dissic.tavg-ols-hxy-sea.mon.30S-90S": {
+            "original_name": "srfdissic"
+        },
+        "ocnBgchem.dissic.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "dissiclvl"
+        },
+        "ocnBgchem.dissoc.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "dissoclvl",
+            "sources": {
+                "dissoclvl": 122.0
+            },
+            "history": "dissco = dissoclvl*122"
         },
         "ocnBgchem.dmso.tavg-ols-hxy-sea.mon.glb": {
             "original_name": "dms"
         },
         "ocnBgchem.dpco2.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "pco2, atmco2",
+            "original_name": "pco2, pco2_gex",
             "sources": {
-                "pco2": 0.101325,
-                "atmco2": -0.101325
+                "pco2": 1.0,
+                "pco2_gex": 1.0
             },
-            "history": "dpco2 = (pco2-atmco2)*muatm2pa, where muatm2pa=0.101325"
-        },
-        "ocnBgchem.frn.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "carflx_bot/122*16+dnitint",
-            "sources": {
-                "carflx_bot": 0.13114754098360656,
-                "dnitint": 1.0
+            "postprocs": {
+                "muatm2pa": true
             },
-            "history": "frn = carflx_bot/122*16+dnitint, where 0.13114754098360656 is the conversion factor from [mol C/m2/s] to [mol N/m2/s] using Redfield ratio of 122:16"
+            "history": "dpco2 = (pco2-pco2_gex)*muatm2pa",
+            "comment": "Convert from micro-atm to Pascal"
         },
-        "ocnBgchem.intpoc.tavg-u-hxy-sea.mon.30S-90S": {
-            "original_name": "detoclvl",
+        "ocnBgchem.epn.tavg-d100m-hxy-sea.mon.glb": {
+            "original_name": "carflx0100",
             "sources": {
-                "detoclvl": 1.464
+                "carflx0100": 0.13114754098360656
+            },
+            "history": "epn = carflx0100/122*16",
+            "comment": ""
+        },
+        "ocnBgchem.epp.tavg-d100m-hxy-sea.mon.glb": {
+            "original_name": "carflx0100",
+            "sources": {
+                "carflx0100": 0.00819672131147541
+            },
+            "history": "epp = carflx0100/122"
+        },
+        "ocnBgchem.epsi.tavg-d100m-hxy-sea.mon.glb": {
+            "original_name": "bsiflx0100"
+        },
+        "ocnBgchem.expc.tavg-d1000m-hxy-sea.mon.glb": {
+            "original_name": "carflx1000"
+        },
+        "ocnBgchem.expc.tavg-d100m-hxy-sea.mon.glb": {
+            "original_name": "carflx0100"
+        },
+        "ocnBgchem.expcalc.tavg-d1000m-hxy-sea.mon.glb": {
+            "original_name": "calflx1000"
+        },
+        "ocnBgchem.expcalc.tavg-d100m-hxy-sea.mon.glb": {
+            "original_name": "calflx0100"
+        },
+        "ocnBgchem.expcalcob.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "calflx_bot",
+            "preprocs": {
+              "positive": "down"
+            }
+        },
+        "ocnBgchem.expcob.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "carflx_bot",
+            "preprocs": {
+              "positive": "down"
+            }
+        },
+        "ocnBgchem.expfeob.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "carflx_bot",
+            "sources": {
+                "carflx_bot": 0.000005
             },
             "preprocs": {
-                "comment": "Integrate from surface to seafloor, where 1.464 is the conversion factor from [mol C/m3] to [kg C/m2] using 122 mol C/mol P and 12 g C/mol C and 1000 g/kg"
+              "positive": "down"
+            },
+            "history": "expfeob = carflx_bot*5.*1.e-6"
+        },
+        "ocnBgchem.expnob.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "carflx_bot",
+            "sources": {
+                "carflx_bot": 0.13114754098360656
+            },
+            "preprocs": {
+              "positive": "down"
+            },
+            "history": "expnob = carflx_bot/122*16"
+        },
+        "ocnBgchem.exppob.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "carflx_bot",
+            "sources": {
+                "carflx_bot": 0.00819672131147541
+            },
+            "preprocs": {
+              "positive": "down"
+            },
+            "history": "exppob = carflx_bot/122"
+        },
+        "ocnBgchem.expsiob.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "bsiflx_bot",
+            "preprocs": {
+              "positive": "down"
+            }
+        },
+        "ocnBgchem.fg13co2.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "co213fxd, co213fxu",
+            "sources": {
+                "co213fxd": 1.0,
+                "co213fxu": -1.0
+            },
+            "history": "fg13co2 = co213fxd-co213fxu"
+        },
+        "ocnBgchem.fgco2.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "co2fxd, co2fxu",
+            "sources": {
+                "co2fxd": 1.0,
+                "co2fxu": -1.0
+            },
+            "preprocs": {
+              "positive": "down"
+            },
+            "history": "fgco2 = co2fxd-co2fxu"
+        },
+        "ocnBgchem.fgdms.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "dmsflux",
+            "preprocs": {
+              "positive": "up"
+            }
+        },
+        "ocnBgchem.frfe.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "carflx_bot",
+            "sources": {
+                "carflx_bot": 0.000005
+            },
+            "history": "frfe = carflx_bot*5.*1.e-6"
+        },
+        "ocnBgchem.fric.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "calflx_bot, sedfdic",
+            "sources": {
+                "calflx_bot": 1.0,
+                "sedfdic": 1.0
+            },
+            "history": "fric = calflx_bot+sedfdic"
+        },
+        "ocnBgchem.frn.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "carflx_bot, dnitint, sediffn2, sediffno3, sediffnh4, sediffn2o, sediffno2",
+            "sources": {
+                "carflx_bot": 0.13114754098360656,
+                "dnitint": 1.0,
+                "sediffn2": 2.0,
+                "sediffno3": 1.0,
+                "sediffnh4": 1.0,
+                "sediffn2o": 2.0,
+                "sediffno2": 1.0
+            },
+            "history": "frn = carflx_bot/122*16+dnitint+2*sediffn2+sediffno3+sediffnh4+2*sediffn2o+sediffno2"
+        },
+        "ocnBgchem.froc.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "carflx_bot"
+        },
+        "ocnBgchem.intdic.tavg-u-hxy-sea.mon.30S-90S": {
+            "original_name": "dissiclvl)",
+            "sources": {
+                "dissiclvl": 0.012
+            },
+            "postprocs": {
+                "lsumz": true
+            },
+            "history": "intdic = int(dissiclvl*12/1000)_z",
+            "comment": "Vertical sum of dissiclvl*12/1000"
+        },
+        "ocnBgchem.intdoc.tavg-u-hxy-sea.mon.30S-90S": {
+            "original_name": "dissoclvl",
+            "sources": {
+                "dissoclvl": 1.464
             },
             "postprocs": {
                 "sumz": true
             },
-            "history": "intpoc = vertical integration of detoclvl*122*12/1000 (detoclvl*1.464)"
+            "history": "intdoc [kg C m-2] = sum_z(dissoclvl[mol P m-2]*122*12/1000)",
+            "comment": "conversion of [mol P m-2] to [kg C m-2], where 122 converts from P->C using the model redfield-ratio, 12 converts from mol-g, and division by 1000 converts from g->kg"
+        },
+        "ocnBgchem.intpn2.tavg-u-hxy-sea.mon.30S-90S": {
+            "original_name": "nfixint"
+        },
+        "ocnBgchem.intpoc.tavg-u-hxy-sea.day.glb": {
+            "original_name": "intpoc",
+            "sources": {
+                "intpoc": 1.464
+            },
+            "history": "intpoc[kg C m-2] = intpoc[mol P m-2]*122*12/1000",
+            "comment": "conversion of [mol P m-2] to [kg C m-2], where 122 converts from P->C using the model redfield-ratio, 12 converts from mol-g, and division by 1000 converts from g->kg"
+        },
+        "ocnBgchem.intpoc.tavg-u-hxy-sea.mon.30S-90S": {
+            "original_name": "intpoc",
+            "sources": {
+                "intpoc": 1.464
+            },
+            "history": "intpoc[kg C m-2] = intpoc[mol P m-2]*122*12/1000",
+            "comment": "conversion of [mol P m-2] to [kg C m-2], where 122 converts from P->C using the model redfield-ratio, 12 converts from mol-g, and division by 1000 converts from g->kg"
+        },
+        "ocnBgchem.intpp.tavg-u-hxy-sea.day.glb": {
+            "original_name": "ppint"
+        },
+        "ocnBgchem.intpp.tavg-u-hxy-sea.mon.glb": {
+            "original_name": "ppint"
+        },
+        "ocnBgchem.nh4.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "nh4lvl"
+        },
+        "ocnBgchem.no3.tavg-ols-hxy-sea.mon.glb": {
+            "original_name": "srfno3"
+        },
+        "ocnBgchem.no3.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "no3lvl"
+        },
+        "ocnBgchem.o2.tavg-ols-hxy-sea.day.glb": {
+            "original_name": "srfo2"
+        },
+        "ocnBgchem.o2.tavg-ols-hxy-sea.mon.glb": {
+            "original_name": "srfo2"
+        },
+        "ocnBgchem.o2.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "o2lvl"
+        },
+        "ocnBgchem.o2.tavg-op20bar-hxy-sea.day.glb": {
+            "original_name": "o2_200"
+        },
+        "ocnBgchem.o2min.tavg-u-hxy-sea.day.glb": {
+            "original_name": "o2min"
+        },
+        "ocnBgchem.o2sat.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "satoxylvl"
+        },
+        "ocnBgchem.ph.tavg-ols-hxy-sea.day.glb": {
+            "original_name": "srfph"
+        },
+        "ocnBgchem.ph.tavg-ols-hxy-sea.mon.30S-90S": {
+            "original_name": "srfph"
+        },
+        "ocnBgchem.ph.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "phlvl"
+        },
+        "ocnBgchem.ph.tavg-op20bar-hxy-sea.day.glb": {
+            "original_name": "ph_200"
+        },
+        "ocnBgchem.phyc.tavg-ols-hxy-sea.day.glb": {
+            "original_name": "srfphyc"
+        },
+        "ocnBgchem.phyc.tavg-ols-hxy-sea.mon.glb": {
+            "original_name": "srfphyc",
+            "sources": {
+                "srfphyc": 122.0
+            },
+            "history": "phyc = srfphyc*122"
+        },
+        "ocnBgchem.phyc.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "phyclvl*122",
+            "sources": {
+                "phyclvl": 122.0
+            },
+            "history": "phyc = phyclvl*122"
+        },
+        "ocnBgchem.phyc.tavg-op20bar-hxy-sea.day.glb": {
+            "original_name": "phyc_200"
+        },
+        "ocnBgchem.po4.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "po4lvl"
+        },
+        "ocnBgchem.pp.tavg-ols-hxy-sea.mon.glb": {
+            "original_name": "pplvl",
+            "sources": {
+                "pplvl": 1.0
+            },
+            "postprocs": {
+                "lvl2srf": true
+            },
+            "history": "pp = pplvl[:,:,1]",
+            "comment": "Surface value of pplvl"
+        },
+        "ocnBgchem.pp.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "pplvl"
+        },
+        "ocnBgchem.si.tavg-ols-hxy-sea.mon.glb": {
+            "original_name": "srfsi"
+        },
+        "ocnBgchem.si.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "silvl"
         },
         "ocnBgchem.spco2.tavg-u-hxy-sea.mon.glb": {
             "original_name": "pco2",
-            "sources": {
-                "pco2": 0.101325
+            "postprocs": {
+                "muatm2pa": true
             },
-            "history": "spco2 = pco2*muatm2pa, where muatm2pa is 0.101325"
+            "history": "spco2 = pco2*muatm2pa",
+            "comment": "Convert from micro-atm to Pascal"
+        },
+        "ocnBgchem.talk.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "talklvl"
+        },
+        "ocnBgchem.zooc.tavg-ols-hxy-sea.mon.30S-90S": {
+            "original_name": "zooclvl",
+            "sources": {
+                "zooclvl": 122.0
+            },
+            "postprocs": {
+                "lvl2srf": true
+            },
+            "history": "zooc = zooclvl[:,:,1]*122"
+        },
+        "ocnBgchem.zooc.tavg-ol-hxy-sea.mon.glb": {
+            "original_name": "zooclvl",
+            "sources": {
+                "zooclvl": 122.0
+            },
+            "history": "zooc = zooclvl*122"
         },
         "seaIce.siconc.tavg-u-hxy-u.mon.glb": {
             "original_name": "aice"

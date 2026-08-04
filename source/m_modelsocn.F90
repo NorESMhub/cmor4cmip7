@@ -1677,6 +1677,11 @@ contains
     else if (dims == 'longitude,latitude,time,osurf') then
       vtype = 'ols'
       kk = 1
+      if (dimlens(3) .eq. kdm .and. kdm>0) THEN
+        kk = kdm
+      else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
+        kk = ddm
+      end if
     else if (dims == 'latitude,rho,basin,time') then
       vtype = 'merk'
       ii = ldm
@@ -2025,7 +2030,7 @@ contains
       if ((trim(vtype) == '2d' .and. .not. (trim(zcoord) == 'ol' .or. &
                                             index(special, 'glbave') > 0 .or. index(special, '2zos') > 0. &
                                             )) .or. lsumz .and. .not. index(special, 'glbave') > 0 &
-          .or. index(special, 'lvl2srf') > 0 &
+        ! .or. index(special, 'lvl2srf') > 0 &
           .or. index(special, 'locmin') > 0 &
           .or. index(special, 'dpint') > 0 &
           .or. index(special, 'dp.avg') > 0 &
@@ -2347,7 +2352,7 @@ contains
       write (*, *) 'cannot find input variable ', trim(vnm)
       stop
     end if
-    if (trim(vtype) == '2d') then
+    if (trim(vtype) == '2d' .or. vtype == 'op20bar' .or. vtype == 'ols' ) then
       if (kk == 1) then
         status = nf90_get_var(fid, rhid, fldtmp, (/1, 1, rec/), (/ii, jj, 1/))
       else
@@ -2577,7 +2582,7 @@ contains
                        ntimes_passed=1, &
                        time_vals=tval, &
                        time_bnds=tbnds)
-        else if (vtype == 'op20bar' ) then
+        else if (vtype == 'op20bar' .or. vtype == 'ols') then
           error_flag = cmor_write( &
                        var_id=varid, &
                        data=fld(:, :, 1), &

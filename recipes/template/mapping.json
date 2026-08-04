@@ -665,17 +665,15 @@
             "history": "fric = calflx_bot+sedfdic"
         },
         "ocnBgchem.frn.tavg-u-hxy-sea.mon.glb": {
-            "original_name": "carflx_bot, dnitint, sediffn2, sediffno3, sediffnh4, sediffn2o, sediffno2",
+            "original_name": "ndepnoy, ndepnhx, 2*fgn2, 2*n2oflux, nh3flux",
             "sources": {
-                "carflx_bot": 0.13114754098360656,
-                "dnitint": 1.0,
-                "sediffn2": 2.0,
-                "sediffno3": 1.0,
-                "sediffnh4": 1.0,
-                "sediffn2o": 2.0,
-                "sediffno2": 1.0
+                "ndepnoy": 1.0,
+                "ndepnhx": 1.0,
+                "fgn2": 2.0,
+                "n2oflux": 2.0,
+                "nh3flux": 1.0
             },
-            "history": "frn = carflx_bot/122*16+dnitint+2*sediffn2+sediffno3+sediffnh4+2*sediffn2o+sediffno2"
+            "history": "frn = ndepnoy+ndepnhx-2*fgn2-2*n2oflux-nh3flux"
         },
         "ocnBgchem.froc.tavg-u-hxy-sea.mon.glb": {
             "original_name": "carflx_bot"

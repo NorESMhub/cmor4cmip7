@@ -142,7 +142,7 @@ compound_names    =
     'ocnBgchem.fgdms.tavg-u-hxy-sea.mon.glb'            ! done
     'ocnBgchem.frfe.tavg-u-hxy-sea.mon.glb'             ! done
     'ocnBgchem.fric.tavg-u-hxy-sea.mon.glb'             ! done
-    'ocnBgchem.frn.tavg-u-hxy-sea.mon.glb'              ! n/a dnitint
+    'ocnBgchem.frn.tavg-u-hxy-sea.mon.glb'              ! done
     'ocnBgchem.froc.tavg-u-hxy-sea.mon.glb'             ! done
     'ocnBgchem.fsfe.tavg-u-hxy-sea.mon.glb'             ! done
     'ocnBgchem.fsn.tavg-u-hxy-sea.mon.glb'              ! done

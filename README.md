@@ -12,7 +12,7 @@
 ---
 Example steps to run cmorization for a `piControl` simulation by NorESM3-LM
 
-## Clone and build
+## 1. Clone and build
 ```bash
 cd ~/
 tag=v20260618-alpha
@@ -23,7 +23,7 @@ cd ~/cmor4cmip7/build
 ./build.sh
 ```
 
-## Update recipes
+## 2. Update recipes
 update the information under `cmor4cmip7/recipes/test`, where find necessary
 * experiment.nml    : about the experiment
 * model.nml         : about the model
@@ -34,7 +34,7 @@ As for a test, you will only need to replace `obasedir` in the `system.nml` with
 
 Note, these are Fortran namelist files, so general Fortran rule applies when modifying these namelists.
 
-## Run the cmorization
+## 3. Run the cmorization
 ```bash
 cd ~/cmor4cmip7/bin
 
@@ -42,24 +42,26 @@ pnml=$HOME/cmor4cmip7/recipes/test
 ./cmor ${pnml}/system.nml ${pnml}/model.nml ${pnml}/experiment.nml ${pnml}/variables.nml
 ```
 
-## Check the data 
+## 4. Check the data 
 The cmorized data will be located under e.g., `/scratch/$USER/cmorout`
 
-## Technically validate the data
-### Checkout 'cmip7validate'
+## 5. Technically validate the data
+(refer: cmip7validate [README](https://github.com/NorESMhub/cmip7validate#technically-validate-the-cmip7-data-by-noresm3)
+
+### 5.1 Checkout 'cmip7validate'
 ```bash
 cd ~
 git clone git@github.com:NorESMhub/cmip7validate.git
 ```
-### Update the configuration of the experiment
+### 5.2 Update the configuration of the experiment
 update the value correspondingly to the cmorized experiment, in `params.yml`
 
-### Build and execute the validation
+### 5.3 Build and execute the validation
 ```bash
 cd ~/cmip7validate
 ./build.sh
 ```
-### Check the result
+### 5.4 Check the result
 find the generated book/webpage by default at:
 ```
 https://ns9560k.web.sigma2.no/datalake/diagnostics/cmip7validate

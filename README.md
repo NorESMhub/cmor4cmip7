@@ -46,7 +46,7 @@ pnml=$HOME/cmor4cmip7/recipes/test
 The cmorized data will be located under e.g., `/scratch/$USER/cmorout`
 
 ## 5. Technically validate the data
-(refer: cmip7validate [README](https://github.com/NorESMhub/cmip7validate#technically-validate-the-cmip7-data-by-noresm3)
+(refer: cmip7validate [README](https://github.com/NorESMhub/cmip7validate#technically-validate-the-cmip7-data-by-noresm3))
 
 ### 5.1 Checkout 'cmip7validate'
 ```bash

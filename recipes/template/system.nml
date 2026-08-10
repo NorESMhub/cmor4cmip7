@@ -1,7 +1,7 @@
 &sys
  ibasedir      = '/nird/datalake/NS9560K/masan'
  obasedir      = '/scratch/yanchun/cmorout',
- griddata      = '/diagnostics/CMOR/cmor4cmip7/griddata',
+ griddata      = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/griddata',
  tabledir      = '../tables',
  mapfile       = '../recipes/template/mapping.json',
  createsubdirs = .false.,

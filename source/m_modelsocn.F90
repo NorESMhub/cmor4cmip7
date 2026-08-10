@@ -38,8 +38,7 @@ module m_modelsocn
   ! Dataset related variables
   character(len=slenmax), save          :: ivnm, ovnm, vunits, vpositive, vtype
   character(len=slenmax), save          :: bvnm, cvnm, original_name
-  character(len=slenmax*10), save     :: vcomment, vhistory
-  !character(len=slenmax)               :: key, value
+  character(len=slenmax*10), save       :: vcomment, vhistory
   logical, save :: lsumz
   logical       :: found
 
@@ -75,11 +74,8 @@ contains
     implicit none
 
     logical :: badrec, last, first
-    !logical :: badrec
-    !integer :: k, m, n, nrec
     integer :: k, m, n
     integer :: romon = 365*10*2
-    !character(len=slenmax) :: realm, frequency
     character(len=slenmax), dimension(5) :: itags
 
     badrec = .false.
@@ -145,6 +141,8 @@ contains
       table = 'CMIP7_'//trim(realm)//'.json'
 
       write (*, *) 'cvnm:', trim(cvnm)
+
+      ! Initialize variable attributes
       vpositive = ''
       vcomment = ''
       vhistory = ''
@@ -152,13 +150,15 @@ contains
       tcoord = ''
       zcoord = ''
 
+      ! Select file tag according to realm and frequency
       call select_ocn_ftag(realm, frequency, itag)
       if (bvnm == 'sf6_tavg-ol-hxy-sea') call select_ocn_ftag('ocnBgchem', frequency, itag)
 
+      ! Get variable attributes from table and mapfile
       call json_get_units(trim(tabledir)//trim(table), trim(ovnm), vunits)
-
       call json_get_vertcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
 
+      ! Get sources and factors from mapfile
       if (allocated(sources)) deallocate(sources)
       if (allocated(factors)) deallocate(factors)
       call json_get_original_name(trim(mapfile), trim(cvnm), original_name)
@@ -172,14 +172,7 @@ contains
         allocate(sources(1))
         allocate(factors(1))
         sources(1) = trim(original_name)
-        !call json_get_original_name(trim(mapfile), &
-        !trim(cvnm), sources(1), lfound=found)
-!       if (.not. found) then
-!           write(*,*) "ERROR: "//trim(cvnm)//" not found in "//trim(mapfile)
-!           cycle
-!       else
         factors(1) = 1.0
-!       end if
       end if
       ivnm = sources(1)
 
@@ -191,21 +184,21 @@ contains
         write (*, *) 'dimension(k):', trim(dimensions(k))
         dims = trim(dims)//","//trim(dimensions(k))
       end do
-      write (*, *) 'dims:', trim(dims)
-      !stop 174
+      if (verbose) write (*, *) 'dims:', trim(dims)
 
-      !special = 'test text'
       call special_cat
-      write (*, *) 'special:'
-      write (*, *) trim(special)
+      if (verbose) then
+        write (*, *) 'special:'
+        write (*, *) trim(special)
+      end if
 
 !     ! Prepare output file
       call special_pre
 
-! time independpent
+      ! time independpent
       if (frequency == 'fx') then
 
-        write (*, *) 'ovnm: ', trim(ovnm)
+        if (verbose) write (*, *) 'ovnm: ', trim(ovnm)
         IF (ovnm .EQ. 'basin_ti-u-hxy-u') THEN
           fnm = TRIM(griddata)//TRIM(ocnregnfile)
         else
@@ -230,7 +223,7 @@ contains
 ! --- - Close output file
         CALL close_ofile
 
-! time dependpent
+      ! time dependpent
       else
 
         call scan_files(reset=.true.)
@@ -247,11 +240,6 @@ contains
         do k = 1, size(sources)
           if (.not. var_in_file(fnm, sources(k))) cycle main_loop
         end do
-!       ivnm = sources(1)
-
-        !else
-        !if (.not. var_in_file(fnm, ivnm)) cycle main_loop
-        !end if
 
 !       ! Loop over input files
         m = 0
@@ -347,7 +335,6 @@ contains
 
     character(len=slenmax), dimension(:), allocatable  :: keys
     character(len=slenmax)        :: key, val
-    logical       :: found
 
     call json_get_preproc_keys(trim(mapfile), &
                                trim(cvnm), keys, lfound=found)
@@ -405,193 +392,24 @@ contains
     if (.not. found) return
 
     do n = 1, size(keys)
-      write (*, *) 'n:', n
       key = keys(n)
-      write (*, *) 'key:', trim(key)
       call json_get_preproc_val(trim(mapfile), &
                                 trim(cvnm), trim(key), val, lfound=found)
-      if (found) then
-        write (*, *) trim(key), ":", trim(val)
-      else
-        cycle
-      end if
+      if (.not. found) cycle
+      if (verbose) write (*, *) trim(key), ":", trim(val)
 
       select case (key)
-
-!     case ('history')
-!       vhistory = val
-
-        ! atm to Pa
-      case ('atm2Pa')
-        vunits = 'Pa'
-
-        ! uatm to Pa
-      case ('uatm2Pa')
-        vunits = 'Pa'
-
-        ! Unit transformation: mol cfcXX m-3 -> mol cfcXX kg-1
-      case ('cfcunits')
-        vunits = 'mol kg-1'
-
-        ! CFC11 comment
-      case ('cfc11comment')
-        vcomment = 'In this simulation, annual means of reconstructed' &
-                   //' Northern Hemisphere CFC-11 are applied globally to the ocean.' &
-                   //' Reference: Walker S.J., Weiss R.F., Salameh P.K. (2000)' &
-                   //' Reconstructed histories of the annual mean atmospheric mole' &
-                   //' fractions for the halocarbons CFC-11, CFC-12, CFC-113 and' &
-                   //' carbon tetrachloride. J. Geophys. Res. 105(C6): 14285-14296.' &
-                   //' CFC-11 data in ppt (1910.5-2008.5):' &
-                   //' 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,' &
-                   //' 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,' &
-                   //' 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,' &
-                   //' 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.1, 0.2, 0.4, 0.7, 1.0,' &
-                   //' 1.5, 2.2, 3.0, 4.1, 5.4, 6.8, 8.1, 9.4, 11.1, 13.3, 16.1,' &
-                   //' 19.6, 23.8, 28.4, 33.6, 39.5, 46.1, 53.7, 62.5, 72.0, 82.7,' &
-                   //' 94.9, 108.4, 121.4, 133.9, 145.9, 156.6, 168.3, 176.7, 184.3,' &
-                   //' 191.4, 199.4, 208.1, 218.1, 229.5, 241.7, 253.0, 259.5,' &
-                   //' 266.0, 268.4, 268.3, 269.7, 269.8, 268.5, 267.3, 265.9,' &
-                   //' 264.4, 262.9, 262.0, 260.3, 258.1, 256.0, 254.1, 252.0,' &
-                   //' 248.9, 246.9, 245.3'
-
-        ! CFC12 comment
-      case ('cfc12comment')
-        vcomment = 'In this simulation, annual means of reconstructed' &
-                   //' Northern Hemisphere CFC-12 are applied globally to the ocean.' &
-                   //' Reference: Walker S.J., Weiss R.F., Salameh P.K. (2000)' &
-                   //' Reconstructed histories of the annual mean atmospheric mole' &
-                   //' fractions for the halocarbons CFC-11, CFC-12, CFC-113 and' &
-                   //' carbon tetrachloride. J. Geophys. Res. 105(C6): 14285-14296.' &
-                   //' CFC-12 data in ppt (1910.5-2008.5):' &
-                   //' 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,' &
-                   //' 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,' &
-                   //' 0.0, 0.0, 0.1, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.7,' &
-                   //' 2.3, 3.4, 4.8, 6.1, 7.6, 9.2, 11.0, 12.8, 15.0, 17.4, 20.2,' &
-                   //' 23.4, 26.8, 30.5, 35.0, 40.0, 45.8, 52.5, 60.4, 69.3, 79.2,' &
-                   //' 90.3, 102.8, 116.7, 132.0, 148.3, 166.1, 185.7, 207.1, 228.1,' &
-                   //' 248.0, 266.9, 284.2, 305.9, 323.0, 339.6, 353.3, 369.0,' &
-                   //' 385.7, 403.4, 424.3, 444.0, 465.4, 483.6, 497.7, 506.0,' &
-                   //' 516.4, 523.2, 528.9, 533.9, 537.6, 540.5, 542.5, 544.1,' &
-                   //' 546.4, 546.9, 546.8, 546.5, 547.2, 546.5, 544.5, 541.8, 540.6'
-
-        ! mol m-3
-      case ('mol m-3')
-        vunits = 'mol m-3'
-
-        ! mol m-2 s-1
-      case ('mol m-2 s-1')
-        vunits = 'mol m-2 s-1'
-
-        ! mol m-3 s-1
-      case ('mol m-3 s-1')
-        vunits = 'mol m-3 s-1'
-
-        ! Salinity has to be in practical salinity units
-      case ('psu')
-        vunits = 'psu'
-
-        ! Fix unitless units
-      case ('unitless')
-        vunits = '1'
-
-        ! Set correct units for percentage
-      case ('percent')
-        vunits = '%'
-
-        ! Set correct units for fraction
-      case ('fraction')
-        vunits = '1'
-
-        ! Unit transformation: kg m-2
-      case ('kg m-2')
-        vunits = 'kg m-2'
-
-        ! Unit transformation: mm s-1 -> kg m-2 s-1
-      case ('kg m-2 s-1')
-        vunits = 'kg m-2 s-1'
-
-        ! Fix micrometers units
-      case ('micrometer')
-        vunits = 'micrometers'
-
-        ! Fix m-2 units
-      case ('m-2')
-        vunits = 'm-2'
-
-        ! Fix wo units
-      case ('wflx2wo')
-        vunits = 'm s-1'
-
-        ! Set units to kg
-      case ('kg')
-        vunits = 'kg'
-
-        ! Set units to m^3
-      case ('m3')
-        vunits = 'm3'
-
-        ! Convert units from radians2 to m2
-      case ('rad2m')
-        vunits = 'm2'
-
-        ! Set units for streamfunction
-      case ('strmf')
-        vunits = 'kg s-1'
-        lsumz = .true.
 
         ! Set positive attribute
       case ('positive')
         vpositive = trim(val)
-        !case ('positivedo')
-        !vpositive = 'down'
 
         ! Compute vertical sum
-      case ('sumz')
-        lsumz = .true.
+!     case ('sumz')
+!       lsumz = .true.
 
-        ! Compute density
-      case ('ts2rho0')
-        vunits = 'kg m-3'
-
-        ! Compute steric sea level change from density
-      case ('ts2zossga', 't2zostoga')
-        vunits = 'm'
-
-        ! Compute fixed cell volume of interpolated grid
-      case ('volcello')
-        vunits = 'm3'
-
-        ! Compute fixed cell thickness
-      case ('thkcello')
-        vunits = 'm'
-
-        ! Compute depth of local mimina
-      case ('locminz')
-        vunits = 'm'
-
-        ! Compute depth of local mimina
-      case ('omega2z')
-        vunits = 'm'
-
-        ! Convert units from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]
-      case ('kg m-3')
-        vunits = 'kg m-3'
-
-        ! Convert units from [m3] to [1e3 km3]
-      case ('1e3 km3')
-        vunits = '1e3 km3'
-
-        ! Convert units from [s-1] to [s-2], fix bug for the units of bfsq in micom
-      case ('s-2')
-        vunits = 's-2'
-
-        ! Set unit g m-2
-      case ('g m-2')
-        vunits = 'g m-2'
-
-        ! Set unit degC kg m-2
-      case ('degC kg m-2')
-        vunits = 'degC kg m-2'
+      case default
+        write (*, *) 'ERROR: unknown pre-processing key: ', trim(key)
 
       end select
       !if (str1 == str2) exit
@@ -643,33 +461,12 @@ contains
         end do
         fld = fldacc
 
-        ! Convert units from radians2 to m2
-      case ('rad2m')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) < 1e20) &
-                fld(i, j, k) = fld(i, j, k)*6.37122e6**2
-            end do
-          end do
-        end do
-
         ! Set ice free points to missing value
       case ('zero2missing')
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
               if (abs(fld(i, j, k)) < 1e-6) fld(i, j, k) = 1e20
-            end do
-          end do
-        end do
-
-        ! Set ice free points to missing value
-      case ('pmask')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (pmask(i, j) < 0.5) fld(i, j, k) = 1e20
             end do
           end do
         end do
@@ -702,70 +499,6 @@ contains
 !       end do
 !       fld(i, j, 1) = fld(i, j, 1)/dp(i, j, 1)
 
-        ! Compute local minima
-      case ('locmin')
-        do j = 1, jj
-          do i = 1, ii
-            do k = 2, kk
-              if (fld(i, j, 1) > fld(i, j, k)) then
-                fld(i, j, 1) = fld(i, j, k)
-              else
-                exit
-              end if
-            end do
-          end do
-        end do
-
-        ! Compute local minima depth
-      case ('locminz')
-        fld2 = fld
-        do j = 1, jj
-          do i = 1, ii
-            fld2(i, j, 1) = depth(1)
-            do k = 2, kk
-              if (fld(i, j, 1) > fld(i, j, k)) then
-                fld(i, j, 1) = fld(i, j, k)
-                fld2(i, j, 1) = depth(k)
-              else
-                exit
-              end if
-            end do
-          end do
-        end do
-        fld = fld2
-
-        ! Compute Aragonite Saturation Depth
-      case ('omega2z')
-        fldtmp = 1e20
-        do j = 1, jj
-          do i = 1, ii
-            do k = 1, kk
-              if (fld(i, j, k) < 1.0) then
-                if (k == 1) then
-                  fldtmp(i, j, 1) = 0.0
-                else
-                  fldtmp(i, j, 1) = depth(k)
-                end if
-              end if
-            end do
-          end do
-        end do
-        fld = fldtmp
-
-        ! Multiply with global ocean area
-      case ('xglbarea')
-        fld = fld*aoglb
-
-        ! Multiply gravity constant
-      case ('xg')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) < 1e20) fld(i, j, k) = fld(i, j, k)*9.806
-            end do
-          end do
-        end do
-
         ! Devide by gravity constant
       case ('divide.g')
         do k = 1, kk
@@ -776,63 +509,9 @@ contains
           end do
         end do
 
-        ! Flip sign
-      case ('flipsign')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) < 1e20) fld(i, j, k) = -fld(i, j, k)
-            end do
-          end do
-        end do
-
         ! Compute global 2d average
       case ('glbave2d')
         fld(1, 1, 1) = sum(fld(:, :, 1)*parea)/sum(parea)
-
-        ! Compute global 3d average
-      case ('glbave3d')
-        r = 0.
-        rd = 0.
-        do k = 1, kk
-          r = r + sum(fld(:, :, k)*dp(:, :, k)*parea)
-          rd = rd + sum(dp(:, :, k)*parea)
-        end do
-        fld(1, 1, 1) = r/max(1e-10, rd)
-
-        ! Compute potential density
-!     case ('ts2rho0')
-!       do k = 1, kk
-!         do j = 1, jj
-!           do i = 1, ii
-!             if (fld(i, j, k) /= 1e20) &
-!               fld(i, j, k) = 1e3*rho(0._r8, fld(i, j, k), fld2(i, j, k))
-!           end do
-!         end do
-!       end do
-
-        ! Compute steric sea level
-!     case ('ts2zossga')
-!       if (vtype == 'layer') then
-!         r = 0.
-!         do j = 1, jj
-!           do i = 1, ii
-!             pbottmp = 0.
-!             do k = 1, kk
-!               ptoptmp = pbottmp
-!               pbottmp = ptoptmp + dp(i, j, k)
-!               if (fld(i, j, k) /= 1e20) then
-!                 r = r + 1e-2*(1e-2*ginv)*parea(i, j)* &
-!                     p_alpha(ptoptmp, pbottmp, fld(i, j, k), fld2(i, j, k))
-!               end if
-!             end do
-!           end do
-!         end do
-!         fld(1, 1, 1) = (r - voglb)/aoglb
-!         write (*, *) 'zossga=', fld(1, 1, 1)
-!       else
-!         stop 'input variables for zossga must be of type layer'
-!       end if
 
         ! Compute thermo-steric sea level following Griffies et al., GMD 2016, H27
       case ('t2zostoga')
@@ -852,25 +531,16 @@ contains
         end do
         rhoglb = rhoglb/ptmp
 
-!       write(*,*) 'voglb:',voglb
-!       write(*,*) 'aoglb:',aoglb
-!       write(*,*) 'rhoglb0:',rhoglb0
-!       write(*,*) 'rhoglb:',rhoglb
         fld(1, 1, 1) = voglb/aoglb*(1-rhoglb/rhoglb0)
-
 
         ! Compute fixed cell volume of interpolated grid
       case ('volcello')
         do j = 1, jj
           do i = 1, ii
             do k = ddm, 1, -1
-!             if (fld(i, j, 1) == 0.) then
-!               fld(i, j, k) = 1e20
-!             else
               ptoptmp = min(depth_bnds(1, k), fld(i, j, 1))
               pbottmp = min(depth_bnds(2, k), fld(i, j, 1))
               fld(i, j, k) = (pbottmp - ptoptmp)*parea(i, j)
-!             end if
             end do
           end do
         end do
@@ -893,106 +563,15 @@ contains
         do j = 1, jj
           do i = 1, ii
             do k = ddm, 1, -1
-              !if (fld(i, j, 1) == 0.) then
-              !fld(i, j, k) = 1e20
-              !else
               fld(i, j, k) = min(fld(i, j, 1), depth_bnds(2, k)) - &
                              min(fld(i, j, 1), depth_bnds(1, k))
-              !end if
-            end do
-          end do
-        end do
-
-        ! Compute basin index
-      case ('basin')
-        open (10, file=trim(griddata)//trim(ocnmertfile))
-        read (10, '(2i6)') i, j
-        if (i /= idm .or. j /= jdm) &
-          stop 'mertraocean: incorrect indexes in mertraoceans.dat!'
-        str1 = ' '
-        write (str1, *) '(', jdm, 'i1)'
-        read (10, str1) ((basin(i, j), j=1, jdm), i=1, idm)
-        close (10)
-        fld = 0
-        do j = 1, jdm
-          do i = 1, idm
-            ! Southern Ocean
-            if (plat(i, j) < 0. .and. basin(i, j) == 1) fld(i, j, 1) = 1
-            ! Pacific Ocean
-            if (basin(i, j) == 3) fld(i, j, 1) = 3
-            ! Arctic Ocean
-            if (plat(i, j) > 60. .and. basin(i, j) == 1) fld(i, j, 1) = 4
-            ! Indian Ocean
-            if (basin(i, j) == 4) fld(i, j, 1) = 5
-            ! Mediterranean Sea
-            if (basin(i, j) == 2 .and. plat(i, j) > 30.5 .and. &
-                plat(i, j) < 40.5 .and. (plon(i, j) > 354.5 .or. &
-                                         plon(i, j) < 37)) fld(i, j, 1) = 6
-            if (basin(i, j) == 2 .and. plat(i, j) > 40.5 .and. &
-                plat(i, j) < 46. .and. (plon(i, j) > 359. .or. &
-                                        plon(i, j) < 27.5)) fld(i, j, 1) = 6
-            ! Black Sea
-            if (basin(i, j) == 1 .and. plat(i, j) > 40.5 .and. &
-                plat(i, j) < 48. .and. plon(i, j) > 27.5 .and. &
-                plon(i, j) < 45) fld(i, j, 1) = 7
-            ! Hudson Bay
-            if (basin(i, j) == 2 .and. plat(i, j) > 50. .and. &
-                plat(i, j) < 70. .and. plon(i, j) > 265. .and. &
-                plon(i, j) < 295) fld(i, j, 1) = 8
-            ! Baltic Sea
-            if (basin(i, j) == 2 .and. plat(i, j) > 53. .and. &
-                plat(i, j) < 62. .and. plon(i, j) > 10. .and. &
-                plon(i, j) < 30) fld(i, j, 1) = 9
-            if (basin(i, j) == 2 .and. plat(i, j) > 62. .and. &
-                plat(i, j) < 66.5 .and. plon(i, j) > 17. .and. &
-                plon(i, j) < 30) fld(i, j, 1) = 9
-            ! Red Sea
-            if (basin(i, j) == 4 .and. plat(i, j) > 13. .and. &
-                plat(i, j) < 30. .and. plon(i, j) > 31. .and. &
-                plon(i, j) < 44) fld(i, j, 1) = 10
-            ! Atlantic ocean
-            if (basin(i, j) == 2 .and. fld(i, j, 1) == 0) fld(i, j, 1) = 2
-          end do
-        end do
-
-        ! Multiple a second field
-      case ('Xfield2')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) &
-                fld(i, j, k) = fld(i, j, k)*fld2(i, j, k)
-            end do
-          end do
-        end do
-
-        ! Divide a second field
-      case ('Dfield2')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) &
-                fld(i, j, k) = fld(i, j, k)/fld2(i, j, k)
-            end do
-          end do
-        end do
-
-        ! Integratal with respect to depth
-      case ('dpint')
-        do j = 1, jj
-          do i = 1, ii
-            if (fld(i, j, 1) /= 1e20) &
-              fld(i, j, 1) = fld(i, j, 1)*fld2(i, j, 1)/9.806
-            do k = 2, kk
-              if (fld(i, j, k) /= 1e20) &
-                fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fld2(i, j, k)/9.806
             end do
           end do
         end do
 
         ! Extract surface value from field on depth levels
-      ! if output field is 2D while the input is 3D,
-      ! the output will use the first level (k) of the input field by default
+          ! if output field is 2D while the input is 3D,
+          ! the output will use the first level (k) of the input field by default
 !     case ('lvl2srf') 
 !       do j = 1, jj
 !         do i = 1, ii
@@ -1099,125 +678,12 @@ contains
           end do
         end do
 
-        ! Unit transformation: mol cfcXX m-3 -> mol cfcXX kg-1
-      case ('cfcunits')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) fld(i, j, k) = fld(i, j, k)/1027.
-            end do
-          end do
-        end do
-
-        ! atm to Pa
-      case ('atm2Pa')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) fld(i, j, k) = fld(i, j, k)*101325
-            end do
-          end do
-        end do
-
         ! uatm to Pa
       case ('muatm2Pa')
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
               if (fld(i, j, k) /= 1e20) fld(i, j, k) = fld(i, j, k)*0.101325
-            end do
-          end do
-        end do
-
-        ! Convert units from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]
-      case ('mol P m-3 -> kg Chl m-3')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) &
-                fld(i, j, k) = fld(i, j, k)*122*12/60/1000
-            end do
-          end do
-        end do
-
-        ! Convert units from [m3] to [1e3 km3]
-      case ('1e3 km3')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) &
-                fld(i, j, k) = fld(i, j, k)/1e3/1e9
-            end do
-          end do
-        end do
-
-        ! Mask grid points in the southern hemisphere
-      case ('masks')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (plat(i, j) < 0.0) fld(i, j, k) = 1e20
-            end do
-          end do
-        end do
-
-        ! Mask grid points in the southern hemisphere
-      case ('maskn')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (plat(i, j) > 0.0) fld(i, j, k) = 1e20
-            end do
-          end do
-        end do
-
-        ! Multiple parea
-      case ('xparea')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) fld(i, j, k) = fld(i, j, k)*parea(i, j)
-            end do
-          end do
-        end do
-
-        ! Iron to phosphorous ratio in organic matter
-      case ('fe2ph')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) &
-                fld(i, j, k) = fld(i, j, k)*5.*122.*1.e-6
-            end do
-          end do
-        end do
-
-        ! Carbon to iron
-      case ('c2fe')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) fld(i, j, k) = fld(i, j, k)*5.*1.e-6
-            end do
-          end do
-        end do
-
-        ! epc100 to epn100
-      case ('epc100toepn100')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) fld(i, j, k) = fld(i, j, k)/122.*16.
-            end do
-          end do
-        end do
-
-        ! epc100 to epp100
-      case ('epc100toepp100')
-        do k = 1, kk
-          do j = 1, jj
-            do i = 1, ii
-              if (fld(i, j, k) /= 1e20) fld(i, j, k) = fld(i, j, k)/122.
             end do
           end do
         end do
@@ -1231,6 +697,9 @@ contains
             end do
           end do
         end do
+      
+      case default
+        write (*, *) 'ERROR: unknown post-processing key: ', trim(key)
 
       end select
 
@@ -1381,22 +850,18 @@ contains
       !write(*, *) 'section:', section
       section1 = ' '
       do i = 1, sdm
-        !write(*, *) 'i:', i
         s1 = ' '
         do j = 1, slenmax2
           s1(j:j) = section(j, i)
         end do
-        !write(*, *) 's1:', s1
         if (trim(s1) == 'taiwan_and_luzon_straits') then
           section1(i) = 'taiwan_luzon_straits'
         else
           section1(i) = trim(s1)
         end if
-        !k = k + 1
       end do
     end if
 
-    !write(*, *) 'l1898'
     ! Read calendar information (change reference year)
     status = nf90_inq_varid(ncid, 'time', rhid)
     call handle_ncerror(status)
@@ -1467,7 +932,6 @@ contains
     parea = parea*pmask
 
     ! Read coordinates
-    !write(*, *) 'line1974'
     status = nf90_inq_varid(ncid, 'plon', rhid)
     call handle_ncerror(status)
     status = nf90_get_var(ncid, rhid, plon)
@@ -1518,7 +982,6 @@ contains
     call handle_ncerror(status)
     status = nf90_get_var(ncid, rhid, vlat_crns)
     call handle_ncerror(status)
-    !write(*, *) 'line2025'
 
     ! Permute to compensate for dimension bug in CMOR
     do j = 1, jdm
@@ -1609,12 +1072,10 @@ contains
     logical, optional, intent(in)   :: fx
     logical                         :: fxflag
 
-    character(len=*), intent(in)   :: ivnm, ovnm
+    character(len=*), intent(in)    :: ivnm, ovnm
 
-    !real                            :: fac1, fac2, fac3, fac4, fac5, fac6
     integer, parameter              :: ndimmax = 10
     integer                 :: i, j, k, n, ndims, dimids(ndimmax), dimlens(ndimmax)
-    !character(len=slenmax)  :: coord, ivnm1, ivnm2, ivnm3, ivnm4, ivnm5, ivnm6
     character(len=slenmax)  :: coord
 
     real(r8), allocatable       :: tmp1d(:), tmp2d(:, :)
@@ -1648,20 +1109,16 @@ contains
     ii = idm
     jj = jdm
     kk = kdm
-    write (*, *) 'ivm:', trim(ivnm)
-    write (*, *) 'ovnm:', trim(ovnm)
-    write (*, *) 'dimlens:', dimlens
-    !write(*, *) 'kdm:', kdm
+    if (verbose) then
+      write (*, *) 'ivm:', trim(ivnm)
+      write (*, *) 'ovnm:', trim(ovnm)
+      write (*, *) 'dimlens:', dimlens
+      write(*, *) 'kdm:', kdm
+    end if
     if (dims(1:25) == 'longitude,latitude,olevel') then
       vtype = 'level'
       kk = ddm
-!     if (dimlens(3) == 1) then
-!       kk = 1
-!     else
-!       kk  = kko
-!     end if
     else if (dims == 'longitude,latitude,time' .or. dims == 'longitude,latitude' .or. &
-             dims(1:30) == 'longitude,latitude,time,olayer' .or. &
              dims(1:29) == 'longitude,latitude,time,depth' .or. &
              dims       == 'longitude,latitude,time,deltasigt') then
       vtype = '2d'
@@ -1671,6 +1128,9 @@ contains
       else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
         kk = ddm
       end if
+    else if (dims(1:30) == 'longitude,latitude,time,olayer') then
+      vtype = 'olayer'
+      kk = 1
     else if (dims == 'longitude,latitude,time,op20bar') then
       vtype = 'op20bar'
       kk = 1
@@ -1718,22 +1178,17 @@ contains
       write (*, *) 'Undefined variable type, please check!'
     end if
     write (*, *) 'vtype:', trim(vtype)
-
     write (*, *) 'ii,jj,kk:', ii, jj, kk
     allocate (fld(ii, jj, kk), fld2(ii, jj, kk), fldacc(ii, jj, kk), &
               fldtmp(ii, jj, kk), stat=status)
     if (status /= 0) stop 'cannot ALLOCATE enough memory (4)'
-!   if (index(special, 'half') > 0) then
-!     if (allocated(fldhalf)) deallocate (fldhalf)
-!     allocate (fldhalf(idm, jdm, kdm + 1), stat=status)
-!     if (status /= 0) stop 'cannot ALLOCATE enough memory (5)'
-!   end if
 
-    if (len_trim(vunits) == 0) then
-      status = nf90_get_att(ncid, rhid, 'units', vunits)
-      call handle_ncerror(status)
-      if (trim(vunits) == 'mm/s') vunits = 'kg m-2 s-1'
-    end if
+    ! vunits has default value from data table
+!   if (len_trim(vunits) == 0) then
+!     status = nf90_get_att(ncid, rhid, 'units', vunits)
+!     call handle_ncerror(status)
+!     if (trim(vunits) == 'mm/s') vunits = 'kg m-2 s-1'
+!   end if
 
     coord = ' '
     status = nf90_get_att(ncid, rhid, 'coordinates', coord)
@@ -1780,26 +1235,20 @@ contains
     ! Define output dataset
     grid_label = ocngrid_label
     grid = trim(ocngrid)
-    if (trim(vtype) == 'layer' .and. .not. &
-        (lsumz .or. index(special, 'glbave') > 0 &
-         .or. index(special, '2zos') > 0 &
-         .or. index(special, 'level1') > 0)) then
+    if (trim(vtype) == 'layer' ) then
       grid = trim(ocngrid)//', vertical density coordinate'
-    else
-      if (index(special, 'glbave') > 0 &
-          .or. index(special, '2zos') > 0) then
-        !grid_label = 'gm'
-        grid = 'global mean or integral'
-      else
-        if (vtype(1:3) == 'mer' .or. ovnm(1:7) == 'hfbasin') then
+    else if (trim(vtype) == 'olayer' ) then
+      grid = trim(ocngrid)//', at specified vertical depth'
+    else if (trim(vtype) == '1d' ) then
+      grid = 'global mean or integral'
+    else if (trim(vtype) == 'level' ) then
+      grid = trim(ocngrid)//', hybrid coordinate remapped to z-levels'
+    else if (trim(vtype) == 'merk' .or. trim(vtype) == 'merd' .or. trim(vtype) == 'mert') then
           !grid_label = 'grz'
           grid = 'zonal mean or integral'
-        else if (trim(vtype) == 'level') then
-          !grid_label = 'gr'
-          !grid_label = 'g999'
-          grid = trim(ocngrid)//', interpolated to z-levels'
-        end if
-      end if
+    else if (trim(vtype) == 'sect') then
+          !grid_label = 'grs'
+          grid = 'section mean or integral' 
     end if
     call json_write_attributes(grid, grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)
@@ -1862,11 +1311,7 @@ contains
     end if
 
     ! Define vertical axis
-    !write(*,*) 'vtype:',vtype
-    if (trim(vtype) == 'layer' .and. .not. &
-        (lsumz .or. index(special, 'glbave') > 0 &
-         .or. index(special, '2zos') > 0 &
-         .or. index(special, 'level1') > 0)) then
+    if (trim(vtype) == 'layer')then
       if (index(special, 'half') > 0) then
         kaxid = cmor_axis( &
                 table=trim(tablepath), &
@@ -1876,7 +1321,6 @@ contains
                 coord_vals=1000.+sigmahalf, &
                 cell_bounds=1000.+sigmahalf_bnds)
       else
-        !write(*, *) "line 2451"
         kaxid = cmor_axis( &
                 table=trim(tablepath), &
                 table_entry='rho', &
@@ -1884,41 +1328,45 @@ contains
                 length=kdm, &
                 coord_vals=1000.+sigma, &
                 cell_bounds=1000.+sigma_bnds)
-        write (*, *) "line 2459"
       end if
-    else if (index(special, 'level1') > 0) then
+    else if (trim(vtype) == 'level') then
       kaxid = cmor_axis( &
               table=trim(tablepath), &
-              table_entry='depth0m', &
+              table_entry='depth_coord', &
               units='m', &
-              length=1, &
-              coord_vals=(/0/))
-    else if (index(special, 'dzavg300m') > 0) then
-      kaxid = cmor_axis( &
-              table=trim(tablepath), &
-              table_entry='olayer300m', &
-              units='m', &
-              length=1, &
-              coord_vals=(/150./), &
-              cell_bounds=(/0., 300./))
-    else if (index(special, 'dzavg700m') > 0) then
-      kaxid = cmor_axis( &
-              table=trim(tablepath), &
-              table_entry='olayer700m', &
-              units='m', &
-              length=1, &
-              coord_vals=(/350./), &
-              cell_bounds=(/0., 700./))
-    else if (index(special, 'dzavg2000m') > 0) then
-      kaxid = cmor_axis( &
-              table=trim(tablepath), &
-              table_entry='olayer2000m', &
-              units='m', &
-              length=1, &
-              coord_vals=(/1000./), &
-              cell_bounds=(/0., 2000./))
+              length=ddm, &
+              coord_vals=depth, &
+              cell_bounds=depth_bnds)
+    else if (trim(vtype) == 'olayer') then
+      if (index(special, 'dzavg300m') > 0) then
+        kaxid = cmor_axis( &
+                table=trim(tablepath), &
+                table_entry='olayer300m', &
+                units='m', &
+                length=1, &
+                coord_vals=(/150./), &
+                cell_bounds=(/0., 300./))
+      else if (index(special, 'dzavg700m') > 0) then
+        kaxid = cmor_axis( &
+                table=trim(tablepath), &
+                table_entry='olayer700m', &
+                units='m', &
+                length=1, &
+                coord_vals=(/350./), &
+                cell_bounds=(/0., 700./))
+      else if (index(special, 'dzavg2000m') > 0) then
+        kaxid = cmor_axis( &
+                table=trim(tablepath), &
+                table_entry='olayer2000m', &
+                units='m', &
+                length=1, &
+                coord_vals=(/1000./), &
+                cell_bounds=(/0., 2000./))
+      else
+        write(*,*) 'Error: olayer depth not supported'
+        write(*,*) 'special: ', trim(special)
+      end if
     else if (vtype == 'op20bar') then
-      write(*,*) 'tablepath:',trim(tablepath)
       kaxid = cmor_axis( &
               table=trim(tablepath), &
               table_entry='op20bar', &
@@ -1927,7 +1375,6 @@ contains
               coord_vals=(/20./), &
               cell_bounds=(/20., 20./))
     else if (vtype == 'ols') then
-      write(*,*) 'tablepath:',trim(tablepath)
       kaxid = cmor_axis( &
               table=trim(tablepath), &
               table_entry='osurf', &
@@ -1935,7 +1382,7 @@ contains
               length=1, &
               coord_vals=(/0./), &
               cell_bounds=(/0., 0./))
-    else if (trim(vtype) == 'level' .or. vtype(1:4) == 'merd') then
+    else if (trim(vtype) == 'merd') then
       kaxid = cmor_axis( &
               table=trim(tablepath), &
               table_entry='depth_coord', &
@@ -1943,7 +1390,7 @@ contains
               length=ddm, &
               coord_vals=depth, &
               cell_bounds=depth_bnds)
-    else if (vtype(1:4) == 'merk') then
+    else if (trim(vtype) == 'merk') then
       kaxid = cmor_axis( &
               table=trim(tablepath), &
               table_entry='rho', &
@@ -1951,18 +1398,18 @@ contains
               length=kdm, &
               coord_vals=sigma + 1000., &
               cell_bounds=sigma_bnds + 1000.)
-    else if (trim(zcoord) == 'olevel') then
-      allocate (tmp1d(1), tmp2d(2, 1))
-      tmp1d(:) = (/5.d0/)
-      tmp2d(:, 1) = (/0.d0, 10.d0/)
-      kaxid = cmor_axis( &
-              table=trim(tablepath), &
-              table_entry='depth_coord', &
-              units='m', &
-              length=1, &
-              coord_vals=tmp1d, &
-              cell_bounds=tmp2d)
-      deallocate (tmp1d, tmp2d)
+!   else if (trim(zcoord) == 'olevel') then
+!     allocate (tmp1d(1), tmp2d(2, 1))
+!     tmp1d(:) = (/5.d0/)
+!     tmp2d(:, 1) = (/0.d0, 10.d0/)
+!     kaxid = cmor_axis( &
+!             table=trim(tablepath), &
+!             table_entry='depth_coord', &
+!             units='m', &
+!             length=1, &
+!             coord_vals=tmp1d, &
+!             cell_bounds=tmp2d)
+!     deallocate (tmp1d, tmp2d)
     else if (vtype(1:4) == 'sect') then
       saxid = cmor_axis( &
               table=trim(tablepath), &
@@ -1985,13 +1432,13 @@ contains
     end if
 
     ! Define output variable
-    !write(*, *) 'Define output variable'
-    write (*, *) 'zcoord:', trim(zcoord)
-    write (*, *) 'vunits:', trim(vunits)
+    if (verbose) then
+      write(*, *) 'Define output variable'
+      write (*, *) 'zcoord:', trim(zcoord)
+      write (*, *) 'vunits:', trim(vunits)
+    end if
     if (fxflag) then
-      if ((trim(vtype) == '2d' .and. .not. (trim(zcoord) == 'olevel' .or. &
-                                            index(special, 'glbave') > 0 .or. index(special, '2zos') > 0.)) &
-          .or. lsumz) then
+      if (trim(vtype) == '2d') then
         varid = cmor_variable( &
                 table=trim(tablepath), &
                 table_entry=trim(ovnm), &
@@ -2001,8 +1448,7 @@ contains
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 original_name=trim(original_name))
-      else if (index(special, 'glbave') > 0 &
-               .or. index(special, '2zos') > 0.) then
+      else if (trim(vtype) == '1d') then
         varid = cmor_variable( &
                 table=trim(tablepath), &
                 table_entry=trim(ovnm), &
@@ -2013,7 +1459,7 @@ contains
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
-      else
+      else if (trim(vtype) == 'level') then
         varid = cmor_variable( &
                 table=trim(tablepath), &
                 table_entry=trim(ovnm), &
@@ -2023,20 +1469,12 @@ contains
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 original_name=trim(original_name))
+      else 
+        write(*,*) 'Error: variable type not supported for fx variable'
+        write(*,*) 'vtype: ', trim(vtype)
       end if
     else
-      write (*, *) 'vtype:', trim(vtype)
-      write (*, *) 'zcoord:', trim(zcoord)
-      if ((trim(vtype) == '2d' .and. .not. (trim(zcoord) == 'ol' .or. &
-                                            index(special, 'glbave') > 0 .or. index(special, '2zos') > 0. &
-                                            )) .or. lsumz .and. .not. index(special, 'glbave') > 0 &
-        ! .or. index(special, 'lvl2srf') > 0 &
-          .or. index(special, 'locmin') > 0 &
-          .or. index(special, 'dpint') > 0 &
-          .or. index(special, 'dp.avg') > 0 &
-          .or. index(special, 'omega2z') > 0) then
-        !write(*, *) 'case l2594'
-        !write(*, *) 'vunits:',trim(vunits)
+      if (trim(vtype) == '2d') then
         varid = cmor_variable( &
                 table=trim(tablepath), &
                 table_entry=trim(ovnm), &
@@ -2047,21 +1485,8 @@ contains
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
-      else if (index(special, 'dzavg') > 0.) then
-        varid = cmor_variable( &
-                table=trim(tablepath), &
-                table_entry=trim(ovnm), &
-                units=trim(vunits), &
-                axis_ids=(/grdid, taxid, kaxid/), &
-                original_name=trim(original_name), &
-                missing_value=1e20, &
-                history=trim(vhistory), &
-                comment=trim(vcomment), &
-                positive=trim(vpositive))
-      else if (trim(vtype) == 'layer' .and. .not. (trim(ovnm) == 'zfull' &
-                                                   .or. trim(ovnm) == 'half' .or. index(special, 'glbave') > 0 &
-                                                   .or. index(special, '2zos') > 0.)) then
-        write (*, *) 'case l2617'
+      else if (trim(vtype) == 'layer' .or. trim(vtype) == 'level' .or. vtype(1:6) == 'olayer' &
+        .or. trim(vtype) == 'ols' .or. trim(vtype) == 'op20bar') then
         varid = cmor_variable( &
                 table=trim(tablepath), &
                 table_entry=trim(ovnm), &
@@ -2071,12 +1496,7 @@ contains
                 missing_value=1e20, &
                 positive=trim(vpositive), &
                 history=trim(vhistory), &
-                comment='Please note that the layer depth ' &
-                //'information is stored ' &
-                //'separately in "zfull" ' &
-                //'and "zhalf" while approximate layer ' &
-                //'density values are stored together ' &
-                //'with "msftmrho". '//trim(vcomment))
+                comment=trim(vcomment))
       else if (vtype(1:4) == 'merd' .or. vtype(1:4) == 'merk') then
         varid = cmor_variable( &
                 table=trim(tablepath), &
@@ -2122,16 +1542,8 @@ contains
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
       else
-        varid = cmor_variable( &
-                table=trim(tablepath), &
-                table_entry=trim(ovnm), &
-                units=trim(vunits), &
-                axis_ids=(/grdid, kaxid, taxid/), &
-                original_name=trim(original_name), &
-                missing_value=1e20, &
-                history=trim(vhistory), &
-                comment=trim(vcomment), &
-                positive=trim(vpositive))
+        write(*,*) 'Error: variable type not supported for time-dependent variable'
+        write(*,*) 'vtype: ', trim(vtype)
       end if
     end if
 #ifdef DEFLATE
@@ -2165,22 +1577,6 @@ contains
     call handle_ncerror(status)
 
     ! Read data
-    if (index(special, 'glbave3d') > 0) then
-      fld = 0.
-      s1 = 'dp'
-      call add_fixed(s1, 1.0_r8, ncid)
-      do k = 1, kk
-        do j = 1, jj
-          do i = 1, ii
-            if (fld(i, j, k) == 1e20) then
-              dp(i, j, k) = 0.
-            else
-              dp(i, j, k) = fld(i, j, k)
-            end if
-          end do
-        end do
-      end do
-    end if
 
     fld = 0.
 
@@ -2259,8 +1655,7 @@ contains
       end do
     end if
 
-    if (index(special, 'Dfield2') > 0 .or. &
-        index(special, 'dp.avg') > 0) then
+    if (index(special, 'dp.avg') > 0) then
       fld = 0.
       call add_tslice(sources(2), factors(2), rec1, fid)
       fld2 = fld
@@ -2352,7 +1747,7 @@ contains
       write (*, *) 'cannot find input variable ', trim(vnm)
       stop
     end if
-    if (trim(vtype) == '2d' .or. vtype == 'op20bar' .or. vtype == 'ols' ) then
+    if (trim(vtype) == '2d' .or.vtype == 'op20bar' .or. vtype == 'ols' .or. vtype(1:6) == 'olayer') then
       if (kk == 1) then
         status = nf90_get_var(fid, rhid, fldtmp, (/1, 1, rec/), (/ii, jj, 1/))
       else
@@ -2375,7 +1770,6 @@ contains
     else if (trim(vtype) == 'mert') then
       status = nf90_get_var(fid, rhid, fldtmp, (/1, 1, rec/), (/ldm, rdm, 1/))
     else if (trim(vtype) == 'sect') then
-!     write (*, *) 'read sections ', sdm
       status = nf90_get_var(fid, rhid, fldtmp, (/1, rec/), (/sdm, 1/))
     end if
     call handle_ncerror(status)
@@ -2480,11 +1874,7 @@ contains
     end do
 
     ! Store variable
-    if (index(special, 'glbave') > 0 .or. index(special, '2zos') > 0.) then
-      error_flag = cmor_write( &
-                   var_id=varid, &
-                   data=(/fld(1, 1, 1)/))
-    else if (vtype == '2d') then
+    if (vtype == '2d') then
       error_flag = cmor_write( &
                    var_id=varid, &
                    data=reshape(fld, (/idm, jdm/)))
@@ -2530,15 +1920,15 @@ contains
 
     ! Set missing on land grid cells
     !if (index(special, 'glbave') <= 0) then
-    if (index(special, 'glbave') > 0) then
-      do k = 1, kk
-        do j = 1, jj
-          do i = 1, ii
-            if (abs(fld(i, j, k)) > 1e20) fld(i, j, k) = 1e20
-          end do
-        end do
-      end do
-    end if
+!   if (index(special, 'glbave') > 0) then
+!     do k = 1, kk
+!       do j = 1, jj
+!         do i = 1, ii
+!           if (abs(fld(i, j, k)) > 1e20) fld(i, j, k) = 1e20
+!         end do
+!       end do
+!     end do
+!   end if
 
     ! Store variable
 !   if (index(special, 'half') > 0) then
@@ -2582,7 +1972,7 @@ contains
                        ntimes_passed=1, &
                        time_vals=tval, &
                        time_bnds=tbnds)
-        else if (vtype == 'op20bar' .or. vtype == 'ols') then
+        else if (vtype == 'op20bar' .or. vtype == 'ols' .or. vtype(1:6) == 'olayer') then
           error_flag = cmor_write( &
                        var_id=varid, &
                        data=fld(:, :, 1), &

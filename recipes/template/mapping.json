@@ -684,7 +684,7 @@
                 "dissiclvl": 0.012
             },
             "postprocs": {
-                "lsumz": true
+                "sumz": true
             },
             "history": "intdic = int(dissiclvl*12/1000)_z",
             "comment": "Vertical sum of dissiclvl*12/1000"

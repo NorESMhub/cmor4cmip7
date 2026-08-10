@@ -4,11 +4,8 @@ compound_names    =
 ! --- --- --- --- --- ---
 ! list of variables to be cmorized;
 ! use Fortran comment to skip any of them, e.g.,
-!   'atmos.tas.tavg-h2m-hxy-u.mon.glb'
+!   'ocean.agessc.tavg-ol-hxy-sea.mon.glb'
 ! --- --- --- --- --- ---
-!
-!   'atmos.ta.tavg-al-hxy-u.mon.glb'
-!   'atmos.tas.tavg-h2m-hxy-u.mon.glb'
 !
     'ocean.agessc.tavg-ol-hxy-sea.mon.glb'          ! done
     'ocean.areacello.ti-u-hxy-u.fx.glb'             ! done
@@ -180,12 +177,5 @@ compound_names    =
     'ocnBgchem.zooc.tavg-ols-hxy-sea.mon.30S-90S'       ! done
     'ocnBgchem.zooc.tavg-ol-hxy-sea.mon.glb'            ! done
 
-!
-!   'seaIce.siconc.tavg-u-hxy-u.mon.glb'
-!   'seaIce.sidmasstranx.tavg-u-hxy-u.mon.glb'
-!   'seaIce.sithick.tavg-u-hxy-si.mon.glb'
-!
-! --- --- --- --- --- ---
-!
 /
 

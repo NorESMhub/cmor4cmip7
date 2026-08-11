@@ -16,29 +16,23 @@ module m_namelists
     forcefilescan, verbose
 
   ! Model namelist
-  character(len=slenmax), save                  :: model_id, institute_id
-  character(len=slenmax), save :: institution, source, references, contact
-  character(len=slenmax), save :: tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, &
-                                  tagodaybgc, tagimon, tagiday, tagamon, tagaday, taga6hr, taga6hri, taga3hr, &
-                                  taga3hri, taglmon, taglday, tagl3hr, tagl3hri, taglyr
-  character(len=slenmax), save :: secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
-                                  rhotablesuff, atmgridfile, ocnregnfile
+  character(len=slenmax), save  :: model_id, institute_id
+  character(len=slenmax), save  :: institution, source, references, contact
+  character(len=slenmax), save  :: tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc
+                                   
+  character(len=slenmax), save  :: secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
+                                   ocnregnfile
   character(len=slenmax), save  :: parent_source_id, coordtable, json_file_attributes, &
-                                   atmgrid, atmgrid_label, atmgrid_resolution, ocngrid, ocngrid_label, ocngrid_resolution, &
-                                   icegrid, icegrid_label, icegrid_resolution, lndgrid, lndgrid_label, lndgrid_resolution
+                                   ocngrid, ocngrid_label, ocngrid_resolution
+
+  logical, save                 :: lshiftgrid   ! shift c-stggering grid from low-left to upper-right stencil
 
   namelist /model/ model_id, institute_id, &
     institution, source, references, contact, &
     tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc, &
-    tagimon, tagiday, tagamon, tagaday, taga6hr, taga6hri, taga3hr, &
-    taga3hri, taglmon, taglday, tagl3hr, tagl3hri, taglyr, &
-    secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
-    rhotablesuff, atmgridfile, ocnregnfile, &
+    secindexfile, ocngridfile, ocninitfile, ocnmertfile, ocnregnfile, &
     parent_source_id, coordtable, json_file_attributes, &
-    atmgrid, atmgrid_label, atmgrid_resolution, &
-    ocngrid, ocngrid_label, ocngrid_resolution, &
-    icegrid, icegrid_label, icegrid_resolution, &
-    lndgrid, lndgrid_label, lndgrid_resolution
+    ocngrid, ocngrid_label, ocngrid_resolution
 
   ! Experiment namelist
   character(len=slenmax), save :: casename, experiment_id, parent_experiment_id, &
@@ -111,26 +105,12 @@ contains
     tagomonbgc = ' '
     tagoday = ' '
     tagodaybgc = ' '
-    tagimon = ' '
-    tagiday = ' '
-    tagamon = ' '
-    tagaday = ' '
-    taga6hr = ' '
-    taga6hri = ' '
-    taga3hr = ' '
-    taga3hri = ' '
-    taglyr = ' '
-    taglmon = ' '
-    taglday = ' '
-    tagl3hr = ' '
-    tagl3hri = ' '
-    atmgridfile = ' '
     ocngridfile = ' '
     ocninitfile = ' '
     ocnmertfile = ' '
     ocnregnfile = ' '
     secindexfile = ' '
-    rhotablesuff = 'OnRho'
+    lshiftgrid = .true.
     coordtable = 'CMIP7_coordinate.json'
     year1 = 0
     month1 = 1
@@ -306,20 +286,6 @@ contains
     write (*, *) ' tag monthly bgc  = ', trim(tagomonbgc)
     write (*, *) ' tag daily ocn    = ', trim(tagoday)
     write (*, *) ' tag daily bgc    = ', trim(tagodaybgc)
-    write (*, *) ' tag monthly ice  = ', trim(tagimon)
-    write (*, *) ' tag daily ice    = ', trim(tagiday)
-    write (*, *) ' tag monthly atm  = ', trim(tagamon)
-    write (*, *) ' tag daily atm    = ', trim(tagaday)
-    write (*, *) ' tag 6hourly atm  = ', trim(taga6hr)
-    write (*, *) ' tag 6hourly insa = ', trim(taga6hri)
-    write (*, *) ' tag 3hourly atm  = ', trim(taga3hr)
-    write (*, *) ' tag 3hourly insa = ', trim(taga3hri)
-    write (*, *) ' tag yearly lnd   = ', trim(taglyr)
-    write (*, *) ' tag monthly lnd  = ', trim(taglmon)
-    write (*, *) ' tag daily lnd    = ', trim(taglday)
-    write (*, *) ' tag 3hourly lnd  = ', trim(tagl3hr)
-    write (*, *) ' tag 3hourly insl = ', trim(tagl3hri)
-    write (*, *) ' atmos grid file  = ', trim(atmgridfile)
     write (*, *) ' ocean grid file  = ', trim(ocngridfile)
     write (*, *) ' ocean ini file   = ', trim(ocninitfile)
     write (*, *) ' ocean sec file   = ', trim(secindexfile)

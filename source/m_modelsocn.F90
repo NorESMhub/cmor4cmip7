@@ -905,7 +905,6 @@ contains
     call handle_ncerror(status)
     status = nf90_get_var(ncid, rhid, pdepth)
     call handle_ncerror(status)
-    call handle_ncerror(status)
     status = nf90_inq_varid(ncid, 'pmask', rhid)
     call handle_ncerror(status)
     status = nf90_get_var(ncid, rhid, pmask)
@@ -1172,6 +1171,11 @@ contains
 
     status = nf90_get_att(ncid, rhid, 'coordinates', hcoord)
     if (status /= nf90_noerr) hcoord(1:1) = ivnm(1:1)
+    if (hcoord(1:1) .ne. 'p' .and. hcoord(1:1) .ne. 'u' .and. &
+        hcoord(1:1) .ne. 'v') then
+      hcoord(1:1) = 'p'
+    end if
+    if (verbose) write(*,*) 'hcoord: ',hcoord(1:1)
 
     status = nf90_close(ncid)
     call handle_ncerror(status)
@@ -1242,35 +1246,73 @@ contains
               units='1', &
               length=idm, &
               coord_vals=xvec)
-      jaxid = cmor_axis( &
-              table=trim(tabledir)//'CMIP7_grids.json', &
-              table_entry='j_index', &
-              units='1', &
-              length=jdm, &
-              coord_vals=yvec)
+      if (lshiftgrid) then
+        jaxid = cmor_axis( &
+                table=trim(tabledir)//'CMIP7_grids.json', &
+                table_entry='j_index', &
+                units='1', &
+                length=jdm-1, &
+                coord_vals=yvec(1:jdm-1))
+      else
+        jaxid = cmor_axis( &
+                table=trim(tabledir)//'CMIP7_grids.json', &
+                table_entry='j_index', &
+                units='1', &
+                length=jdm, &
+                coord_vals=yvec)
+      end if
 
       !write(*, *) 'Define horizontal grid '//hcoord(1:1)
       if (hcoord(1:1) == 'p') then
-        grdid = cmor_grid( &
-                axis_ids=(/iaxid, jaxid/), &
-                latitude=plat, &
-                longitude=plon, &
-                latitude_vertices=plat_crnsp, &
-                longitude_vertices=plon_crnsp)
+        if (lshiftgrid) then
+          grdid = cmor_grid( &
+                  axis_ids=(/iaxid, jaxid/), &
+                  latitude=plat(:,1:jdm-1), &
+                  longitude=plon(:,1:jdm-1), &
+                  latitude_vertices=plat_crnsp(:,:,1:jdm-1), &
+                  longitude_vertices=plon_crnsp(:,:,1:jdm-1))
+        else
+          grdid = cmor_grid( &
+                  axis_ids=(/iaxid, jaxid/), &
+                  latitude=plat, &
+                  longitude=plon, &
+                  latitude_vertices=plat_crnsp, &
+                  longitude_vertices=plon_crnsp)
+       end if
       else if (hcoord(1:1) == 'u') then
-        grdid = cmor_grid( &
-                axis_ids=(/iaxid, jaxid/), &
-                latitude=ulat, &
-                longitude=ulon, &
-                latitude_vertices=ulat_crnsp, &
-                longitude_vertices=ulon_crnsp)
+        if (lshiftgrid) then
+          grdid = cmor_grid( &
+                  axis_ids=(/iaxid, jaxid/), &
+                  latitude=cshift(ulat(:,1:jdm-1), -1, 1), &
+                  longitude=cshift(ulon(:,1:jdm-1), -1, 1), &
+                  latitude_vertices=cshift(ulat_crnsp(:,:,1:jdm-1), -1, 2), &
+                  longitude_vertices=cshift(ulon_crnsp(:,:,1:jdm-1), -1, 2))
+        else
+          grdid = cmor_grid( &
+                  axis_ids=(/iaxid, jaxid/), &
+                  latitude=ulat, &
+                  longitude=ulon, &
+                  latitude_vertices=ulat_crnsp, &
+                  longitude_vertices=ulon_crnsp)
+        end if
       else if (hcoord(1:1) == 'v') then
-        grdid = cmor_grid( &
-                axis_ids=(/iaxid, jaxid/), &
-                latitude=vlat, &
-                longitude=vlon, &
-                latitude_vertices=vlat_crnsp, &
-                longitude_vertices=vlon_crnsp)
+        if (lshiftgrid) then
+           grdid = cmor_grid( &
+                   axis_ids=(/iaxid, jaxid/), &
+                   latitude=vlat(:,2:jdm), &
+                   longitude=vlon(:,2:jdm), &
+                   latitude_vertices=vlat_crnsp(:,:,2:jdm), &
+                   longitude_vertices=vlon_crnsp(:,:,2:jdm))
+        else
+           grdid = cmor_grid( &
+                   axis_ids=(/iaxid, jaxid/), &
+                   latitude=vlat, &
+                   longitude=vlon, &
+                   latitude_vertices=vlat_crnsp, &
+                   longitude_vertices=vlon_crnsp)
+        end if
+      else
+        write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
       end if
     end if
 
@@ -1378,18 +1420,6 @@ contains
               length=kdm, &
               coord_vals=sigma + 1000., &
               cell_bounds=sigma_bnds + 1000.)
-!   else if (trim(zcoord) == 'olevel') then
-!     allocate (tmp1d(1), tmp2d(2, 1))
-!     tmp1d(:) = (/5.d0/)
-!     tmp2d(:, 1) = (/0.d0, 10.d0/)
-!     kaxid = cmor_axis( &
-!             table=trim(tablepath), &
-!             table_entry='depth_coord', &
-!             units='m', &
-!             length=1, &
-!             coord_vals=tmp1d, &
-!             cell_bounds=tmp2d)
-!     deallocate (tmp1d, tmp2d)
     else if (vtype(1:4) == 'sect') then
       saxid = cmor_axis( &
               table=trim(tablepath), &
@@ -1877,19 +1907,54 @@ contains
     integer :: i, j, k
 
     if (trim(tcoord) == 'time1') then
-      error_flag = cmor_write( &
-                   var_id=varid, &
-                   data=fld, &
-                   ntimes_passed=1, &
-                   time_vals=tval)
+      if (lshiftgrid) then
+         error_flag = cmor_write( &
+                      var_id=varid, &
+                      data=fld(:,1:jdm-1,1), &
+                      ntimes_passed=1, &
+                      time_vals=tval)
+      else
+         error_flag = cmor_write( &
+                      var_id=varid, &
+                      data=fld, &
+                      ntimes_passed=1, &
+                      time_vals=tval)
+      end if
     else
       if (vtype == '2d' .or. vtype == 'op20bar' .or. vtype == 'ols' .or. vtype(1:6) == 'olayer') then
-        error_flag = cmor_write( &
-                     var_id=varid, &
-                     data=fld(:, :, 1), &
-                     ntimes_passed=1, &
-                     time_vals=tval, &
-                     time_bnds=tbnds)
+        if (lshiftgrid) then
+          if (hcoord(1:1) == 'p') then
+            error_flag = cmor_write( &
+                         var_id=varid, &
+                         data=fld(:, 1:jdm-1, 1), &
+                         ntimes_passed=1, &
+                         time_vals=tval, &
+                         time_bnds=tbnds)
+          else if (hcoord(1:1) == 'u') then
+            error_flag = cmor_write( &
+                         var_id=varid, &
+                         data=cshift(fld(:, 1:jdm-1, 1), -1, 1), &
+                         ntimes_passed=1, &
+                         time_vals=tval, &
+                         time_bnds=tbnds)
+          else if (hcoord(1:1) == 'v') then
+            error_flag = cmor_write( &
+                         var_id=varid, &
+                         data=fld(:, 2:jdm, 1), &
+                         ntimes_passed=1, &
+                         time_vals=tval, &
+                         time_bnds=tbnds)
+          else
+            write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
+          end if
+        else
+          error_flag = cmor_write( &
+                       var_id=varid, &
+                       data=fld(:, :, 1), &
+                       ntimes_passed=1, &
+                       time_vals=tval, &
+                       time_bnds=tbnds)
+        end if
       else if (vtype(1:2) == '1d') then
         error_flag = cmor_write( &
                      var_id=varid, &
@@ -1905,12 +1970,39 @@ contains
                      time_vals=tval, &
                      time_bnds=tbnds)
       else
-        error_flag = cmor_write( &
-                     var_id=varid, &
-                     data=fld, &
-                     ntimes_passed=1, &
-                     time_vals=tval, &
-                     time_bnds=tbnds)
+        if (lshiftgrid) then
+          if (hcoord(1:1) == 'p') then
+            error_flag = cmor_write( &
+                         var_id=varid, &
+                         data=fld(:,1:jdm-1,:), &
+                         ntimes_passed=1, &
+                         time_vals=tval, &
+                         time_bnds=tbnds)
+          else if (hcoord(1:1) == 'u') then
+            error_flag = cmor_write( &
+                         var_id=varid, &
+                         data=cshift(fld(:,1:jdm-1,:), -1, 1), &
+                         ntimes_passed=1, &
+                         time_vals=tval, &
+                         time_bnds=tbnds)
+          else if (hcoord(1:1) == 'v') then
+            error_flag = cmor_write( &
+                         var_id=varid, &
+                         data=fld(:,2:jdm,:), &
+                         ntimes_passed=1, &
+                         time_vals=tval, &
+                         time_bnds=tbnds)
+          else
+            write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
+          end if
+        else
+          error_flag = cmor_write( &
+                       var_id=varid, &
+                       data=fld, &
+                       ntimes_passed=1, &
+                       time_vals=tval, &
+                       time_bnds=tbnds)
+        end if
       end if
     end if
 

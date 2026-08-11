@@ -32,7 +32,8 @@ module m_namelists
     tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc, &
     secindexfile, ocngridfile, ocninitfile, ocnmertfile, ocnregnfile, &
     parent_source_id, coordtable, json_file_attributes, &
-    ocngrid, ocngrid_label, ocngrid_resolution
+    ocngrid, ocngrid_label, ocngrid_resolution, &
+    lshiftgrid
 
   ! Experiment namelist
   character(len=slenmax), save :: casename, experiment_id, parent_experiment_id, &

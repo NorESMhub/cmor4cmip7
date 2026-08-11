@@ -114,8 +114,6 @@ compound_names    =
     'ocnBgchem.detoc.tavg-ol-hxy-sea.mon.glb'           ! done
     'ocnBgchem.dfe.tavg-ols-hxy-sea.mon.glb'            ! done
     'ocnBgchem.dfe.tavg-ol-hxy-sea.mon.glb'             ! done
-    'ocnBgchem.dissi13c.tavg-ols-hxy-sea.mon.glb'       ! n/a
-    'ocnBgchem.dissi13c.tavg-ol-hxy-sea.mon.glb'        ! n/a
     'ocnBgchem.dissic.tavg-ols-hxy-sea.mon.30S-90S'     ! done
     'ocnBgchem.dissic.tavg-ol-hxy-sea.mon.glb'          ! done
     'ocnBgchem.dissoc.tavg-ol-hxy-sea.mon.glb'          ! done
@@ -134,7 +132,6 @@ compound_names    =
     'ocnBgchem.expnob.tavg-u-hxy-sea.mon.glb'           ! done
     'ocnBgchem.exppob.tavg-u-hxy-sea.mon.glb'           ! done
     'ocnBgchem.expsiob.tavg-u-hxy-sea.mon.glb'          ! done
-    'ocnBgchem.fg13co2.tavg-u-hxy-sea.mon.glb'          ! n/a
     'ocnBgchem.fgco2.tavg-u-hxy-sea.mon.glb'            ! done
     'ocnBgchem.fgdms.tavg-u-hxy-sea.mon.glb'            ! done
     'ocnBgchem.frfe.tavg-u-hxy-sea.mon.glb'             ! done

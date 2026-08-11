@@ -29,7 +29,7 @@ module m_modelsocn
   real(r4), allocatable, save, dimension(:, :, :)   :: dpini, sini, tini
   character(len=slenmax), allocatable, save, dimension(:)   :: region1, section1
   character, allocatable, save, dimension(:, :)             :: region, section
-  character(len=slenmax), save                              :: tcoord, zcoord, s1
+  character(len=slenmax), save                              :: tcoord, zcoord, hcoord, s1
   character(len=slenmax), save                              :: grid, grid_label
 
   ! Gravity
@@ -149,6 +149,7 @@ contains
       special = ''
       tcoord = ''
       zcoord = ''
+      hcoord = ''
 
       ! Select file tag according to realm and frequency
       call select_ocn_ftag(realm, frequency, itag)
@@ -1076,7 +1077,7 @@ contains
 
     integer, parameter              :: ndimmax = 10
     integer                 :: i, j, k, n, ndims, dimids(ndimmax), dimlens(ndimmax)
-    character(len=slenmax)  :: coord
+!   character(len=slenmax)  :: coord
 
     real(r8), allocatable       :: tmp1d(:), tmp2d(:, :)
 
@@ -1190,9 +1191,9 @@ contains
 !     if (trim(vunits) == 'mm/s') vunits = 'kg m-2 s-1'
 !   end if
 
-    coord = ' '
-    status = nf90_get_att(ncid, rhid, 'coordinates', coord)
-    if (status /= nf90_noerr) coord(1:1) = ivnm(1:1)
+!   coord = ' '
+    status = nf90_get_att(ncid, rhid, 'coordinates', hcoord)
+    if (status /= nf90_noerr) hcoord(1:1) = ivnm(1:1)
 
     status = nf90_close(ncid)
     call handle_ncerror(status)
@@ -1270,22 +1271,22 @@ contains
               length=jdm, &
               coord_vals=yvec)
 
-      !write(*, *) 'Define horizontal grid '//coord(1:1)
-      if (coord(1:1) == 'p') then
+      !write(*, *) 'Define horizontal grid '//hcoord(1:1)
+      if (hcoord(1:1) == 'p') then
         grdid = cmor_grid( &
                 axis_ids=(/iaxid, jaxid/), &
                 latitude=plat, &
                 longitude=plon, &
                 latitude_vertices=plat_crnsp, &
                 longitude_vertices=plon_crnsp)
-      else if (coord(1:1) == 'u') then
+      else if (hcoord(1:1) == 'u') then
         grdid = cmor_grid( &
                 axis_ids=(/iaxid, jaxid/), &
                 latitude=ulat, &
                 longitude=ulon, &
                 latitude_vertices=ulat_crnsp, &
                 longitude_vertices=ulon_crnsp)
-      else if (coord(1:1) == 'v') then
+      else if (hcoord(1:1) == 'v') then
         grdid = cmor_grid( &
                 axis_ids=(/iaxid, jaxid/), &
                 latitude=vlat, &
@@ -1573,7 +1574,7 @@ contains
     implicit none
 
     integer                 :: i, j, k
-    character(len=slenmax)  :: coord
+!   character(len=slenmax)  :: coord
 
     ! Open input file
     status = nf90_open(fnm, nf90_nowrite, ncid)

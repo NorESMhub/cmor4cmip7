@@ -1372,8 +1372,9 @@ contains
               table_entry='op20bar', &
               units='bar', &
               length=1, &
-              coord_vals=(/20./), &
-              cell_bounds=(/20., 20./))
+              coord_vals=(/20./))
+             !coord_vals=(/20./), &     ! omit bounds;
+             !cell_bounds=(/20., 20./)) ! value close to 200m at hybrid coordinate.
     else if (vtype == 'ols') then
       kaxid = cmor_axis( &
               table=trim(tablepath), &
@@ -1420,10 +1421,12 @@ contains
 
     ! Define time axis
     if (.not. fxflag) then
-      !write(*, *) 'Define time axis '
-      !write(*, *) 'tablepath:table_entry:', trim(tablepath),':',trim(tcoord)
-      write (*, *) 'tcoord:', trim(tcoord)
-      !write(*, *) 'calunits:', trim(calunits)
+      if(verbose) then
+        write(*, *) 'Define time axis '
+        write(*, *) 'tablepath:table_entry:', trim(tablepath),':',trim(tcoord)
+        write (*, *) 'tcoord:', trim(tcoord)
+        write(*, *) 'calunits:', trim(calunits)
+      end if
       taxid = cmor_axis( &
               table=trim(tablepath), &
               table_entry=trim(tcoord), &

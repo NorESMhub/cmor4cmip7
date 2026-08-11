@@ -1169,7 +1169,7 @@ contains
       jj = 1
       kk = 1
       if (dimlens(1) .eq. idm .and. idm>0) ii = idm
-      if (dimlens(2) .eq. jdm .and. jdm>0) jj = idm
+      if (dimlens(2) .eq. jdm .and. jdm>0) jj = jdm
       if (dimlens(3) .eq. kdm .and. kdm>0) THEN
         kk = kdm
       else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
@@ -1178,8 +1178,10 @@ contains
     else
       write (*, *) 'Undefined variable type, please check!'
     end if
-    write (*, *) 'vtype:', trim(vtype)
-    write (*, *) 'ii,jj,kk:', ii, jj, kk
+    if (verbose) then
+      write (*, *) 'vtype:', trim(vtype)
+      write (*, *) 'ii,jj,kk:', ii, jj, kk
+    end if
     allocate (fld(ii, jj, kk), fld2(ii, jj, kk), fldacc(ii, jj, kk), &
               fldtmp(ii, jj, kk), stat=status)
     if (status /= 0) stop 'cannot ALLOCATE enough memory (4)'

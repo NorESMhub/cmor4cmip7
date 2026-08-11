@@ -156,7 +156,7 @@ contains
 
       ! Get variable attributes from table and mapfile
       call json_get_units(trim(tabledir)//trim(table), trim(ovnm), vunits)
-      call json_get_vertcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
+      call json_get_zcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
 
       ! Get sources and factors from mapfile
       if (allocated(sources)) deallocate(sources)
@@ -1201,7 +1201,7 @@ contains
     tablepath = trim(tabledir)//trim(table)
 
     ! Inquire time dimension of output variable
-    if (.not. fxflag) call json_get_timecoord(trim(tablepath), ovnm, tcoord)
+    if (.not. fxflag) call json_get_tcoord(trim(tablepath), ovnm, tcoord)
 
     ! Call CMOR setup
     if (verbose) then

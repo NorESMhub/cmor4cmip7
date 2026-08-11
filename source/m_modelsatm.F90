@@ -97,7 +97,7 @@ contains
       write(*, *) 'tabledir:', tabledir
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       write(*, *) 'zcoord:', trim(zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
@@ -160,7 +160,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       write(*, *) 'zcoord(1:4):', zcoord(1:4)
       !write(*, *) trim(ovnm), trim(zcoord), do_3d
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
@@ -266,7 +266,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         ! Read pressure levels from table
@@ -366,7 +366,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -467,7 +467,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -566,7 +566,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -662,7 +662,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -750,7 +750,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -838,7 +838,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -926,7 +926,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -1016,7 +1016,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -1090,7 +1090,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -1162,7 +1162,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -1242,7 +1242,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -1321,7 +1321,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -1391,7 +1391,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -1462,7 +1462,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -1532,7 +1532,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -1602,7 +1602,7 @@ contains
       vcomment = ' '
 
       ! Check if 2d and/or 3d fields are to be written
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (zcoord(1:4) == 'plev' .or. zcoord(2:5) == 'leve' .or. &
         !zcoord(2:5) == 'levh') then
         !if (.not. do_3d) cycle
@@ -2215,10 +2215,10 @@ contains
 
     ! Inquire time and vertical dimension of output variable
     if (.not. fxflag) then
-      call get_timecoord(trim(tabledir)//trim(table), ovnm, tcoord)
+      call get_tcoord(trim(tabledir)//trim(table), ovnm, tcoord)
       if (len_trim(tcoord) == 0) tcoord = 'time'
     end if
-    call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+    call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
     if (zcoord(2:4) == 'lev' .or. index(special, 'calcload') > 0) then
       if (.not. allocated(ps)) then
         allocate(ps(idm, jdm), stat=status)

@@ -77,7 +77,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (trim(zcoord) == 'sdepth') then
         !if (.not. do_3d) cycle
       !else
@@ -122,7 +122,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
 
       ! Choose history file
       itag = taglyr
@@ -196,7 +196,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (trim(zcoord) == 'sdepth') then
         !if (.not. do_3d) cycle
       !else
@@ -281,7 +281,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (trim(zcoord) == 'sdepth') then
         !if (.not. do_3d) cycle
       !else
@@ -366,7 +366,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (trim(zcoord) == 'sdepth') then
         !if (.not. do_3d) cycle
       !else
@@ -451,7 +451,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (trim(zcoord) == 'sdepth') then
         !if (.not. do_3d) cycle
       !else
@@ -518,7 +518,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (trim(zcoord) == 'sdepth') then
         !if (.not. do_3d) cycle
       !else
@@ -585,7 +585,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (trim(zcoord) == 'sdepth') then
         !if (.not. do_3d) cycle
       !else
@@ -652,7 +652,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (trim(zcoord) == 'sdepth') then
         !if (.not. do_3d) cycle
       !else
@@ -720,7 +720,7 @@ contains
       vpositive = ' '
 
       ! Skip variable?
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
       !if (trim(zcoord) == 'sdepth') then
         !if (.not. do_3d) cycle
       !else
@@ -1185,9 +1185,9 @@ contains
 
     ! Inquire time and vertical dimension of output variable
     if (.not. fxflag) then
-      call get_timecoord(trim(tabledir)//trim(table), ovnm, tcoord)
+      call get_tcoord(trim(tabledir)//trim(table), ovnm, tcoord)
     end if
-    call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+    call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
 
     ! Call CMOR setup
     if (verbose) then

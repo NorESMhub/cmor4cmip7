@@ -99,7 +99,7 @@ contains
       vcomment = ' '
 
       ! Check if vertical coordinate required
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
 
       ! Check if input variable is present
       if (len_trim(pfx) == 0) cycle
@@ -145,7 +145,7 @@ contains
       if (trim(ivnm) == 'uvel' .or. trim(ivnm) == 'vvel') exit
 
       ! Check if vertical coordinate required
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
 
       ! Choose history file
       select case (trim(special))
@@ -231,7 +231,7 @@ contains
       vcomment = ' '
 
       ! Check if vertical coordinate required
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
 
       ! Choose history file
       select case (trim(special))
@@ -317,7 +317,7 @@ contains
       vcomment = ' '
 
       ! Check if vertical coordinate required
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
 
       ! Choose history file
       itag = tagiday
@@ -379,7 +379,7 @@ contains
       vcomment = ' '
 
       ! Check if vertical coordinate required
-      call get_vertcoord(trim(tabledir)//trim(table), ovnm, zcoord)
+      call get_zcoord(trim(tabledir)//trim(table), ovnm, zcoord)
 
       ! Choose history file
       itag = tagiday
@@ -964,7 +964,7 @@ contains
     ! Inquire time dimension of output variable
     write(*, *) 'get tcoord'
     if (.not. fxflag) then
-      call get_timecoord(trim(tabledir)//trim(table), ovnm, tcoord)
+      call get_tcoord(trim(tabledir)//trim(table), ovnm, tcoord)
     end if
     write(*, *) 'get tcoord (after)'
 

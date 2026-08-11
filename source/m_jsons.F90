@@ -270,7 +270,7 @@ contains
   end subroutine json_get_array_real
 
   ! -----------------------------------------------------------------
-  subroutine json_get_vertcoord(tnm, vnm, str, separator, lfound)
+  subroutine json_get_zcoord(tnm, vnm, str, separator, lfound)
 
     character(len=*), intent(in) :: tnm, vnm
     character(len=*), intent(out) :: str
@@ -312,10 +312,10 @@ contains
 
     if (allocated(cval)) deallocate (cval)
 
-  end subroutine json_get_vertcoord
+  end subroutine json_get_zcoord
 
   ! -----------------------------------------------------------------
-  subroutine json_get_timecoord(tnm, vnm, str, separator, lfound)
+  subroutine json_get_tcoord(tnm, vnm, str, separator, lfound)
 
     character(len=*), intent(in) :: tnm, vnm
     character(len=*), intent(out) :: str
@@ -354,7 +354,7 @@ contains
     if (present(lfound)) lfound = found
     if (allocated(cval)) deallocate (cval)
 
-  end subroutine json_get_timecoord
+  end subroutine json_get_tcoord
 
   ! -----------------------------------------------------------------
   subroutine json_get_original_name(tnm, vnm, str, lfound)

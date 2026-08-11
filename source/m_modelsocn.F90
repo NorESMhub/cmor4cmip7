@@ -1971,14 +1971,7 @@ contains
 !         print *, shape(fld)           ! Add before cmor_write
 !         print *, lbound(fld), ubound(fld)
 
-        if (vtype == '2d' ) then
-          error_flag = cmor_write( &
-                       var_id=varid, &
-                       data=fld(:, :, 1), &
-                       ntimes_passed=1, &
-                       time_vals=tval, &
-                       time_bnds=tbnds)
-        else if (vtype == 'op20bar' .or. vtype == 'ols' .or. vtype(1:6) == 'olayer') then
+        if (vtype == '2d' .or. vtype == 'op20bar' .or. vtype == 'ols' .or. vtype(1:6) == 'olayer') then
           error_flag = cmor_write( &
                        var_id=varid, &
                        data=fld(:, :, 1), &

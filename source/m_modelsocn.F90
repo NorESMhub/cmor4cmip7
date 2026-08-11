@@ -571,9 +571,10 @@ contains
         end do
 
         ! Extract surface value from field on depth levels
-          ! if output field is 2D while the input is 3D,
-          ! the output will use the first level (k) of the input field by default
-!     case ('lvl2srf') 
+      case ('lvl2srf') 
+        ! if output field is 2D while the input is 3D,
+        ! the output will use the first level (k) of the input field by default
+        ! so nothing needs to be done here
 !       do j = 1, jj
 !         do i = 1, ii
 !           fld(i, j, 1) = fld(i, j, 1)
@@ -2029,8 +2030,10 @@ contains
     case ('yr')
       if (realm == 'ocean') itag = tagoyr
       if (realm == 'ocnBgchem') itag = tagoyrbgc
+    case ('fx')
     case default
-      write(*,*) 'Error: Unknown realm: ',trim(realm)
+      write(*,*) 'Error: Unknown realm and frequency: '
+      write(*,*) trim(realm), ': ', trim(frequency)
     end select
 
   end subroutine select_ocn_ftag

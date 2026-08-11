@@ -21,7 +21,7 @@ module m_modelsocn
                                                    sigma, sigmahalf, depth, slat
   real(r8), allocatable, save, dimension(:, :)  :: parea, pmask, pdepth, plon, &
                                                    plat, ulon, ulat, vlon, vlat, slat_bnds, sigma_bnds, sigmahalf_bnds, &
-                                                   depth_bnds, uscaley, vscalex, udepth, vdepth
+                                                   depth_bnds
   real(r8), allocatable, save, dimension(:, :, :)   :: plon_crns, plat_crns, &
                                                        ulon_crns, ulat_crns, vlon_crns, vlat_crns, plon_crnsp, plat_crnsp, &
                                                        ulon_crnsp, ulat_crnsp, vlon_crnsp, vlat_crnsp
@@ -320,8 +320,7 @@ contains
                 vlon_crnsp, vlat_crnsp, &
                 sealv, xvec, yvec, kvec, pbot, &
                 dpini, sini, tini, &
-                kvechalf, uscaley, vscalex, &
-                udepth, vdepth, basin, stat=status)
+                kvechalf, basin, stat=status)
 
     if (allocated(idx)) deallocate (idx)
 
@@ -889,8 +888,7 @@ contains
               vlon_crnsp(ncrns, idm, jdm), vlat_crnsp(ncrns, idm, jdm), &
               sealv(idm, jdm), xvec(idm), yvec(jdm), kvec(kdm), pbot(idm, jdm), &
               dpini(idm, jdm, kdm), sini(idm, jdm, kdm), tini(idm, jdm, kdm), &
-              kvechalf(kdm + 1), uscaley(idm, jdm), vscalex(idm, jdm), &
-              udepth(idm, jdm), vdepth(idm, jdm), basin(idm, jdm), stat=status)
+              kvechalf(kdm + 1), basin(idm, jdm), stat=status)
     if (status /= 0) stop 'cannot ALLOCATE enough memory (1)'
 
     forall (i=1:idm) xvec(i) = i
@@ -907,13 +905,6 @@ contains
     call handle_ncerror(status)
     status = nf90_get_var(ncid, rhid, pdepth)
     call handle_ncerror(status)
-    status = nf90_inq_varid(ncid, 'udepth', rhid)
-    call handle_ncerror(status)
-    status = nf90_get_var(ncid, rhid, udepth)
-    call handle_ncerror(status)
-    status = nf90_inq_varid(ncid, 'vdepth', rhid)
-    call handle_ncerror(status)
-    status = nf90_get_var(ncid, rhid, vdepth)
     call handle_ncerror(status)
     status = nf90_inq_varid(ncid, 'pmask', rhid)
     call handle_ncerror(status)
@@ -922,14 +913,6 @@ contains
     status = nf90_inq_varid(ncid, 'parea', rhid)
     call handle_ncerror(status)
     status = nf90_get_var(ncid, rhid, parea)
-    call handle_ncerror(status)
-    status = nf90_inq_varid(ncid, 'udy', rhid)
-    call handle_ncerror(status)
-    status = nf90_get_var(ncid, rhid, uscaley)
-    call handle_ncerror(status)
-    status = nf90_inq_varid(ncid, 'vdx', rhid)
-    call handle_ncerror(status)
-    status = nf90_get_var(ncid, rhid, vscalex)
     call handle_ncerror(status)
     parea = parea*pmask
 
@@ -1187,14 +1170,6 @@ contains
               fldtmp(ii, jj, kk), stat=status)
     if (status /= 0) stop 'cannot ALLOCATE enough memory (4)'
 
-    ! vunits has default value from data table
-!   if (len_trim(vunits) == 0) then
-!     status = nf90_get_att(ncid, rhid, 'units', vunits)
-!     call handle_ncerror(status)
-!     if (trim(vunits) == 'mm/s') vunits = 'kg m-2 s-1'
-!   end if
-
-!   coord = ' '
     status = nf90_get_att(ncid, rhid, 'coordinates', hcoord)
     if (status /= nf90_noerr) hcoord(1:1) = ivnm(1:1)
 

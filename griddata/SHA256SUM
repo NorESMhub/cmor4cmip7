@@ -1,0 +1,11 @@
+bc71ec04311b0aea44e9bae6c5910e0dcaab86fbdb5ad79c665f0a5c689a8d49  grid_tnx1v4.nc
+572048e88976c1c74abcea282949adafda68d7dda38d60af35afd27410fcf3e9  inicon_tnx1v4.nc
+36715353fce4c54b674fdfca1142bb198455fce6dcfe606aa7e6b9540ef2b5bb  mertraoceans_tnx1v4.dat
+45e2fd071df4cd1ef2d83a14924448696c1d51c06010778e464ebf7c7d0bb5b8  ocean_regions_tnx1v4.nc
+1e8fb31862f3b6ecbe881a6f632738aa525784d1bf201458a255470684b5bd59  secindex_tnx1v4.dat
+
+-rw-r--r-- 1 yanchun ns16000b  75162156 Jun  8 17:31 grid_tnx1v4.nc
+-rw-r--r-- 1 yanchun ns16000b 120307076 Jun 11 20:38 inicon_tnx1v4.nc
+-rw-r--r-- 1 yanchun ns16000b    138973 Jun  8 17:31 mertraoceans_tnx1v4.dat
+-rw-r--r-- 1 yanchun ns16000b    555200 Jun  8 17:31 ocean_regions_tnx1v4.nc
+-rw-r--r-- 1 yanchun ns16000b      3027 Jun  8 17:32 secindex_tnx1v4.dat

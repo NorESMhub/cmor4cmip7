@@ -1901,115 +1901,43 @@ contains
 
     integer :: i, j, k
 
-    ! Populate field defined at interface level
-!   if (index(special, 'zhalf') > 0) then
-!     fldhalf(:, :, 1) = sealv
-!     fldhalf(:, :, 2:kdm + 1) = fld
-!     do k = 1, kk + 1
-!       do j = 1, jj
-!         do i = 1, ii
-!           if (abs(fldhalf(i, j, k)) > 2e20) fldhalf(i, j, k) = 0.
-!         end do
-!       end do
-!     end do
-!   else if (index(special, 'halfl') > 0) then
-!     fldhalf(:, :, 2:kdm + 1) = fld
-!     do j = 1, jj
-!       do i = 1, ii
-!         if (abs(fldhalf(i, j, 2)) >= 1e20) then
-!           fldhalf(i, j, 1) = 1e20
-!         else
-!           fldhalf(i, j, 1) = 0.
-!         end if
-!       end do
-!     end do
-!   end if
-
-    ! Set missing on land grid cells
-    !if (index(special, 'glbave') <= 0) then
-!   if (index(special, 'glbave') > 0) then
-!     do k = 1, kk
-!       do j = 1, jj
-!         do i = 1, ii
-!           if (abs(fld(i, j, k)) > 1e20) fld(i, j, k) = 1e20
-!         end do
-!       end do
-!     end do
-!   end if
-
-    ! Store variable
-!   if (index(special, 'half') > 0) then
-!     if (trim(tcoord) == 'time1') then
-!       error_flag = cmor_write( &
-!                    var_id=varid, &
-!                    data=fldhalf, &
-!                    ntimes_passed=1, &
-!                    time_vals=tval)
-!     else
-!       error_flag = cmor_write( &
-!                    var_id=varid, &
-!                    data=fldhalf, &
-!                    ntimes_passed=1, &
-!                    time_vals=tval, &
-!                    time_bnds=tbnds)
-!     end if
-!   else
-      if (trim(tcoord) == 'time1') then
+    if (trim(tcoord) == 'time1') then
+      error_flag = cmor_write( &
+                   var_id=varid, &
+                   data=fld, &
+                   ntimes_passed=1, &
+                   time_vals=tval)
+    else
+      if (vtype == '2d' .or. vtype == 'op20bar' .or. vtype == 'ols' .or. vtype(1:6) == 'olayer') then
+        error_flag = cmor_write( &
+                     var_id=varid, &
+                     data=fld(:, :, 1), &
+                     ntimes_passed=1, &
+                     time_vals=tval, &
+                     time_bnds=tbnds)
+      else if (vtype(1:2) == '1d') then
+        error_flag = cmor_write( &
+                     var_id=varid, &
+                     data=(/fld(1, 1, 1)/), &
+                     ntimes_passed=1, &
+                     time_vals=tval, &
+                     time_bnds=tbnds)
+      else if (vtype(1:4) == 'sect') then
+        error_flag = cmor_write( &
+                     var_id=varid, &
+                     data=fld(:, 1, 1), &
+                     ntimes_passed=1, &
+                     time_vals=tval, &
+                     time_bnds=tbnds)
+      else
         error_flag = cmor_write( &
                      var_id=varid, &
                      data=fld, &
                      ntimes_passed=1, &
-                     time_vals=tval)
-      else
-!       if ((lsumz .or. index(special, 'level1') > 0) .and. &
-!           .not. index(special, 'glbave') > 0 &
-!           .or. index(special, 'lvl2srf') > 0 &
-!           .or. index(special, 'dpint') > 0 &
-!           .or. index(special, 'dp.avg') > 0 &
-!           .or. index(special, 'locmin') > 0 &
-!           .or. index(special, 'omega2z') > 0) then
-
-!         print *, shape(fld)           ! Add before cmor_write
-!         print *, lbound(fld), ubound(fld)
-
-        if (vtype == '2d' .or. vtype == 'op20bar' .or. vtype == 'ols' .or. vtype(1:6) == 'olayer') then
-          error_flag = cmor_write( &
-                       var_id=varid, &
-                       data=fld(:, :, 1), &
-                       ntimes_passed=1, &
-                       time_vals=tval, &
-                       time_bnds=tbnds)
-        else if (vtype(1:2) == '1d') then
-          error_flag = cmor_write( &
-                       var_id=varid, &
-                       data=(/fld(1, 1, 1)/), &
-                       ntimes_passed=1, &
-                       time_vals=tval, &
-                       time_bnds=tbnds)
-!       else if (index(special, 'dzavg') > 0) then
-!         error_flag = cmor_write( &
-!                      var_id=varid, &
-!                      data=(reshape(fld(:, :, 1), (/idm, jdm, 1/))), &
-!                      ntimes_passed=1, &
-!                      time_vals=tval, &
-!                      time_bnds=tbnds)
-        else if (vtype(1:4) == 'sect') then
-          error_flag = cmor_write( &
-                       var_id=varid, &
-                       data=fld(:, 1, 1), &
-                       ntimes_passed=1, &
-                       time_vals=tval, &
-                       time_bnds=tbnds)
-        else
-          error_flag = cmor_write( &
-                       var_id=varid, &
-                       data=fld, &
-                       ntimes_passed=1, &
-                       time_vals=tval, &
-                       time_bnds=tbnds)
-        end if
+                     time_vals=tval, &
+                     time_bnds=tbnds)
       end if
-!   end if
+    end if
 
   end subroutine write_tslice
 

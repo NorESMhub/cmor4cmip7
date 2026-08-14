@@ -1283,10 +1283,10 @@ contains
         if (lshiftgrid) then
           grdid = cmor_grid( &
                   axis_ids=(/iaxid, jaxid/), &
-                  latitude=cshift(ulat(:,1:jdm-1), -1, 1), &
-                  longitude=cshift(ulon(:,1:jdm-1), -1, 1), &
-                  latitude_vertices=cshift(ulat_crnsp(:,:,1:jdm-1), -1, 2), &
-                  longitude_vertices=cshift(ulon_crnsp(:,:,1:jdm-1), -1, 2))
+                  latitude=cshift(ulat(:,1:jdm-1), 1, 1), &
+                  longitude=cshift(ulon(:,1:jdm-1), 1, 1), &
+                  latitude_vertices=cshift(ulat_crnsp(:,:,1:jdm-1), 1, 2), &
+                  longitude_vertices=cshift(ulon_crnsp(:,:,1:jdm-1), 1, 2))
         else
           grdid = cmor_grid( &
                   axis_ids=(/iaxid, jaxid/), &
@@ -1895,7 +1895,7 @@ contains
          else if (hcoord(1:1) == 'u') then
            error_flag = cmor_write( &
                         var_id=varid, &
-                        data=cshift(fld(:,1:jdm-1,1), -1, 1))
+                        data=cshift(fld(:,1:jdm-1,1), 1, 1))
          else if (hcoord(1:1) == 'v') then
             error_flag = cmor_write( &
                          var_id=varid, &
@@ -1935,7 +1935,7 @@ contains
         else if (hcoord(1:1) == 'u') then
            error_flag = cmor_write( &
                         var_id=varid, &
-                        data=cshift(fld(:,1:jdm-1,1), -1, 1), &
+                        data=cshift(fld(:,1:jdm-1,1), 1, 1), &
                         ntimes_passed=1, &
                         time_vals=tval)
         else if (hcoord(1:1) == 'v') then
@@ -1967,7 +1967,7 @@ contains
           else if (hcoord(1:1) == 'u') then
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=cshift(fld(:, 1:jdm-1, 1), -1, 1), &
+                         data=cshift(fld(:, 1:jdm-1, 1), 1, 1), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
@@ -2015,7 +2015,7 @@ contains
           else if (hcoord(1:1) == 'u') then
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=cshift(fld(:,1:jdm-1,:), -1, 1), &
+                         data=cshift(fld(:,1:jdm-1,:), 1, 1), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)

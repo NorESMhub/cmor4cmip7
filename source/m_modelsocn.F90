@@ -1887,9 +1887,27 @@ contains
 
     ! Store variable
     if (vtype == '2d') then
-      error_flag = cmor_write( &
-                   var_id=varid, &
-                   data=reshape(fld, (/idm, jdm/)))
+       if (lshiftgrid) then
+         if (hcoord(1:1) == 'p') then
+           error_flag = cmor_write( &
+                        var_id=varid, &
+                        data=fld(:,1:jdm-1,1))
+         else if (hcoord(1:1) == 'u') then
+           error_flag = cmor_write( &
+                        var_id=varid, &
+                        data=cshift(fld(:,1:jdm-1,1), -1, 1))
+         else if (hcoord(1:1) == 'v') then
+            error_flag = cmor_write( &
+                         var_id=varid, &
+                         data=fld(:, 2:jdm, 1))
+         else
+           write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
+         end if
+       else
+         error_flag = cmor_write( &
+                      var_id=varid, &
+                      data=fld(:,:,1))
+       end if
     else
       error_flag = cmor_write( &
                    var_id=varid, &
@@ -1908,11 +1926,27 @@ contains
 
     if (trim(tcoord) == 'time1') then
       if (lshiftgrid) then
-         error_flag = cmor_write( &
-                      var_id=varid, &
-                      data=fld(:,1:jdm-1,1), &
-                      ntimes_passed=1, &
-                      time_vals=tval)
+        if (hcoord(1:1) == 'p') then
+           error_flag = cmor_write( &
+                        var_id=varid, &
+                        data=fld(:,1:jdm-1,1), &
+                        ntimes_passed=1, &
+                        time_vals=tval)
+        else if (hcoord(1:1) == 'u') then
+           error_flag = cmor_write( &
+                        var_id=varid, &
+                        data=cshift(fld(:,1:jdm-1,1), -1, 1), &
+                        ntimes_passed=1, &
+                        time_vals=tval)
+        else if (hcoord(1:1) == 'v') then
+           error_flag = cmor_write( &
+                        var_id=varid, &
+                        data=fld(:, 2:jdm, 1), &
+                        ntimes_passed=1, &
+                        time_vals=tval)
+        else
+          write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
+        end if
       else
          error_flag = cmor_write( &
                       var_id=varid, &

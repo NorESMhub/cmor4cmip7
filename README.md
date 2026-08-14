@@ -25,6 +25,12 @@ cd build
 ./build.sh
 ```
 
+hack the CMOR CV (a temporary solution before CMOR CV officially updated)
+```
+cp /nird/datalake/NS16000B/CMOR/cmor4cmip7/cmor/cmip7-cmor-tables/tables-cvs/cmor-cvs.json ~/cmor4cmip7/cmor/cmip7-cmor-tables/tables-cvs/cmor-cvs.json
+```
+
+
 ## 2. Update recipes
 update the information under `cmor4cmip7/recipes/test`, where find necessary
 * experiment.nml    : about the experiment

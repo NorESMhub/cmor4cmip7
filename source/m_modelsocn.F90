@@ -1887,31 +1887,49 @@ contains
 
     ! Store variable
     if (vtype == '2d') then
-       if (lshiftgrid) then
-         if (hcoord(1:1) == 'p') then
+      if (lshiftgrid) then
+        if (hcoord(1:1) == 'p') then
+          error_flag = cmor_write( &
+                       var_id=varid, &
+                       data=fld(:,1:jdm-1,1))
+        else if (hcoord(1:1) == 'u') then
+          error_flag = cmor_write( &
+                       var_id=varid, &
+                       data=cshift(fld(:,1:jdm-1,1), 1, 1))
+        else if (hcoord(1:1) == 'v') then
            error_flag = cmor_write( &
                         var_id=varid, &
-                        data=fld(:,1:jdm-1,1))
-         else if (hcoord(1:1) == 'u') then
-           error_flag = cmor_write( &
-                        var_id=varid, &
-                        data=cshift(fld(:,1:jdm-1,1), 1, 1))
-         else if (hcoord(1:1) == 'v') then
-            error_flag = cmor_write( &
-                         var_id=varid, &
-                         data=fld(:, 2:jdm, 1))
-         else
-           write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
-         end if
-       else
-         error_flag = cmor_write( &
-                      var_id=varid, &
-                      data=fld(:,:,1))
-       end if
+                        data=fld(:, 2:jdm, 1))
+        else
+          write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
+        end if
+      else
+        error_flag = cmor_write( &
+                     var_id=varid, &
+                     data=fld(:,:,1))
+      end if
     else
-      error_flag = cmor_write( &
-                   var_id=varid, &
-                   data=fld)
+      if (lshiftgrid) then
+        if (hcoord(1:1) == 'p') then
+          error_flag = cmor_write( &
+                       var_id=varid, &
+                       data=fld(:,1:jdm-1,:))
+        else if (hcoord(1:1) == 'u') then
+          error_flag = cmor_write( &
+                       var_id=varid, &
+                       data=cshift(fld(:,1:jdm-1,:), 1, 1))
+        else if (hcoord(1:1) == 'v') then
+           error_flag = cmor_write( &
+                        var_id=varid, &
+                        data=fld(:, 2:jdm, :))
+        else
+          write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
+        end if
+      else
+        error_flag = cmor_write( &
+                     var_id=varid, &
+                     data=fld(:,:,:))
+      end if
     end if
 
   end subroutine write_field

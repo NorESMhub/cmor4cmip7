@@ -61,7 +61,7 @@ compound_names    =
     'ocean.sfy.tavg-ol-hxy-sea.mon.glb'                 ! done
     'ocean.sfy.tavg-u-hxy-sea.mon.glb'                  ! done
     'ocean.siflfwbot.tavg-u-hxy-sea.mon.glb'            ! done
-!   'ocean.so.tavg-ol-hm-sea.mon.glb'                   ! check: test with dreq v1.2.2.4
+    'ocean.so.tavg-u-hm-sea.mon.glb'                    ! done
     'ocean.so.tavg-ol-hxy-sea.mon.glb'                  ! done
     'ocean.sob.tavg-u-hxy-sea.mon.glb'                  ! done
     'ocean.sos.tavg-u-hm-sea.mon.glb'                   ! done
@@ -76,7 +76,7 @@ compound_names    =
     'ocean.thetao.tavg-d2000m-hxy-sea.mon.glb'          ! done
     'ocean.thetao.tavg-d300m-hxy-sea.mon.glb'           ! done
     'ocean.thetao.tavg-d700m-hxy-sea.mon.glb'           ! done
-!   'ocean.thetao.tavg-ol-hm-sea.mon.glb'               ! check: test with dreq v1.2.2.4
+    'ocean.thetao.tavg-u-hm-sea.mon.glb'                ! done
     'ocean.thetao.tavg-ol-hxy-sea.mon.glb'              ! done
     'ocean.thetaot.tavg-u-hxy-sea.mon.glb'              ! done
     'ocean.thkcello.ti-ol-hxy-sea.fx.glb'               ! done

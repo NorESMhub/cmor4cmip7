@@ -16,7 +16,7 @@ FC=gfortran
 LD=$(FC)
 
 # Libraries
-CMOR=/nird/datalake/NS16000B/CMOR/cmorlib/3.14.1/gnu
+CMOR=/nird/datalake/NS16000B/CMOR/cmorlib/3.15.3/gnu
 JSONF=/nird/datalake/NS16000B/CMOR/json-fortran/9.2.1-gnu
 GSW=/nird/datalake/NS16000B/CMOR/GSW-Fortran/v3.05-7-gnu
 NETCDFF=$(EBROOTNETCDFMINFORTRAN)

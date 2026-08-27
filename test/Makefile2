@@ -1,0 +1,52 @@
+# Targets 
+TARGET=test_json
+
+# Objects
+OBJ=json_kinds.o json_parameters.o json_string_utilities.o json_value_module.o json_file_module.o json_module.o test_json1.o
+
+# Paths 
+SRCDIR=../json-fortran/src
+
+# Fortran compiler
+FC=gfortran
+
+# Linker
+LD=$(FC)
+
+# Directory list to search for library files
+LIBS=-ljson-c
+
+# Compiler flags
+FFLAGS=-I$(SRCDIR)
+
+.PHONY: all clean
+
+all: $(TARGET)
+
+clean:
+	rm -f *.o *.h *.inc *.mod
+
+$(TARGET): $(OBJ)
+	$(LD) -o $(TARGET) $(OBJ) $(LIBS)
+
+test_json1.o: ./test_json1.F90
+	$(FC) $(FFLAGS) -c ./test_json1.F90
+
+json_module.o: $(SRCDIR)/json_module.F90
+	$(FC) $(FFLAGS) -c $(SRCDIR)/json_module.F90
+
+json_file_module.o: $(SRCDIR)/json_file_module.F90
+	$(FC) $(FFLAGS) -c $(SRCDIR)/json_file_module.F90
+
+json_value_module.o: $(SRCDIR)/json_value_module.F90
+	$(FC) $(FFLAGS) -c $(SRCDIR)/json_value_module.F90
+
+json_string_utilities.o: $(SRCDIR)/json_string_utilities.F90
+	$(FC) $(FFLAGS) -c $(SRCDIR)/json_string_utilities.F90
+
+json_parameters.o: $(SRCDIR)/json_parameters.F90
+	$(FC) $(FFLAGS) -c $(SRCDIR)/json_parameters.F90
+
+json_kinds.o: $(SRCDIR)/json_kinds.F90
+	$(FC) $(FFLAGS) -c $(SRCDIR)/json_kinds.F90
+

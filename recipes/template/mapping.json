@@ -236,11 +236,11 @@
         "ocean.siflfwbot.tavg-u-hxy-sea.mon.glb": {
             "original_name": "fmltfz"
         },
-        "ocean.so.tavg-u-hm-sea.mon.glb": {
-            "original_name": "salnga"
-        },
         "ocean.so.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "salnlvl"
+        },
+        "ocean.so.tavg-u-hm-sea.mon.glb": {
+            "original_name": "salnga"
         },
         "ocean.sob.tavg-u-hxy-sea.mon.glb": {
             "original_name": "sbot"
@@ -308,11 +308,11 @@
             },
             "history": "thetao = sum(templvl(i,j,k)*(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))/sum(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))"
         },
-        "ocean.thetao.tavg-u-hm-sea.mon.glb": {
-            "original_name": "tempga"
-        },
         "ocean.thetao.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "templvl"
+        },
+        "ocean.thetao.tavg-u-hm-sea.mon.glb": {
+            "original_name": "tempga"
         },
         "ocean.thetaot.tavg-u-hxy-sea.mon.glb": {
             "original_name": "temp, dp",

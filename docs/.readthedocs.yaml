@@ -10,12 +10,8 @@ build:
       # this Jupyter Book so it builds.
       - "jupyter-book config sphinx docs/"
 
-python:
-  install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - sphinx
+conda:
+  environment: environment.yml
 
 sphinx:
   builder: html

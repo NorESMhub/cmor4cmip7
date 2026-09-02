@@ -3,6 +3,6 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "CMOR4CMIP7"
+name = "cmor4cmip7"
 authors = [{name = "Yanchun He", email = "yh_at_nersc.no"}]
 dynamic = ["version", "description"]

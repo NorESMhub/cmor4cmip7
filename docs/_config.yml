@@ -1,9 +1,10 @@
 # Book settings
 # Learn more at https://jupyterbook.org/customize/config.html
 
-title: cmor4cmip7
-author: yanchun.he_at_nersc.no
-logo: cmor4cmip7.png
+title: "cmor4cmip7"
+project: "cmor4cmip7: A program to CMORize NorESM3 output for CMIP7."
+author: "yanchun.he_at_nersc.no"
+logo: "logo.png"
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html

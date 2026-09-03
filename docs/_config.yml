@@ -30,3 +30,10 @@ repository:
 html:
   use_issues_button: true
   use_repository_button: true
+
+
+# Set sphnix extensions
+#sphinx:
+#  extensions:
+#    - myst_nb
+#    - jupyter_book

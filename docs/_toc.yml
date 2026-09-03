@@ -4,5 +4,16 @@
 format: jb-book
 root: intro
 chapters:
-- file: markdown
-- file: markdown-notebooks
+- file: install/intro.md
+  sections:
+    - file: install/cmor4cmip7.md
+    - file: install/cmor.md
+    - file: install/gsw.md
+    - file: install/json.md
+- file: tutorial/intro.md
+  sections:
+    - file: tutorial/install.md
+    - file: tutorial/recipe.md
+    - file: tutorial/validate.md
+- file: recipes.md
+- file: contribute.md

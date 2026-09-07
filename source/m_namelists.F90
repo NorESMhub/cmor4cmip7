@@ -16,49 +16,60 @@ module m_namelists
     forcefilescan, verbose
 
   ! Model namelist
-  character(len=slenmax), save  :: model_id, institute_id
+  character(len=slenmax), save  :: source_id, institute_id
   character(len=slenmax), save  :: institution, source, references, contact
   character(len=slenmax), save  :: tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc
                                    
   character(len=slenmax), save  :: secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
                                    ocnregnfile
-  character(len=slenmax), save  :: parent_source_id, coordtable, json_file_attributes, &
+  character(len=slenmax), save  :: coordtable, json_file_attributes, &
                                    ocngrid, ocngrid_label, ocngrid_resolution
+  ! conditionally required global attributes
+! character(len=slenmax), save  :: external_variables
 
   logical, save                 :: lshiftgrid   ! shift c-stggering grid from low-left to upper-right stencil
 
-  namelist /model/ model_id, institute_id, &
+  namelist /model/ source_id, institute_id, &
     institution, source, references, contact, &
     tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc, &
     secindexfile, ocngridfile, ocninitfile, ocnmertfile, ocnregnfile, &
-    parent_source_id, coordtable, json_file_attributes, &
+    coordtable, json_file_attributes, &
     ocngrid, ocngrid_label, ocngrid_resolution, &
     lshiftgrid
 
   ! Experiment namelist
-  character(len=slenmax), save :: casename, experiment_id, parent_experiment_id, &
+  character(len=slenmax), save :: casename, experiment_id, &
                                   parent_experiment_rip, isubdir, osubdir, membertag
-  character(len=slenmax), save :: history, comment, forcing
+  character(len=slenmax), save :: history, comment
   integer, save                                 :: realization, exprefyear, year1, yearn, month1, monthn
   real(r8), save                            :: branch_time
   logical, save :: dry_run, plevdummy, readdummy, add_fill_day, scanallfiles
   integer, save :: physics_version = 1, initialization_method = 1
-  character(len=slenmax), save  :: activity_id, parent_variant_label, &
-                                   parent_mip_era, mip_era, sub_experiment_id, parent_sub_experiment, &
-                                   parent_activity_id, branch_method, parent_time_units, tracking_prefix, &
-                                   variant_label, source_type
-  real(r8), save            :: branch_time_in_child, branch_time_in_parent
+  ! CMIP7 DRS elements
+  character(len=slenmax), save  :: activity_id, &
+                                   mip_era, tracking_prefix, &
+                                   variant_label
   character(len=slenmax), save  :: forcing_index, physics_index, realization_index, &
                                    initialization_index
-  namelist /experiment/ casename, experiment_id, parent_experiment_id, &
+  ! conditionally required global attributes
+  real(r8), save                :: branch_time_in_child,  &
+                                   branch_time_in_parent
+  character(len=slenmax), save  :: parent_activity_id,    &
+                                   parent_experiment_id,  &
+                                   parent_mip_era,        &
+                                   parent_source_id,      &
+                                   parent_time_units,     &
+                                   parent_variant_label
+
+  namelist /experiment/ casename, experiment_id, parent_experiment_id, parent_source_id, &
     parent_experiment_rip, isubdir, osubdir, membertag, &
-    history, comment, forcing, &
+    history, comment, &
     realization, exprefyear, year1, yearn, month1, monthn, &
     branch_time, &
     dry_run, plevdummy, readdummy, add_fill_day, scanallfiles, &
     activity_id, parent_variant_label, parent_mip_era, mip_era, &
-    sub_experiment_id, parent_sub_experiment, parent_activity_id, branch_method, &
-    parent_time_units, tracking_prefix, variant_label, source_type, &
+    parent_sub_experiment, parent_activity_id, &
+    parent_time_units, tracking_prefix, variant_label, &
     branch_time_in_child, branch_time_in_parent, &
     forcing_index, physics_index, realization_index, initialization_index
 
@@ -136,8 +147,7 @@ contains
     history = ' '
     comment = ' '
     references = ' '
-    model_id = ' '
-    forcing = ' '
+    source_id = ' '
     realization = 1
     branch_time = 0.0
     parent_experiment_id = ' '
@@ -277,7 +287,7 @@ contains
     write (*, *)
     write (*, *) 'Model namelist:'
     write (*, *) ' institution      = ', trim(institution)
-    write (*, *) ' model id         = ', trim(model_id)
+    write (*, *) ' source id         = ', trim(source_id)
     write (*, *) ' source           = ', trim(source)
     write (*, *) ' references       = ', trim(references)
     write (*, *) ' contact          = ', trim(contact)

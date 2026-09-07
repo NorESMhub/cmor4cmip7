@@ -2,12 +2,11 @@
  casename               = 'n1850.ne16pg3_tn14.noresm3_0_beta17.Run12-1.restartfromold.2026-05-21',
  osubdir                = 'UKESM1-3-LL/piControl/v20260827'
  experiment_id          = 'piControl'
- sub_experiment_id      = 'none',
  parent_experiment_id   = 'piControl-spinup',
  parent_experiment_rip  = 'r1i1p1',
  parent_time_units      = 'days since 0421-01-01',
- history                = ' ',
- forcing                = 'N/A',
+ parent_source_id       = 'UKESM1-3-LL',
+ history                = '',
  realization_index      = 'r1',
  initialization_index   = 'i1',
  physics_index          = 'p1',

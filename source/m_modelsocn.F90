@@ -1063,6 +1063,10 @@ contains
 !   character(len=slenmax)  :: coord
 
     real(r8), allocatable       :: tmp1d(:), tmp2d(:, :)
+    character(len=slenmax)      :: cell_measures
+
+    ! initalise
+    cell_measures = '' 
 
     ! Check if output variable should have time coordinate
     fxflag = .false.
@@ -1558,6 +1562,17 @@ contains
         write(*,*) 'vtype: ', trim(vtype)
       end if
     end if
+
+    call json_get_val_str(trim(tabledir)//"CMIP7_cell_measures.json", &
+         "cell_measures:"//trim(cvnm), cell_measures, separator=':', lfound=found)
+    if (cell_measures == 'area: areacello') then
+      status = cmor_set_variable_attribute(varid, "cell_measures", 'area: areacello')
+    else
+      if (cell_measures == 'area: areacello volume: volcello') then
+        status = cmor_set_variable_attribute(varid, "cell_measures", 'area: areacello volume: volcello')
+      end if
+    end if
+
 #ifdef DEFLATE
     error_flag = cmor_set_deflate(varid, 1, 1, 5)
 #endif

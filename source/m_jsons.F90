@@ -55,7 +55,7 @@ contains
 !   call json%add(p, 'comment', trim(comment))
 
     ! CMOR library needed
-    call json%add(p, '_controlled_vocabulary_file', 'cmor-cvs.json')
+    call json%add(p, '_controlled_vocabulary_file', '../tables-cvs/cmor-cvs.json')
     call json%add(p, '_AXIS_ENTRY_FILE', 'CMIP7_coordinate.json')
     call json%add(p, '_FORMULA_VAR_FILE', 'CMIP7_formula_terms.json')
     call json%add(p, '_cmip7_option', 1)

@@ -22,7 +22,6 @@
  parent_variant_label   = 'r1i1p1f1',
  parent_mip_era         = 'CMIP7',
  mip_era                = 'CMIP7',
- parent_sub_experiment  = '',
  branch_time_in_child   = 0.0D0,
  branch_time_in_parent  = 430700.0D0,
  tracking_prefix        = 'hdl:21.14107',

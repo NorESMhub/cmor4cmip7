@@ -68,7 +68,7 @@ module m_namelists
     branch_time, &
     dry_run, plevdummy, readdummy, add_fill_day, scanallfiles, &
     activity_id, parent_variant_label, parent_mip_era, mip_era, &
-    parent_sub_experiment, parent_activity_id, &
+    parent_activity_id, &
     parent_time_units, tracking_prefix, variant_label, &
     branch_time_in_child, branch_time_in_parent, &
     forcing_index, physics_index, realization_index, initialization_index
@@ -310,7 +310,6 @@ contains
     write (*, *) ' experiment id    = ', trim(experiment_id)
     write (*, *) ' history          = ', trim(history)
     write (*, *) ' comment          = ', trim(comment)
-    write (*, *) ' forcing          = ', trim(forcing)
     write (*, *) ' realization      = ', realization
     write (*, *) ' start year       = ', year1
     write (*, *) ' end year         = ', yearn

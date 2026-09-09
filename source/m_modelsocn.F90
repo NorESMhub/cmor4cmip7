@@ -75,8 +75,12 @@ contains
 
     logical :: badrec, last, first
     integer :: k, m, n
-    integer :: romon = 365*10*2
     character(len=slenmax), dimension(5) :: itags
+
+    ! rmax: maximum number of records;
+    ! initial value 120, corresponds to 10-year of monthly data, and 
+    ! 120-year of yearly data, etc
+    integer :: rmax = 120
 
     badrec = .false.
 
@@ -152,8 +156,20 @@ contains
       hcoord = ''
 
       ! Select file tag according to realm and frequency
-      call select_ocn_ftag(realm, frequency, itag)
-      if (bvnm == 'sf6_tavg-ol-hxy-sea') call select_ocn_ftag('ocnBgchem', frequency, itag)
+      call set_ocn_tag(realm, frequency, itag)
+      if (bvnm == 'sf6_tavg-ol-hxy-sea') call set_ocn_tag('ocnBgchem', frequency, itag)
+
+      !! Set maximum number of records for different frequencies
+      !(currently all hard-coded to 10 years)
+      select case (frequency)
+      case ('yr')
+        rmax = 10
+      case ('mon')
+        rmax = 120
+      case ('day')
+        rmax = 3650
+      end select
+
 
       ! Get variable attributes from table and mapfile
       call json_get_units(trim(tabledir)//trim(table), trim(ovnm), vunits)
@@ -248,7 +264,7 @@ contains
           m = m + 1
 
 !         ! Open output file
-          if (mod(m - 1, romon) == 0) then
+          if (mod(m - 1, rmax) == 0) then
             call open_ofile(ivnm, ovnm)
           end if
 
@@ -256,6 +272,8 @@ contains
           rec = 0
           call scan_files(reset=.false.)
           if (rec == 0) exit
+          if (verbose) write(*,*) 'read_tslice: ', &
+            trim(fnm(index(fnm, '/', back=.true.)+1:))
           call read_tslice(rec, badrec, fnm)
 
           !! calcluate tval and tbnds
@@ -278,12 +296,15 @@ contains
           call write_tslice
 
 !         ! Close output file if max rec has been reached
-          if (mod(m, romon) == 0) call close_ofile
+          if (mod(m, rmax) == 0) then
+            call close_ofile
+            write(*,*) 'm:',m
+          end if
 
         end do
 
 !       ! Close output file if still open
-        if (mod(m, romon) > 0) call close_ofile
+        if (mod(m, rmax) > 0) call close_ofile
 
       end if
 
@@ -1098,6 +1119,7 @@ contains
     jj = jdm
     kk = kdm
     if (verbose) then
+      write (*, *) 'open_ofile()'
       write (*, *) 'ivm:', trim(ivnm)
       write (*, *) 'ovnm:', trim(ovnm)
       write (*, *) 'dimlens:', dimlens
@@ -1657,6 +1679,7 @@ contains
         stop
       end if
       status = nf90_get_var(fid, rhid, tval, (/rec1/), (/1/))
+      if (status /= nf90_noerr) badrec = .true.
       call handle_ncerror(status)
       if (rec == 0) tval = tval - 1
 
@@ -2077,7 +2100,7 @@ contains
 
   ! -----------------------------------------------------------------
 
-  subroutine select_ocn_ftag(realm, frequency, itag)
+  subroutine set_ocn_tag(realm, frequency, itag)
 
     character(len=*), intent(in) :: realm, frequency
     character(len=*), intent(out) :: itag
@@ -2098,6 +2121,6 @@ contains
       write(*,*) trim(realm), ': ', trim(frequency)
     end select
 
-  end subroutine select_ocn_ftag
+  end subroutine set_ocn_tag
 
 end module m_modelsocn

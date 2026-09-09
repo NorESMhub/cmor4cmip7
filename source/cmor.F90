@@ -34,7 +34,7 @@ program main
         //trim('filelist_'//casename)//trim(membertag)
       if (len_trim(membertag) .gt. 0) then
         call SYSTEM('find '//trim(ibasedir)//'/'//trim(casename) &
-          //'/{ice,ocn} ' &
+          //'/ocn ' &
           //'-mindepth 2 -maxdepth 2 -path "*/hist/*" -name "*.*_'//trim(membertag) &
           //'.h*.nc" | sort > '//trim('filelist_'//casename) &
           //trim(membertag))
@@ -44,14 +44,14 @@ program main
 !         //' \( -path "*/hist/*" -or ' &
 !         //'    -path "*/hist_true/*" \)' &
         call SYSTEM('find '//trim(ibasedir)//'/'//trim(casename) &
-          //'/{ice,ocn} ' &
+          //'/ocn ' &
           //'-mindepth 2 -maxdepth 2' &
           //' -path "*/hist/*"' &
           //' -name "*.nc"' &
           //' | sort > '//trim('filelist_'//casename))
 
         write(*,*) 'find '//trim(ibasedir)//'/'//trim(casename) &
-          //'/{ice,ocn} ' &
+          //'/ocn ' &
           //'-mindepth 2 -maxdepth 2 ' &
           //'-path "*/hist/*" ' &
           //'-name "*.nc" ' &

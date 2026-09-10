@@ -1082,8 +1082,11 @@ contains
     integer                 :: i, j, k, n, ndims, dimids(ndimmax), dimlens(ndimmax)
 !   character(len=slenmax)  :: coord
 
-    real(r8), allocatable       :: tmp1d(:), tmp2d(:, :)
-    character(len=slenmax)      :: cell_measures
+    real(r8), allocatable           :: tmp1d(:), tmp2d(:, :)
+    character(len=slenmax)          :: cell_measures
+
+    real(r8), allocatable, dimension(:, :)      :: ulon_tmp, ulat_tmp
+    real(r8), allocatable, dimension(:, :, :)   :: ulon_crnsp_tmp, ulat_crnsp_tmp
 
     ! initalise
     cell_measures = '' 
@@ -1307,12 +1310,21 @@ contains
        end if
       else if (hcoord(1:1) == 'u') then
         if (lshiftgrid) then
+          allocate (ulon_tmp(idm, jdm-1), &
+                    ulat_tmp(idm, jdm-1), &
+                    ulon_crnsp_tmp(ncrns, idm, jdm-1), &
+                    ulat_crnsp_tmp(ncrns, idm, jdm-1))
+                    ulat_tmp=cshift(ulat(:,1:jdm-1), 1, 1)
+                    ulon_tmp=cshift(ulon(:,1:jdm-1), 1, 1)
+                    ulat_crnsp_tmp=cshift(ulat_crnsp(:,:,1:jdm-1), 1, 2)
+                    ulon_crnsp_tmp=cshift(ulon_crnsp(:,:,1:jdm-1), 1, 2)
           grdid = cmor_grid( &
                   axis_ids=(/iaxid, jaxid/), &
-                  latitude=cshift(ulat(:,1:jdm-1), 1, 1), &
-                  longitude=cshift(ulon(:,1:jdm-1), 1, 1), &
-                  latitude_vertices=cshift(ulat_crnsp(:,:,1:jdm-1), 1, 2), &
-                  longitude_vertices=cshift(ulon_crnsp(:,:,1:jdm-1), 1, 2))
+                  latitude=ulat_tmp, &
+                  longitude=ulon_tmp, &
+                  latitude_vertices=ulat_crnsp_tmp, &
+                  longitude_vertices=ulon_crnsp_tmp)
+          deallocate(ulon_tmp, ulat_tmp, ulat_crnsp_tmp, ulon_crnsp_tmp)
         else
           grdid = cmor_grid( &
                   axis_ids=(/iaxid, jaxid/), &
@@ -1910,6 +1922,7 @@ contains
     implicit none
 
     integer :: i, j, k
+    real(r4), allocatable, dimension(:, :, :)   :: fldtmp2
 
     ! Set zero on ocean grid cells
     do k = 1, kk
@@ -1926,15 +1939,18 @@ contains
         if (hcoord(1:1) == 'p') then
           error_flag = cmor_write( &
                        var_id=varid, &
-                       data=fld(:,1:jdm-1,1))
+                       data=fld(:,1:jj-1,1))
         else if (hcoord(1:1) == 'u') then
+          allocate(fldtmp2(ii,jj-1,1))
+          fldtmp2(:,:,1) = cshift(fld(:,1:jj-1,1), 1, 1)
           error_flag = cmor_write( &
                        var_id=varid, &
-                       data=cshift(fld(:,1:jdm-1,1), 1, 1))
+                       data=fldtmp2(:,:,1))
+          deallocate(fldtmp2)
         else if (hcoord(1:1) == 'v') then
            error_flag = cmor_write( &
                         var_id=varid, &
-                        data=fld(:, 2:jdm, 1))
+                        data=fld(:, 2:jj, 1))
         else
           write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
         end if
@@ -1948,15 +1964,18 @@ contains
         if (hcoord(1:1) == 'p') then
           error_flag = cmor_write( &
                        var_id=varid, &
-                       data=fld(:,1:jdm-1,:))
+                       data=fld(:,1:jj-1,:))
         else if (hcoord(1:1) == 'u') then
+          allocate(fldtmp2(ii,jj-1,kk))
+          fldtmp2 = cshift(fld(:,1:jj-1,:), 1, 1)
           error_flag = cmor_write( &
                        var_id=varid, &
-                       data=cshift(fld(:,1:jdm-1,:), 1, 1))
+                       data=fldtmp2(:,:,:))
+          deallocate(fldtmp2)
         else if (hcoord(1:1) == 'v') then
            error_flag = cmor_write( &
                         var_id=varid, &
-                        data=fld(:, 2:jdm, :))
+                        data=fld(:, 2:jj, :))
         else
           write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
         end if
@@ -1976,58 +1995,67 @@ contains
     implicit none
 
     integer :: i, j, k
+    real(r4), allocatable, dimension(:, :, :)   :: fldtmp2
 
     if (trim(tcoord) == 'time1') then
-      if (lshiftgrid) then
-        if (hcoord(1:1) == 'p') then
-           error_flag = cmor_write( &
-                        var_id=varid, &
-                        data=fld(:,1:jdm-1,1), &
-                        ntimes_passed=1, &
-                        time_vals=tval)
-        else if (hcoord(1:1) == 'u') then
-           error_flag = cmor_write( &
-                        var_id=varid, &
-                        data=cshift(fld(:,1:jdm-1,1), 1, 1), &
-                        ntimes_passed=1, &
-                        time_vals=tval)
-        else if (hcoord(1:1) == 'v') then
-           error_flag = cmor_write( &
-                        var_id=varid, &
-                        data=fld(:, 2:jdm, 1), &
-                        ntimes_passed=1, &
-                        time_vals=tval)
-        else
-          write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
-        end if
-      else
-         error_flag = cmor_write( &
-                      var_id=varid, &
-                      data=fld, &
-                      ntimes_passed=1, &
-                      time_vals=tval)
-      end if
+      write(*,*) "ERROR: time coordinate 'tcoord = time1' is not defined yet"
+      stop "write_tslice()"
+!     if (lshiftgrid) then
+!       if (hcoord(1:1) == 'p') then
+!          error_flag = cmor_write( &
+!                       var_id=varid, &
+!                       data=fld(:,1:jj-1,:), &
+!                       ntimes_passed=1, &
+!                       time_vals=tval)
+!       else if (hcoord(1:1) == 'u') then
+!          allocate(fldtmp2(ii,jj-1,kk))
+!          fldtmp2 = cshift(fld(:,1:jj-1,:), 1, 1)
+!          error_flag = cmor_write( &
+!                       var_id=varid, &
+!                       data=fldtmp2(:,:,:), &
+!                       ntimes_passed=1, &
+!                       time_vals=tval)
+!          deallocate(fldtmp2)
+!       else if (hcoord(1:1) == 'v') then
+!          error_flag = cmor_write( &
+!                       var_id=varid, &
+!                       data=fld(:, 2:jj, :), &
+!                       ntimes_passed=1, &
+!                       time_vals=tval)
+!       else
+!         write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
+!       end if
+!     else
+!        error_flag = cmor_write( &
+!                     var_id=varid, &
+!                     data=fld, &
+!                     ntimes_passed=1, &
+!                     time_vals=tval)
+!     end if
     else
       if (vtype == '2d' .or. vtype == 'op20bar' .or. vtype == 'ols' .or. vtype(1:6) == 'olayer') then
         if (lshiftgrid) then
           if (hcoord(1:1) == 'p') then
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=fld(:, 1:jdm-1, 1), &
+                         data=fld(:, 1:jj-1, 1), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
           else if (hcoord(1:1) == 'u') then
+            allocate(fldtmp2(ii,jj-1,1))
+            fldtmp2(:,:,1) = cshift(fld(:,1:jj-1,1), 1, 1)
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=cshift(fld(:, 1:jdm-1, 1), 1, 1), &
+                         data=fldtmp2(:,:,1), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
+            deallocate(fldtmp2)
           else if (hcoord(1:1) == 'v') then
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=fld(:, 2:jdm, 1), &
+                         data=fld(:, 2:jj, 1), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
@@ -2061,21 +2089,24 @@ contains
           if (hcoord(1:1) == 'p') then
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=fld(:,1:jdm-1,:), &
+                         data=fld(:,1:jj-1,:), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
           else if (hcoord(1:1) == 'u') then
+            allocate(fldtmp2(ii,jj-1,kk))
+            fldtmp2 = cshift(fld(:,1:jj-1,:), 1, 1)
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=cshift(fld(:,1:jdm-1,:), 1, 1), &
+                         data=fldtmp2(:,:,:), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
+            deallocate(fldtmp2)
           else if (hcoord(1:1) == 'v') then
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=fld(:,2:jdm,:), &
+                         data=fld(:,2:jj,:), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)

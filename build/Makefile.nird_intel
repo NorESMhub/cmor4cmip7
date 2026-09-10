@@ -30,7 +30,8 @@ LIBS=-L$(CMOR)/lib -L$(JSONF)/lib -L$(GSW)/lib64 -Wl,-rpath=$(JSONF)/lib -Wl,-rp
 # Compiler flags
 FFLAGS=-O2 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
 # for debug
-#FFLAGS:=$(FFLAGS) -g
+#FFLAGS:=$(FFLAGS) -g -O0 -fcheck=bounds -fbacktrace
+#FFLAGS:=$(FFLAGS) -g -O0 -traceback -check bounds -check arg_temp_created -warn all -heap-arrays 0
 #FFLAGS:=$(FFLAGS) -g -warn all -check all -traceback -fpe0
 
 # Linker flags

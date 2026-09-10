@@ -24,6 +24,7 @@ contains
     character :: yyyymm1*6, yyyymm2*6, c2*2, r3*3
     type(json_core) :: json
     type(json_value), pointer :: p
+    integer   :: itmp
 
     !write(*,*) 'varname:',trim(varname)
     call json%initialize()
@@ -106,7 +107,8 @@ contains
 
     write (yyyymm1, '(I4.4,I2.2)') year1, month1
     write (yyyymm2, '(I4.4,I2.2)') yearn, monthn
-    write (r3, '(I3.3)') realization
+    read(realization_index(2:), *) itmp
+    write (r3, '(I3.3)') itmp
 #ifdef MPI
     call mpi_comm_rank(mpi_comm_world, mpirank, mpierror)
     write (c2, '(I2.2)') mpirank

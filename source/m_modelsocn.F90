@@ -85,19 +85,16 @@ contains
     badrec = .false.
 
     ! Print start information
-    if (verbose) then
-      write (*, *)
-      write (*, *) '----------------------------'
-      write (*, *) '--- Process ocean output ---'
-      write (*, *) '----------------------------'
-      write (*, *)
-    end if
+    write (*, *)
+    write (*, *) '---------------------------------------'
+    write (*, *) '--- Process ocean and ocnBgc output ---'
+    write (*, *) '---------------------------------------'
+    write (*, *)
 
     itags = [tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday]
 
     do n = 1, size(itags)
       itag = itags(n)
-      write(*,*) 'itag:',trim(itag)
       call scan_files(reset=.true.)
 
       if (len_trim(fnm) == 0) then
@@ -112,6 +109,9 @@ contains
     !write(*, *) 'Read grid information from input files'
     itag=tagomon    ! ensure read grid info from monthly output
     call scan_files(reset=.true.)
+
+    ! Read grid info
+    if (verbose) write(*,*) 'Read grid information'
     call read_gridinfo_ifile
 
 !   ! Process table Omon
@@ -144,7 +144,9 @@ contains
       ovnm = bvnm
       table = 'CMIP7_'//trim(realm)//'.json'
 
-      write (*, *) 'cvnm:', trim(cvnm)
+      write(*,*) ''
+      write(*, *) '--- ', trim(cvnm), ' ---'
+      if (verbose) write(*,*) 'CMOR table: ',trim(table)
 
       ! Initialize variable attributes
       vpositive = ''
@@ -193,21 +195,23 @@ contains
       end if
       ivnm = sources(1)
 
+      if (verbose) then
+        write (*, *) 'model input variable name: ', trim(ivnm)
+        write (*, *) 'CMOR output name: ', trim(ovnm)
+        write (*, *) 'CMOR output unit: ', trim(vunits)
+      end if
+
+      ! read dimensions
       call json_get_array_string(trim(tabledir)//trim(table), 'variable_entry.'//trim(bvnm)// &
                                  '.dimensions', dimensions, lfound=found)
-
       dims = dimensions(1)
       do k = 2, size(dimensions)
-        write (*, *) 'dimension(k):', trim(dimensions(k))
         dims = trim(dims)//","//trim(dimensions(k))
       end do
-      if (verbose) write (*, *) 'dims:', trim(dims)
+      if (verbose) write (*, *) 'CMOR output dimensions:', trim(dims)
 
       call special_cat
-      if (verbose) then
-        write (*, *) 'special:'
-        write (*, *) trim(special)
-      end if
+      if (verbose) write (*, *) 'Special processing: ', trim(special)
 
 !     ! Prepare output file
       call special_pre
@@ -215,7 +219,6 @@ contains
       ! time independpent
       if (frequency == 'fx') then
 
-        if (verbose) write (*, *) 'ovnm: ', trim(ovnm)
         IF (ovnm .EQ. 'basin_ti-u-hxy-u') THEN
           fnm = TRIM(griddata)//TRIM(ocnregnfile)
         else
@@ -298,7 +301,6 @@ contains
 !         ! Close output file if max rec has been reached
           if (mod(m, rmax) == 0) then
             call close_ofile
-            write(*,*) 'm:',m
           end if
 
         end do
@@ -381,7 +383,6 @@ contains
         call json_get_postproc_val(trim(mapfile), &
                                    trim(cvnm), trim(key), val, lfound=found)
         if (found .and. val /= 'false') then
-          write (*, *) trim(key), ":", trim(val)
           special = trim(special)//trim(key)//";"
         else
           cycle
@@ -746,8 +747,6 @@ contains
 
     ! Open first input file
     call scan_files(reset=.true.)
-    !write(*,*) 'fnm:',trim(fnm)
-    write(*,*) 'read grid information'
 
     status = nf90_open(fnm, nf90_nowrite, ncid)
     call handle_ncerror(status)
@@ -1119,11 +1118,8 @@ contains
     jj = jdm
     kk = kdm
     if (verbose) then
-      write (*, *) 'open_ofile()'
-      write (*, *) 'ivm:', trim(ivnm)
-      write (*, *) 'ovnm:', trim(ovnm)
-      write (*, *) 'dimlens:', dimlens
-      write(*, *) 'kdm:', kdm
+      write (*, '(1X, A, 4I5)') 'Horizontal dimension of  model input:', dimlens(1:4)
+      write(*, '(1X, A, I5)') 'Vertical dimension of model input:', kdm
     end if
     if (dims(1:25) == 'longitude,latitude,olevel') then
       vtype = 'level'
@@ -1188,8 +1184,12 @@ contains
       write (*, *) 'Undefined variable type, please check!'
     end if
     if (verbose) then
-      write (*, *) 'vtype:', trim(vtype)
-      write (*, *) 'ii,jj,kk:', ii, jj, kk
+      write (*, *) 'CMOR output variable type:', trim(vtype)
+      if (lshiftgrid) then
+        write (*, '(1X, A, 3I5)') 'CMOR output dimension:', ii, jj-1, kk
+      else
+        write (*, '(1X, A, 3I5)') 'CMOR output dimension:', ii, jj, kk
+      end if
     end if
     allocate (fld(ii, jj, kk), fld2(ii, jj, kk), fldacc(ii, jj, kk), &
               fldtmp(ii, jj, kk), stat=status)
@@ -1201,7 +1201,7 @@ contains
         hcoord(1:1) .ne. 'v') then
       hcoord(1:1) = 'p'
     end if
-    if (verbose) write(*,*) 'hcoord: ',hcoord(1:1)
+    if (verbose) write(*,*) 'C-grid point: ',hcoord(1:1)
 
     status = nf90_close(ncid)
     call handle_ncerror(status)
@@ -1458,9 +1458,10 @@ contains
     if (.not. fxflag) then
       if(verbose) then
         write(*, *) 'Define time axis '
-        write(*, *) 'tablepath:table_entry:', trim(tablepath),':',trim(tcoord)
-        write (*, *) 'tcoord:', trim(tcoord)
-        write(*, *) 'calunits:', trim(calunits)
+        if (verbose) then
+          write (*, *) 'Time coord:', trim(tcoord)
+          write(*, *) 'Calendar units:', trim(calunits)
+        end if
       end if
       taxid = cmor_axis( &
               table=trim(tablepath), &
@@ -1470,11 +1471,7 @@ contains
     end if
 
     ! Define output variable
-    if (verbose) then
-      write(*, *) 'Define output variable'
-      write (*, *) 'zcoord:', trim(zcoord)
-      write (*, *) 'vunits:', trim(vunits)
-    end if
+    if (verbose) write(*, *) 'Define output variable'
     if (fxflag) then
       if (trim(vtype) == '2d') then
         varid = cmor_variable( &

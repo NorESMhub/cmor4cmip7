@@ -6,5 +6,5 @@
  mapfile       = '../recipes/template/mapping.json',
  createsubdirs = .false.,
  forcefilescan = .true.,  
- verbose       = .true.,
+ verbose       = .false.,
 /

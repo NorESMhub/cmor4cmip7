@@ -1,7 +1,7 @@
 &experiment
- casename               = 'n1850.ne16pg3_tn14.noresm3_0_beta17.Run12-1.restartfromold.2026-05-21',
- osubdir                = 'UKESM1-3-LL/piControl/v20260827'
- experiment_id          = 'piControl'
+ casename               = 'n1850Gaxg.n30b23LM.501.20260819',
+ osubdir                = 'UKESM1-3-LL/piControl/v20260910',
+ experiment_id          = 'piControl',
  parent_experiment_id   = 'piControl-spinup',
  parent_experiment_rip  = 'r1i1p1',
  parent_time_units      = 'days since 0421-01-01',
@@ -12,8 +12,8 @@
  physics_index          = 'p1',
  forcing_index          = 'f1',
  branch_time            = 0.,
- year1                  = 1341,
- yearn                  = 1341,
+ year1                  = 1456,
+ yearn                  = 1456,
  month1                 = 1,
  monthn                 = 12,
  exprefyear             = 1,
@@ -25,5 +25,5 @@
  branch_time_in_child   = 0.0D0,
  branch_time_in_parent  = 430700.0D0,
  tracking_prefix        = 'hdl:21.14107',
- scanallfiles           = .false.,
+ scanallfiles           = .false.
 /

@@ -138,8 +138,6 @@ compound_names    =
     'ocnBgchem.fric.tavg-u-hxy-sea.mon.glb'             ! done
     'ocnBgchem.frn.tavg-u-hxy-sea.mon.glb'              ! done
     'ocnBgchem.froc.tavg-u-hxy-sea.mon.glb'             ! done
-    'ocnBgchem.fsfe.tavg-u-hxy-sea.mon.glb'             ! done
-    'ocnBgchem.fsn.tavg-u-hxy-sea.mon.glb'              ! done
     'ocnBgchem.intdic.tavg-u-hxy-sea.mon.30S-90S'       ! done
     'ocnBgchem.intdoc.tavg-u-hxy-sea.mon.30S-90S'       ! done
     'ocnBgchem.intpn2.tavg-u-hxy-sea.mon.30S-90S'       ! done

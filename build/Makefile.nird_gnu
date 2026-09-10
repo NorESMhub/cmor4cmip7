@@ -29,10 +29,10 @@ NETCDFF=$(EBROOTNETCDFMINFORTRAN)
 LIBS=-L$(CMOR)/lib -L$(JSONF)/lib -L$(GSW)/lib64 -Wl,-rpath=$(JSONF)/lib -Wl,-rpath=$(GSW)/lib64 -lcmor -lnetcdff -lnetcdf -luuid -ludunits2 -ljson-c -ljsonfortran -lgsw
 
 # Compiler flags
-FFLAGS=-I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
+FFLAGS=-O2 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
 #FFLAGS:=$(FFLAGS) -fdefault-real-8
 # for debug
-FFLAGS:=$(FFLAGS) -g
+#FFLAGS:=$(FFLAGS) -g
 #FFLAGS:=$(FFLAGS) -Wunused
 #FFLAGS:=$(FFLAGS) -Wcompare-reals
 #FFLAGS:=$(FFLAGS) -g -Wall -Wextra -fcheck=all -fbacktrace -ffpe-trap=invalid,zero,overflow
@@ -52,7 +52,7 @@ $(TARGET): $(OBJ)
 	$(LD) -o $(TARGET) $(OBJ) $(LDFLAGS)
 	mkdir -p $(BINDIR) 
 	mv $(TARGET) $(BINDIR)
-	#rm -f *.o *.h *.inc m_*.mod
+	rm -f *.o *.h *.inc m_*.mod
 
 cmor.o: $(SRCDIR)/cmor.F90
 	$(FC) $(FFLAGS) -c $(SRCDIR)/cmor.F90

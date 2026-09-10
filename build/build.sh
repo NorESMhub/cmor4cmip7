@@ -3,7 +3,7 @@
 # Deafult value for machine, now only for nird
 mach=nird
 mpi_flag=false
-compiler=gnu
+compiler=intel
 
 if [ $# == 1 ] && [ $1 == "-h" ]; then
   echo "Usage:"
@@ -104,5 +104,5 @@ load_module_${compiler}
 #module list
 
 # and build
-#make clean -f $Makefile
+make clean -f $Makefile
 make -f $Makefile

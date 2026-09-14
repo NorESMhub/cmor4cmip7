@@ -2,7 +2,6 @@
 TARGET=cmor
 
 # Objects
-#OBJ=m_namelists.o m_utilities.o m_modelsice.o m_modelslnd.o m_modelsatm.o m_modelsocn.o cmor.o
 OBJ=m_namelists.o m_utilities.o m_jsons.o m_modelsocn.o cmor.o
 
 # Paths 

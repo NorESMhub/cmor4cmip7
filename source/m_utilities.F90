@@ -1,9 +1,9 @@
 module m_utilities
 
   use netcdf
-  use m_namelists, only: itag, verbose, ibasedir, slenmax, r4, r8, &
-                         casename, fnm, year1, month1, yearn, monthn, exprefyear, rec, tval, &
-                         tbnd, mbnd, year, month, forcefilescan, funit, scanallfiles, membertag
+  use m_namelists, only: itag, verbose, ibasedir, slenmax, r4, r8, eps, missing, &
+    casename, fnm, year1, month1, yearn, monthn, exprefyear, rec, tval, &
+    tbnd, mbnd, year, month, forcefilescan, funit, scanallfiles, membertag
 
   implicit none
 
@@ -573,8 +573,8 @@ contains
     ! integrate the stream function with boundary condition strmf(1,1)=0
     ! ------------------------------------------------------------------
 
-    where (umflx == 1e20) umflx = 0
-    where (vmflx == 1e20) vmflx = 0
+    where (abs(umflx - missing) < eps) umflx = 0
+    where (abs(vmflx - missing) < eps) vmflx = 0
     umflx(:, :, 1) = sum(umflx, 3)
     vmflx(:, :, 1) = sum(vmflx, 3)
     strmf(1, 1, 1) = 0.
@@ -666,7 +666,7 @@ contains
     
     do j = 1, jdm
       do i = 1, idm
-        if (dp(i,j,k) == 1.e20) cycle
+        if (abs(dp(i,j,k) - missing) < eps) cycle
         dpacc = 0.
         do k = 1, kdm
           dpacc  = dpacc+0.5*dp(i,j,k)
@@ -1029,7 +1029,7 @@ contains
 
     do j = 1, nlat
       do i = 1, imax
-        if (psfc(i, j) == spvl) then
+        if (abs(psfc(i, j) - spvl) < eps) then
           do k = 1, nlevo
             dato(i, j, k) = spvl
           end do

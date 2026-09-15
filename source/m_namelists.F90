@@ -6,6 +6,12 @@ module m_namelists
 ! integer, parameter :: r4 = selected_real_kind(6,30)
 ! integer, parameter :: r8 = selected_real_kind(14,30)
 
+  ! Round-off fraction
+  real(r8)              :: eps = 1.0e-10
+
+  ! _FillValue
+  real(r4)              :: missing = 1.e20
+
   ! Namelist limits
   integer, parameter :: rowmax = 200, slenmax = 1024
 

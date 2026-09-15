@@ -271,7 +271,7 @@ contains
 
     ! Modify output path and create output folder
     obasedir = trim(obasedir)//'/'//trim(osubdir)
-    call system('mkdir -p '//trim(obasedir))
+    call execute_command_line('mkdir -p '//trim(obasedir))
 
   end subroutine read_namelists
 

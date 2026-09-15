@@ -80,13 +80,22 @@ program main
   ! call glc2cmor
    
 #ifdef MPI
-  ! --- Finalise mpi
-  call MPI_FINALIZE(mpierror)
-   
+  call MPI_COMM_RANK(MPI_COMM_WORLD, mpirank, mpierror)
+  if (mpirank .eq. 0) then
 #endif
   write(*,*)
   write(*,*) '===================='
   write(*,*) '   ALL JOBS DONE'
   write(*,*) '===================='
   write(*,*)
+#ifdef MPI
+  end if
+  call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
+#endif
+
+#ifdef MPI
+  ! --- Finalise mpi
+  call MPI_FINALIZE(mpierror)
+#endif
+   
 end program main

@@ -2,11 +2,7 @@
 TARGET=cmor4cmip7_mpi
 
 # Objects
-<<<<<<< Updated upstream
-OBJ=m_namelists.o m_utilities.o m_modelsice.o m_modelslnd.o m_modelsatm.o m_modelsocn.o cmor.o
-=======
 OBJ=m_namelists.o m_utilities.o m_jsons.o m_modelsocn.o cmor4cmip7.o
->>>>>>> Stashed changes
 
 # Paths 
 SRCDIR=../source

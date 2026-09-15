@@ -538,6 +538,7 @@ contains
         ! Compute thermo-steric sea level following Griffies et al., GMD 2016, H27
       case ('t2zostoga')
         rhoglb = 0.
+        ptmp = 0.
         dp = dp*1.e-4     ! pa->dbar
         do j = 1, jdm
           do i = 1, idm
@@ -741,7 +742,6 @@ contains
 
 !   logical         :: check
     integer         :: i, j, k, n
-    real(r8)        :: missing
     real(r8)        :: dptmp, ptmp
 
     ! Open first input file
@@ -1048,6 +1048,7 @@ contains
 
     ! Compute nitial global mean density
     rhoglb0 = 0.
+    ptmp = 0.
     dpini = dpini*1.e-4     ! pa->dbar
     do j = 1, jdm
       do i = 1, idm

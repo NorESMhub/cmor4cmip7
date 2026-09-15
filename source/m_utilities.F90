@@ -668,7 +668,7 @@ contains
     
     do j = 1, jdm
       do i = 1, idm
-        if (abs(dp(i,j,k) - missing) < eps) cycle
+        if (dp(i,j,1) >= missing) cycle
         dpacc = 0.
         do k = 1, kdm
           dpacc  = dpacc+0.5*dp(i,j,k)

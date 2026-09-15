@@ -1,8 +1,8 @@
 # Targets 
-TARGET=cmor
+TARGET=cmor4cmip7
 
 # Objects
-OBJ=m_namelists.o m_utilities.o m_jsons.o m_modelsocn.o cmor.o
+OBJ=m_namelists.o m_utilities.o m_jsons.o m_modelsocn.o cmor4cmip7.o
 
 # Paths 
 SRCDIR=../source
@@ -53,8 +53,8 @@ $(TARGET): $(OBJ)
 	mv $(TARGET) $(BINDIR)
 	rm -f *.o *.h *.inc m_*.mod
 
-cmor.o: $(SRCDIR)/cmor.F90
-	$(FC) $(FFLAGS) -c $(SRCDIR)/cmor.F90
+cmor4cmip7.o: $(SRCDIR)/cmor4cmip7.F90
+	$(FC) $(FFLAGS) -c $(SRCDIR)/cmor4cmip7.F90
 
 #m_modelsatm.o: $(SRCDIR)/m_modelsatm.F90
 	#$(FC) $(FFLAGS) -c $(SRCDIR)/m_modelsatm.F90

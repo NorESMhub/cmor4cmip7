@@ -98,11 +98,11 @@ contains
 
 !   do while (isloop)
       if (present(reset).and.reset) then
-        call get_file_info(ibasedir, casename, itag, fnm, year1, month1, &
+        call get_file_info(casename, itag, fnm, year1, month1, &
                            yearn, monthn, exprefyear, reset, rec, tval(1), tbnd, &
                            mbnd, year, month)
       else
-        call get_file_info(ibasedir, casename, itag, fnm, year1, month1, &
+        call get_file_info(casename, itag, fnm, year1, month1, &
                            yearn, monthn, exprefyear, .false., rec, tval(1), tbnd, &
                            mbnd, year, month)
       end if
@@ -114,13 +114,13 @@ contains
 
   ! -----------------------------------------------------------------
 
-  subroutine get_file_info(idir, cnam, ftag, fnam, y1, m1, y2, m2, yr, &
+  subroutine get_file_info(cnam, ftag, fnam, y1, m1, y2, m2, yr, &
                            lreset, irec, tval, tbnd, mbnd, year, month)
 
     use netcdf
     implicit none
 
-    character(len=1024), intent(in)     :: idir, cnam, ftag
+    character(len=1024), intent(in)     :: cnam, ftag
     character(len=1024), intent(out)    :: fnam
     integer, intent(in)     :: y1, m1, y2, m2, yr
     logical, intent(in)     :: lreset
@@ -1183,6 +1183,11 @@ contains
     mpirank = 0
     mpisize = 1
 #endif
+
+    if (n > nmax) then
+      skip_dataset = .true.
+      return
+    end if
 
     if (mod(n - 1, mpisize) == mpirank) then
       skip_dataset = .false.

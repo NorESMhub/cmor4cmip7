@@ -1261,7 +1261,7 @@ contains
           !grid_label = 'grs'
           grid = 'section mean or integral' 
     end if
-    call json_write_attributes(grid, grid_label, ocngrid_resolution, ovnm)
+    call json_write_attributes(grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)
     !call system('rm '//trim(json_file_attributes))
 

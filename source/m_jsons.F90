@@ -9,7 +9,7 @@ module m_jsons
 contains
 
   ! -----------------------------------------------------------------
-  subroutine json_write_attributes(grid, grid_label, grid_resolution, varname)
+  subroutine json_write_attributes(grid_label, grid_resolution, varname)
 
     !use json_module
 
@@ -20,7 +20,7 @@ contains
     integer :: mpirank, mpisize, mpierror
 #endif
 
-    character(len=*), intent(in) :: grid, grid_label, grid_resolution, varname
+    character(len=*), intent(in) :: grid_label, grid_resolution, varname
     character :: yyyymm1*6, yyyymm2*6, c2*2, r3*3
     type(json_core) :: json
     type(json_value), pointer :: p

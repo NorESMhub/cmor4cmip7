@@ -38,11 +38,11 @@ module m_namelists
     lshiftgrid
 
   ! Experiment namelist
-  character(len=slenmax), save :: casename, experiment_id, &
+  character(len=slenmax), save  :: casename, experiment_id, &
                                   parent_experiment_rip, isubdir, osubdir, membertag
-  character(len=slenmax), save :: history, comment
-  integer, save                                 :: exprefyear, year1, yearn, month1, monthn
-  real(r8), save                            :: branch_time
+  character(len=slenmax), save  :: history, comment
+  integer, save                 :: exprefyear, year1, yearn, month1, monthn
+  real(r8), save                :: branch_time
   logical, save :: dry_run, plevdummy, readdummy, add_fill_day, scanallfiles
   integer, save :: physics_version = 1, initialization_method = 1
   ! CMIP7 DRS elements
@@ -137,6 +137,7 @@ contains
     add_fill_day = .false.
     !newcolumnorder= .true.
     scanallfiles = .true.
+    tracking_prefix = 'hdl:21.14107'
 
     casename = ' '
     experiment_id = ' '
@@ -154,6 +155,8 @@ contains
     isubdir = ' '
     osubdir = ' '
     membertag = ' '
+    parent_source_id = ' '
+    exprefyear = 1
 
     compound_names = ''
 

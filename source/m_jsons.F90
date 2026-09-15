@@ -94,6 +94,7 @@ contains
       call json%add(p, 'parent_activity_id', trim(parent_activity_id))
       call json%add(p, 'parent_experiment_id', trim(parent_experiment_id))
       call json%add(p, 'parent_mip_era', trim(parent_mip_era))
+      if (len_trim(parent_source_id) < 3) parent_source_id = source_id
       call json%add(p, 'parent_source_id', trim(parent_source_id))
       call json%add(p, 'parent_time_units', trim(parent_time_units))
       call json%add(p, 'parent_variant_label', trim(parent_variant_label))

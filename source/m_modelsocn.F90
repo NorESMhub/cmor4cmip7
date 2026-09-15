@@ -2077,6 +2077,20 @@ contains
                      ntimes_passed=1, &
                      time_vals=tval, &
                      time_bnds=tbnds)
+      else if (vtype(1:4) == 'merd' .or. vtype(1:4) == 'merk') then
+        error_flag = cmor_write( &
+                     var_id=varid, &
+                     data=fld(:, :, :), &
+                     ntimes_passed=1, &
+                     time_vals=tval, &
+                     time_bnds=tbnds)
+      else if (vtype(1:4) == 'mert') then
+        error_flag = cmor_write( &
+                     var_id=varid, &
+                     data=fld(:, :, 1), &
+                     ntimes_passed=1, &
+                     time_vals=tval, &
+                     time_bnds=tbnds)
       else if (vtype(1:4) == 'sect') then
         error_flag = cmor_write( &
                      var_id=varid, &

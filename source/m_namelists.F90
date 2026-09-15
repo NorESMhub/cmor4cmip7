@@ -6,6 +6,12 @@ module m_namelists
 ! integer, parameter :: r4 = selected_real_kind(6,30)
 ! integer, parameter :: r8 = selected_real_kind(14,30)
 
+  ! Round-off fraction
+  real(r8)              :: eps = 1.0e-10
+
+  ! _FillValue
+  real(r4)              :: missing = 1.e20
+
   ! Namelist limits
   integer, parameter :: rowmax = 200, slenmax = 1024
 
@@ -38,11 +44,11 @@ module m_namelists
     lshiftgrid
 
   ! Experiment namelist
-  character(len=slenmax), save :: casename, experiment_id, &
+  character(len=slenmax), save  :: casename, experiment_id, &
                                   parent_experiment_rip, isubdir, osubdir, membertag
-  character(len=slenmax), save :: history, comment
-  integer, save                                 :: exprefyear, year1, yearn, month1, monthn
-  real(r8), save                            :: branch_time
+  character(len=slenmax), save  :: history, comment
+  integer, save                 :: exprefyear, year1, yearn, month1, monthn
+  real(r8), save                :: branch_time
   logical, save :: dry_run, plevdummy, readdummy, add_fill_day, scanallfiles
   integer, save :: physics_version = 1, initialization_method = 1
   ! CMIP7 DRS elements
@@ -137,6 +143,7 @@ contains
     add_fill_day = .false.
     !newcolumnorder= .true.
     scanallfiles = .true.
+    tracking_prefix = 'hdl:21.14107'
 
     casename = ' '
     experiment_id = ' '
@@ -154,6 +161,8 @@ contains
     isubdir = ' '
     osubdir = ' '
     membertag = ' '
+    parent_source_id = ' '
+    exprefyear = 1
 
     compound_names = ''
 
@@ -262,7 +271,7 @@ contains
 
     ! Modify output path and create output folder
     obasedir = trim(obasedir)//'/'//trim(osubdir)
-    call system('mkdir -p '//trim(obasedir))
+    call execute_command_line('mkdir -p '//trim(obasedir))
 
   end subroutine read_namelists
 

@@ -5,7 +5,6 @@
  parent_experiment_id   = 'piControl-spinup',
  parent_experiment_rip  = 'r1i1p1',
  parent_time_units      = 'days since 0421-01-01',
- parent_source_id       = 'UKESM1-3-LL',
  history                = '',
  realization_index      = 'r1',
  initialization_index   = 'i1',
@@ -16,7 +15,6 @@
  yearn                  = 1395,
  month1                 = 1,
  monthn                 = 12,
- exprefyear             = 1,
  activity_id            = 'CMIP',
  parent_activity_id     = 'CMIP',
  parent_variant_label   = 'r1i1p1f1',
@@ -24,6 +22,5 @@
  mip_era                = 'CMIP7',
  branch_time_in_child   = 0.0D0,
  branch_time_in_parent  = 430700.0D0,
- tracking_prefix        = 'hdl:21.14107',
  scanallfiles           = .false.
 /

@@ -9,7 +9,7 @@ module m_jsons
 contains
 
   ! -----------------------------------------------------------------
-  subroutine json_write_attributes(grid, grid_label, grid_resolution, varname)
+  subroutine json_write_attributes(grid_label, grid_resolution, varname)
 
     !use json_module
 
@@ -20,7 +20,7 @@ contains
     integer :: mpirank, mpisize, mpierror
 #endif
 
-    character(len=*), intent(in) :: grid, grid_label, grid_resolution, varname
+    character(len=*), intent(in) :: grid_label, grid_resolution, varname
     character :: yyyymm1*6, yyyymm2*6, c2*2, r3*3
     type(json_core) :: json
     type(json_value), pointer :: p
@@ -94,6 +94,7 @@ contains
       call json%add(p, 'parent_activity_id', trim(parent_activity_id))
       call json%add(p, 'parent_experiment_id', trim(parent_experiment_id))
       call json%add(p, 'parent_mip_era', trim(parent_mip_era))
+      if (len_trim(parent_source_id) < 3) parent_source_id = source_id
       call json%add(p, 'parent_source_id', trim(parent_source_id))
       call json%add(p, 'parent_time_units', trim(parent_time_units))
       call json%add(p, 'parent_variant_label', trim(parent_variant_label))

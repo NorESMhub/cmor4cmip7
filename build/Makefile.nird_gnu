@@ -31,11 +31,11 @@ LIBS=-L$(CMOR)/lib -L$(JSONF)/lib -L$(GSW)/lib64 -Wl,-rpath=$(JSONF)/lib -Wl,-rp
 FFLAGS=-O2 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
 #FFLAGS:=$(FFLAGS) -fdefault-real-8
 # for debug
-#FFLAGS:=$(FFLAGS) -g
-#FFLAGS:=$(FFLAGS) -Wunused
-#FFLAGS:=$(FFLAGS) -Wcompare-reals
-#FFLAGS:=$(FFLAGS) -g -Wall -Wextra -fcheck=all -fbacktrace -ffpe-trap=invalid,zero,overflow
-#FFLAGS:=$(FFLAGS) -fcheck=all -fbounds-check -fsanitize=address -fbacktrace
+#FFLAGS:=$(FFLAGS) -g -fcheck=all
+#FFLAGS:=$(FFLAGS) -Wunused-Wcompare-reals -Wconversion-Wmaybe-uninitialized -Wunused-dummy-argument
+#FFLAGS:=$(FFLAGS) -Wall -Wextra 
+#FFLAGS:=$(FFLAGS) -fbacktrace -ffpe-trap=invalid,zero,overflow -fbounds-check
+#FFLAGS:=$(FFLAGS) -fsanitize=address
 
 # Linker flags
 LDFLAGS=$(LIBS)

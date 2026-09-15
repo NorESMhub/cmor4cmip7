@@ -33,7 +33,7 @@ program main
       if (verbose) write(*,*) '(get_file_info) Create new file list: bin/' &
         //trim('filelist_'//casename)//trim(membertag)
       if (len_trim(membertag) .gt. 0) then
-        call SYSTEM('find '//trim(ibasedir)//'/'//trim(casename) &
+        call execute_command_line('find '//trim(ibasedir)//'/'//trim(casename) &
           //'/ocn ' &
           //'-mindepth 2 -maxdepth 2 -path "*/hist/*" -name "*.*_'//trim(membertag) &
           //'.h*.nc" | sort > '//trim('filelist_'//casename) &
@@ -44,11 +44,11 @@ program main
           //'.h*.nc" | sort > '//trim('filelist_'//casename) &
           //trim(membertag)
       else
-!       call SYSTEM('find '//trim(ibasedir)//'/'//trim(casename) &
+!       call execute_command_line('find '//trim(ibasedir)//'/'//trim(casename) &
 !         //'/{atm,ice,lnd,ocn,rof}' &
 !         //' \( -path "*/hist/*" -or ' &
 !         //'    -path "*/hist_true/*" \)' &
-        call SYSTEM('find '//trim(ibasedir)//'/'//trim(casename) &
+        call execute_command_line('find '//trim(ibasedir)//'/'//trim(casename) &
           //'/ocn ' &
           //'-mindepth 2 -maxdepth 2' &
           //' -path "*/hist/*"' &

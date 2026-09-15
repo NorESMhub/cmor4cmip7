@@ -73,7 +73,7 @@ contains
 
     implicit none
 
-    logical :: badrec, last, first
+    logical :: badrec
     integer :: k, m, n
     character(len=slenmax), dimension(5) :: itags
 
@@ -411,7 +411,7 @@ contains
 
     implicit none
 
-    integer :: i, j, k, n
+    integer :: n
 
     character(len=slenmax), dimension(:), allocatable  :: keys
     character(len=slenmax)        :: key, val
@@ -461,7 +461,7 @@ contains
     implicit none
 
     integer     :: i, j, k, n
-    real(r8)    :: r, rd, p, ptoptmp, pbottmp
+    real(r8)    :: ptoptmp, pbottmp
     real(r8)    :: dptmp, ptmp
 
     character(len=slenmax), dimension(:), allocatable  :: keys
@@ -501,7 +501,7 @@ contains
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
-              if (abs(fld(i, j, k)) < 1e-6) fld(i, j, k) = 1e20
+              if (abs(fld(i, j, k)) < 1e-6) fld(i, j, k) = missing
             end do
           end do
         end do
@@ -511,7 +511,7 @@ contains
         do k = 2, kk
           do j = 1, jj
             do i = 1, ii
-              if (abs(fld(i, j, k)) < 1e20) &
+              if (abs(fld(i, j, k)) < missing) &
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)
             end do
           end do
@@ -522,10 +522,10 @@ contains
 !       if (val == 'false') cycle
 !       do j = 1, jj
 !         do i = 1, ii
-!           if (abs(fld(i, j, 1)) < 1e20) &
+!           if (abs(fld(i, j, 1)) < missing) &
 !             fld(i, j, 1) = fld(i, j, 1) * dp(i, j, 1)
 !           do k = 2, kk
-!             if (abs(fld(i, j, k)) < 1e20) then
+!             if (abs(fld(i, j, k)) < missing) then
 !               fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k) * dp(i, j, k)
 !               dp(i, j, 1) = dp(i, j, 1) + dp(i, j, k)
 !             end if
@@ -539,7 +539,7 @@ contains
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
-              if (fld(i, j, k) < 1e20) fld(i, j, k) = fld(i, j, k)/9.806
+              if (fld(i, j, k) < missing) fld(i, j, k) = fld(i, j, k)/9.806
             end do
           end do
         end do
@@ -551,13 +551,14 @@ contains
         ! Compute thermo-steric sea level following Griffies et al., GMD 2016, H27
       case ('t2zostoga')
         rhoglb = 0.
+        ptmp = 0.
         dp = dp*1.e-4     ! pa->dbar
         do j = 1, jdm
           do i = 1, idm
-            if (pmask(i,j) == 0) cycle
+            if (abs(pmask(i,j) - 0) < eps) cycle
             dptmp = 0.
             do k = 1, kdm
-              if (fld(i,j,k)>=1.e20) cycle
+              if (fld(i,j,k)>=missing) cycle
               dptmp  = dptmp+0.5*dp(i,j,k)  ! mid-level pressure
               rhoglb = rhoglb + dp(i,j,k)*rho(dptmp, dble(fld(i,j,k)), sref)
               ptmp = ptmp + dp(i,j,k)
@@ -586,7 +587,7 @@ contains
         do j = 1, jj
           do i = 1, ii
             do k = 1, kk
-              if (fld(i, j, k) /= 1e20) then
+              if (abs(fld(i, j, k) - missing)> eps) then
                 fld(i, j, k) = fld(i, j, k)/(1035.*parea(i, j))
               end if
             end do
@@ -619,93 +620,93 @@ contains
       case ('dp.avg')
         do j = 1, jj
           do i = 1, ii
-            if (fld(i, j, 1) /= 1e20) &
+            if (abs(fld(i, j, 1) - missing) > eps) &
               fld(i, j, 1) = fld(i, j, 1)*fld2(i, j, 1)
             do k = 2, kk
-              if (fld(i, j, k) /= 1e20) then
+              if (abs(fld(i, j, k) - missing) > eps) then
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fld2(i, j, k)
                 fld2(i, j, 1) = fld2(i, j, 1) + fld2(i, j, k)
               end if
             end do
-            if (fld(i, j, 1) /= 1e20) &
+            if (abs(fld(i, j, 1) - missing) > eps) &
               fld(i, j, 1) = fld(i, j, 1)/fld2(i, j, 1)
           end do
         end do
 
         ! Average over upper 300 m
       case ('dzavg300m')
-        fldtmp = 1.e20
+        fldtmp = missing
         do j = 1, jj
           do i = 1, ii
-            if (fld(i, j, 1) /= 1e20) then
+            if (abs(fld(i, j, 1) - missing) > eps) then
               fldtmp(i, j, 1) = (min(300., pdepth(i, j), depth_bnds(2, 1)) &
                                  - min(300., pdepth(i, j), depth_bnds(1, 1)))
               fld(i, j, 1) = fld(i, j, 1)*fldtmp(i, j, 1)
             end if
             do k = 2, kk
-              if (fld(i, j, k) /= 1e20) then
+              if (abs(fld(i, j, k) - missing) > eps) then
                 fldtmp(i, j, k) = (min(300., pdepth(i, j), depth_bnds(2, k)) &
                                    - min(300., pdepth(i, j), depth_bnds(1, k)))
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fldtmp(i, j, k)
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
             end do
-            if (fld(i, j, 1) /= 1e20) &
+            if (abs(fld(i, j, 1) - missing) > eps ) &
               fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
           end do
         end do
 
         ! Average over upper 700 m
       case ('dzavg700m')
-        fldtmp = 1.e20
+        fldtmp = missing
         do j = 1, jj
           do i = 1, ii
-            if (fld(i, j, 1) /= 1e20) then
+            if (abs(fld(i, j, 1) - missing) > eps) then
               fldtmp(i, j, 1) = (min(700., pdepth(i, j), depth_bnds(2, 1)) &
                                  - min(700., pdepth(i, j), depth_bnds(1, 1)))
               fld(i, j, 1) = fld(i, j, 1)*fldtmp(i, j, 1)
             end if
             do k = 2, kk
-              if (fld(i, j, k) /= 1e20) then
+              if (abs(fld(i, j, k) - missing) > eps) then
                 fldtmp(i, j, k) = (min(700., pdepth(i, j), depth_bnds(2, k)) &
                                    - min(700., pdepth(i, j), depth_bnds(1, k)))
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fldtmp(i, j, k)
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
             end do
-            if (fld(i, j, 1) /= 1e20) &
+            if (abs(fld(i, j, 1) - missing) > eps) &
               fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
           end do
         end do
 
         ! Average over upper 2000 m
       case ('dzavg2000m')
-        fldtmp = 1.e20
+        fldtmp = missing
         do j = 1, jj
           do i = 1, ii
-            if (fld(i, j, 1) /= 1e20) then
+            if (abs(fld(i, j, 1) - missing) > eps) then
               fldtmp(i, j, 1) = (min(2000., pdepth(i, j), depth_bnds(2, 1)) &
                                  - min(2000., pdepth(i, j), depth_bnds(1, 1)))
               fld(i, j, 1) = fld(i, j, 1)*fldtmp(i, j, 1)
             end if
             do k = 2, kk
-              if (fld(i, j, k) /= 1e20) then
+              if (abs(fld(i, j, k) - missing) > eps) then
                 fldtmp(i, j, k) = (min(2000., pdepth(i, j), depth_bnds(2, k)) &
                                    - min(2000., pdepth(i, j), depth_bnds(1, k)))
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fldtmp(i, j, k)
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
             end do
-            if (fld(i, j, 1) /= 1e20) &
+            if (abs(fld(i, j, 1) - missing) > eps) &
               fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
           end do
         end do
 
       case ('pbot2dp')
-        !fldtmp = 1e20
+        !fldtmp = missing
         do j = 1, jj
           do i = 1, ii
-            if (pbot(i, j) /= 1e20) then
+            if (abs(pbot(i, j) - missing) > eps) then
               do k = 1, kk
                 fld(i, j, k) = (min(depth_bnds(2, k), pdepth(i, j)) - min(depth_bnds(1, k), pdepth(i, j))) &
                                /pdepth(i, j)*pbot(i, j)
@@ -719,7 +720,7 @@ contains
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
-              if (fld(i, j, k) /= 1e20) fld(i, j, k) = fld(i, j, k)*0.101325
+              if (abs(fld(i, j, k) - missing) > eps) fld(i, j, k) = fld(i, j, k)*0.101325
             end do
           end do
         end do
@@ -729,7 +730,7 @@ contains
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
-              if (fld(i, j, k) /= 1e20) fld(i, j, k) = fld(i, j, k)*100.
+              if (abs(fld(i, j, k) - missing) > eps) fld(i, j, k) = fld(i, j, k)*100.
             end do
           end do
         end do
@@ -752,10 +753,8 @@ contains
 
     implicit none
 
-    logical         :: check
-    integer         :: i, j, k, n, fid
-    real(r8)        :: missing
-    real(r8)        :: phiu, phil
+!   logical         :: check
+    integer         :: i, j, k, n
     real(r8)        :: dptmp, ptmp
 
     ! Open first input file
@@ -1062,13 +1061,14 @@ contains
 
     ! Compute nitial global mean density
     rhoglb0 = 0.
+    ptmp = 0.
     dpini = dpini*1.e-4     ! pa->dbar
     do j = 1, jdm
       do i = 1, idm
-        if (pmask(i,j) == 0) cycle
+        if (abs(pmask(i,j) - 0) < eps) cycle
         dptmp = 0.
         do k = 1, kdm
-        if (tini(i,j,k)>=1.e20) cycle
+        if (tini(i,j,k)>=missing) cycle
           dptmp  = dptmp+0.5*dpini(i,j,k)   ! mid-layer pressure
           rhoglb0 = rhoglb0 + dpini(i,j,k)*rho(dptmp, dble(tini(i,j,k)), sref)
           ptmp = ptmp + dpini(i,j,k)
@@ -1092,10 +1092,9 @@ contains
     character(len=*), intent(in)    :: ivnm, ovnm
 
     integer, parameter              :: ndimmax = 10
-    integer                 :: i, j, k, n, ndims, dimids(ndimmax), dimlens(ndimmax)
+    integer                 :: n, ndims, dimids(ndimmax), dimlens(ndimmax)
 !   character(len=slenmax)  :: coord
 
-    real(r8), allocatable           :: tmp1d(:), tmp2d(:, :)
     character(len=slenmax)          :: cell_measures
 
     real(r8), allocatable, dimension(:, :)      :: ulon_tmp, ulat_tmp
@@ -1275,7 +1274,7 @@ contains
           !grid_label = 'grs'
           grid = 'section mean or integral' 
     end if
-    call json_write_attributes(grid, grid_label, ocngrid_resolution, ovnm)
+    call json_write_attributes(grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)
     !call system('rm '//trim(json_file_attributes))
 
@@ -1504,7 +1503,7 @@ contains
                 table_entry=trim(ovnm), &
                 units=trim(vunits), &
                 axis_ids=(/grdid/), &
-                missing_value=1e20, &
+                missing_value=missing, &
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 original_name=trim(original_name))
@@ -1515,7 +1514,7 @@ contains
                 units=trim(vunits), &
                 axis_ids=(/taxid/), &
                 original_name=trim(original_name), &
-                missing_value=1e20, &
+                missing_value=missing, &
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
@@ -1525,7 +1524,7 @@ contains
                 table_entry=trim(ovnm), &
                 units=trim(vunits), &
                 axis_ids=(/grdid, kaxid/), &
-                missing_value=1e20, &
+                missing_value=missing, &
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 original_name=trim(original_name))
@@ -1541,7 +1540,7 @@ contains
                 units=trim(vunits), &
                 axis_ids=(/grdid, taxid/), &
                 original_name=trim(original_name), &
-                missing_value=1e20, &
+                missing_value=missing, &
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
@@ -1553,7 +1552,7 @@ contains
                 units=trim(vunits), &
                 axis_ids=(/grdid, kaxid, taxid/), &
                 original_name=trim(original_name), &
-                missing_value=1e20, &
+                missing_value=missing, &
                 positive=trim(vpositive), &
                 history=trim(vhistory), &
                 comment=trim(vcomment))
@@ -1564,7 +1563,7 @@ contains
                 units=trim(vunits), &
                 axis_ids=(/laxid, kaxid, raxid, taxid/), &
                 original_name=trim(original_name), &
-                missing_value=1e20, &
+                missing_value=missing, &
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
@@ -1575,7 +1574,7 @@ contains
                 units=trim(vunits), &
                 axis_ids=(/laxid, raxid, taxid/), &
                 original_name=trim(original_name), &
-                missing_value=1e20, &
+                missing_value=missing, &
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
@@ -1586,7 +1585,7 @@ contains
                 units=trim(vunits), &
                 axis_ids=(/saxid, taxid/), &
                 original_name=trim(original_name), &
-                missing_value=1e20, &
+                missing_value=missing, &
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
@@ -1597,7 +1596,7 @@ contains
                 units=trim(vunits), &
                 axis_ids=(/taxid/), &
                 original_name=trim(original_name), &
-                missing_value=1e20, &
+                missing_value=missing, &
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
@@ -1640,7 +1639,7 @@ contains
 
     implicit none
 
-    integer                 :: i, j, k
+    integer                 :: k
 !   character(len=slenmax)  :: coord
 
     ! Open input file
@@ -1717,7 +1716,7 @@ contains
       do k = 1, kk
         do j = 1, jj
           do i = 1, ii
-            if (fld(i, j, k) == 1e20) then
+            if (abs(fld(i, j, k) - missing) < eps) then
               dp(i, j, k) = 0.
             else
               dp(i, j, k) = fld(i, j, k)
@@ -1758,8 +1757,8 @@ contains
       status = nf90_get_att(fid, rhid, '_FillValue', fill)
       do j = 1, jj
         do i = 1, ii
-          if (sealv(i, j) == fill) then
-            sealv(i, j) = 1e20
+          if (abs(sealv(i, j) - fill) < eps) then
+            sealv(i, j) = missing
           else
             sealv(i, j) = sealv(i, j)*sfac + offs
           end if
@@ -1783,8 +1782,8 @@ contains
       status = nf90_get_att(fid, rhid, '_FillValue', fill)
       do j = 1, jj
         do i = 1, ii
-          if (pbot(i, j) == fill) then
-            pbot(i, j) = 1e20
+          if (abs(pbot(i, j) - fill) < eps) then
+            pbot(i, j) = missing
           else
             pbot(i, j) = pbot(i, j)*sfac + offs
           end if
@@ -1862,8 +1861,8 @@ contains
       do k = 1, kk
         do j = 1, jj
           do i = 1, ii
-            if (fldtmp(i, j, k) == fill) then
-              fld(i, j, k) = 1e20
+            if (abs(fldtmp(i, j, k) - fill) < eps) then
+              fld(i, j, k) = missing
             else
               fld(i, j, k) = fld(i, j, k) + (fldtmp(i, j, k)*sfac + offs)*fac
             end if
@@ -1916,8 +1915,8 @@ contains
       do k = 1, kk
         do j = 1, jj
           do i = 1, ii
-            if (fldtmp(i, j, k) == fill) then
-              fld(i, j, k) = 1e20
+            if (abs(fldtmp(i, j, k) - fill) < eps) then
+              fld(i, j, k) = missing
             else
               fld(i, j, k) = fld(i, j, k) + (fldtmp(i, j, k)*sfac + offs)*fac
             end if
@@ -2007,7 +2006,7 @@ contains
 
     implicit none
 
-    integer :: i, j, k
+!   integer :: i, j, k
     real(r4), allocatable, dimension(:, :, :)   :: fldtmp2
 
     if (trim(tcoord) == 'time1') then

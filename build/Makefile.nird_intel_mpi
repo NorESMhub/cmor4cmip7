@@ -28,10 +28,13 @@ NETCDFF=$(EBROOTNETCDFMINFORTRAN)
 LIBS=-L$(CMOR)/lib -L$(JSONF)/lib -L$(GSW)/lib64 -Wl,-rpath=$(JSONF)/lib -Wl,-rpath=$(GSW)/lib64 -lcmor -lnetcdff -lnetcdf -luuid -ludunits2 -ljson-c -ljsonfortran -lgsw
 
 # Compiler flags
-FFLAGS=-O2 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE -DMPI
+FFLAGS=-O2 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
 # for debug
-FFLAGS:=$(FFLAGS) -g
-#FFLAGS:=$(FFLAGS) -g -warn all -check all -traceback -fpe0
+#FFLAGS:=$(FFLAGS) -g -traceback
+#FFLAGS:=$(FFLAGS) -warn all
+#FFLAGS:=$(FFLAGS) -fpe0 -check bounds -check arg_temp_created -heap-arrays 0
+#FFLAGS:=$(FFLAGS) -check all
+
 
 # Linker flags
 LDFLAGS=$(LIBS)

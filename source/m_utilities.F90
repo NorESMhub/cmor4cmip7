@@ -17,7 +17,7 @@ contains
 
     character(len=*), intent(in) :: fnm, vnm
 
-    integer :: ncid, rhid, status, n
+    integer :: ncid, rhid, status
 
     var_in_file = .false.
     if (len_trim(fnm) > 0) then
@@ -92,7 +92,7 @@ contains
     implicit none
 
     logical, intent(in), optional :: reset
-    logical :: isloop
+!   logical :: isloop
 
 !   isloop = .true.
 
@@ -134,7 +134,7 @@ contains
 
     character(len=1024), save   :: fpreold = 'xxx'
     character(len=1024)         :: units, calendar
-    integer, save       :: fstat, n, nrec, unlimdimid, ncid, rhid, rhid2, &
+    integer, save       :: n, nrec, unlimdimid, ncid, rhid, rhid2, &
                            status, sstartend(2, 10), nskip, irecold, toff, ndays
     real(r8), save  :: dnumlo, dnumhi, tbndold(2) = (/-999999., -999999./)
     logical, save       :: ltimebnds, ldone
@@ -312,6 +312,8 @@ contains
     integer, intent(out) :: year, month
 
     integer :: y1, m1, y2, m2, ndays, ndayslast
+    y1 = 1
+    m1 = 1
 
     if (tval < 0.) return
 
@@ -333,7 +335,7 @@ contains
       else
         m2 = m2 + 1
       end if
-      call nccaln(calendar, yref, 1, 1, y2, m2, 1, ndays)
+      call nccaln(calendar, yref, y1, m1, y2, m2, 1, ndays)
     end do
     tbnd(1) = ndayslast
     tbnd(2) = ndays
@@ -855,7 +857,7 @@ contains
     real(r8), intent(in) :: theta_a, lambda_a, theta_b, lambda_b
     real(r8), intent(out) :: theta_c, lambda_c
 
-    real(r8) :: x_a, y_a, z_a, x_b, y_b, z_b, beta, x_c, y_c, z_c
+    real(r8) :: x_a, y_a, z_a, x_b, y_b, z_b, x_c, y_c, z_c
 
     real(r8), parameter :: deg2rad = 3.141592654_r8/180._r8, rad2deg = 1._r8/deg2rad
 
@@ -1017,9 +1019,9 @@ contains
     real(r8), intent(inout) :: plevi(nlevip1)
 
     integer :: i, j, k, kp, kpi
-    real(r8) :: a1, a2ln, a2ln1, a2ln2
-    real(r8) :: tstar, hgt, alnp, t0, tplat, tprime0, alpha, alnp3, psfcmb
-    real(r8) :: alp, alphp
+    real(r8) :: a1, a2ln
+    real(r8) :: tstar, hgt, alnp, t0, tplat, tprime0, alnp3, psfcmb
+    real(r8) :: alp
     real(r8), parameter :: rd = 287.04d0
     real(r8), parameter :: ginv = 1.d0/9.80616d0
     real(r8), parameter :: alpha0 = 0.0065d0*rd*ginv
@@ -1169,10 +1171,10 @@ contains
     implicit none
 #ifdef MPI
     include 'mpif.h'
+    integer :: mpierror
 #endif
     integer, intent(in) :: n, nmax
-
-    integer :: mpirank, mpisize, mpierror
+    integer :: mpirank, mpisize
 
 #ifdef MPI
     call mpi_comm_size(mpi_comm_world, mpisize, mpierror)

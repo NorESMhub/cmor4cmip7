@@ -73,7 +73,7 @@ contains
 
     implicit none
 
-    logical :: badrec, last, first
+    logical :: badrec
     integer :: k, m, n
     character(len=slenmax), dimension(5) :: itags
 
@@ -398,7 +398,7 @@ contains
 
     implicit none
 
-    integer :: i, j, k, n
+    integer :: n
 
     character(len=slenmax), dimension(:), allocatable  :: keys
     character(len=slenmax)        :: key, val
@@ -448,7 +448,7 @@ contains
     implicit none
 
     integer     :: i, j, k, n
-    real(r8)    :: r, rd, p, ptoptmp, pbottmp
+    real(r8)    :: ptoptmp, pbottmp
     real(r8)    :: dptmp, ptmp
 
     character(len=slenmax), dimension(:), allocatable  :: keys
@@ -739,10 +739,9 @@ contains
 
     implicit none
 
-    logical         :: check
-    integer         :: i, j, k, n, fid
+!   logical         :: check
+    integer         :: i, j, k, n
     real(r8)        :: missing
-    real(r8)        :: phiu, phil
     real(r8)        :: dptmp, ptmp
 
     ! Open first input file
@@ -1079,10 +1078,9 @@ contains
     character(len=*), intent(in)    :: ivnm, ovnm
 
     integer, parameter              :: ndimmax = 10
-    integer                 :: i, j, k, n, ndims, dimids(ndimmax), dimlens(ndimmax)
+    integer                 :: n, ndims, dimids(ndimmax), dimlens(ndimmax)
 !   character(len=slenmax)  :: coord
 
-    real(r8), allocatable           :: tmp1d(:), tmp2d(:, :)
     character(len=slenmax)          :: cell_measures
 
     real(r8), allocatable, dimension(:, :)      :: ulon_tmp, ulat_tmp
@@ -1627,7 +1625,7 @@ contains
 
     implicit none
 
-    integer                 :: i, j, k
+    integer                 :: k
 !   character(len=slenmax)  :: coord
 
     ! Open input file
@@ -1994,7 +1992,7 @@ contains
 
     implicit none
 
-    integer :: i, j, k
+!   integer :: i, j, k
     real(r4), allocatable, dimension(:, :, :)   :: fldtmp2
 
     if (trim(tcoord) == 'time1') then

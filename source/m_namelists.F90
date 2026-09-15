@@ -170,7 +170,7 @@ contains
 
     ! Read namelists
     if (iargc() /= 4) then
-      write (*, *) 'Usage: noresm2cmor <system nml-file> <model nml-file>'// &
+      write (*, *) 'Usage: cmor4cmip7 <system nml-file> <model nml-file>'// &
         '<exp nml-file> <variable nml-file>'
       stop
     end if

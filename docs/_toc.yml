@@ -1,0 +1,25 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro.md
+chapters:
+  - file: tutorial.md
+  - file: install/intro.md
+    sections:
+      - file: install/cmor4cmip7.md
+      - file: install/libcmor.md
+      - file: install/libgsw.md
+      - file: install/libjson.md
+  - file: recipes/intro.md
+    sections:
+      - file: recipes/system.md
+      - file: recipes/model.md
+      - file: recipes/experiment.md
+      - file: recipes/variables.md
+  - file: develop/intro.md
+    sections:
+      - file: develop/code.md
+      - file: develop/flowchart.md
+      - file: develop/mapping.md
+  - file: FAQ.md

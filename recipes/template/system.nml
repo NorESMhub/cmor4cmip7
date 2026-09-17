@@ -3,7 +3,6 @@
  obasedir      = '/scratch/yanchun/cmorout',
  griddata      = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/griddata',
  tabledir      = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/cmor/cmip7-cmor-tables/tables',
- mapfile       = '../recipes/template/mapping.json',
  createsubdirs = .false.,
  forcefilescan = .true.,  
  verbose       = .false.,

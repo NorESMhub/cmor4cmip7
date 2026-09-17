@@ -1,5 +1,3 @@
-&variables
-compound_names    = 
 !
 ! --- --- --- --- --- ---
 ! list of variables to be cmorized;
@@ -7,6 +5,9 @@ compound_names    =
 !   'ocean.agessc.tavg-ol-hxy-sea.mon.glb'              ! add note here
 ! --- --- --- --- --- ---
 !
+&variables
+mapfile         = '../recipes/template/mapping.json',
+compound_names  = 
     'ocean.agessc.tavg-ol-hxy-sea.mon.glb'
     'ocean.areacello.ti-u-hxy-u.fx.glb'
     'ocean.basin.ti-u-hxy-u.fx.glb'
@@ -171,6 +172,5 @@ compound_names    =
     'ocnBgchem.talk.tavg-ol-hxy-sea.mon.glb'
     'ocnBgchem.zooc.tavg-ols-hxy-sea.mon.30S-90S'
     'ocnBgchem.zooc.tavg-ol-hxy-sea.mon.glb'
-
 /
 

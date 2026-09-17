@@ -9,7 +9,7 @@ The example below assumes a `piControl` experiment for the `NorESM3-LM` model, b
 
 ```bash
 cd ~/                                             # Install under home as default
-tag=v20260914-beta                                # Chose [the latest release](https://github.com/NorESMhub/cmor4cmip7/tags)
+tag=v20260917-beta                                # Chose [the latest release](https://github.com/NorESMhub/cmor4cmip7/tags)
 git clone git@github.com:NorESMhub/cmor4cmip7.git # Clone the source code
 cd cmor4cmip7
 git checkout -b $tag tags/$tag                    # Checout the tag
@@ -110,7 +110,7 @@ Example:
 ```fortran
 &experiment
  casename               = 'n1850.ne16pg3_tn14.noresm3_0_beta22.bdmc2_1p2.20260811',
- osubdir                = 'NorESM3-LM/piControl/v20260914',
+ osubdir                = 'NorESM3-LM/piControl/v20260917',
  experiment_id          = 'piControl',
  activity_id            = 'CMIP',
  mip_era                = 'CMIP7',
@@ -199,7 +199,7 @@ source_id       : NorESM3-LM
 experiment_id   : piControl
 variant_label   : r1i1p1f1
 grid_label      : g143
-version         : v20260914
+version         : v20260917
 ```
 :::{note}
 The data version number in the `params.yml` needs to be updated as the same as in the `experiment.nml`.

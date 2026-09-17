@@ -1,1 +1,0 @@
-# validate the output

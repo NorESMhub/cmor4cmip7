@@ -1,2 +1,0 @@
-# CMOR Example
-

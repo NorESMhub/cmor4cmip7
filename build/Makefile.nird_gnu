@@ -1,9 +1,8 @@
 # Targets 
-TARGET=cmor
+TARGET=cmor4cmip7
 
 # Objects
-#OBJ=m_namelists.o m_utilities.o m_modelsice.o m_modelslnd.o m_modelsatm.o m_modelsocn.o cmor.o
-OBJ=m_namelists.o m_utilities.o m_jsons.o m_modelsocn.o cmor.o
+OBJ=m_namelists.o m_utilities.o m_jsons.o m_modelsocn.o cmor4cmip7.o
 
 # Paths 
 SRCDIR=../source
@@ -29,14 +28,14 @@ NETCDFF=$(EBROOTNETCDFMINFORTRAN)
 LIBS=-L$(CMOR)/lib -L$(JSONF)/lib -L$(GSW)/lib64 -Wl,-rpath=$(JSONF)/lib -Wl,-rpath=$(GSW)/lib64 -lcmor -lnetcdff -lnetcdf -luuid -ludunits2 -ljson-c -ljsonfortran -lgsw
 
 # Compiler flags
-FFLAGS=-I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
+FFLAGS=-O2 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
 #FFLAGS:=$(FFLAGS) -fdefault-real-8
 # for debug
-FFLAGS:=$(FFLAGS) -g
-#FFLAGS:=$(FFLAGS) -Wunused
-#FFLAGS:=$(FFLAGS) -Wcompare-reals
-#FFLAGS:=$(FFLAGS) -g -Wall -Wextra -fcheck=all -fbacktrace -ffpe-trap=invalid,zero,overflow
-#FFLAGS:=$(FFLAGS) -fcheck=all -fbounds-check -fsanitize=address -fbacktrace
+#FFLAGS:=$(FFLAGS) -g -fcheck=all
+#FFLAGS:=$(FFLAGS) -Wunused-Wcompare-reals -Wconversion-Wmaybe-uninitialized -Wunused-dummy-argument
+#FFLAGS:=$(FFLAGS) -Wall -Wextra 
+#FFLAGS:=$(FFLAGS) -fbacktrace -ffpe-trap=invalid,zero,overflow -fbounds-check
+#FFLAGS:=$(FFLAGS) -fsanitize=address
 
 # Linker flags
 LDFLAGS=$(LIBS)
@@ -52,10 +51,10 @@ $(TARGET): $(OBJ)
 	$(LD) -o $(TARGET) $(OBJ) $(LDFLAGS)
 	mkdir -p $(BINDIR) 
 	mv $(TARGET) $(BINDIR)
-	#rm -f *.o *.h *.inc m_*.mod
+	rm -f *.o *.h *.inc m_*.mod
 
-cmor.o: $(SRCDIR)/cmor.F90
-	$(FC) $(FFLAGS) -c $(SRCDIR)/cmor.F90
+cmor4cmip7.o: $(SRCDIR)/cmor4cmip7.F90
+	$(FC) $(FFLAGS) -c $(SRCDIR)/cmor4cmip7.F90
 
 #m_modelsatm.o: $(SRCDIR)/m_modelsatm.F90
 	#$(FC) $(FFLAGS) -c $(SRCDIR)/m_modelsatm.F90

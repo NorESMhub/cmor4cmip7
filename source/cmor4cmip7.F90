@@ -30,28 +30,33 @@ program main
     inquire(file='filelist_'//trim(casename)//trim(membertag), &
       exist=fileexists)
     if (.not. fileexists .or. forcefilescan) then
-      write(*,*) 'get_file_info: create new file list ' &
+      if (verbose) write(*,*) '(get_file_info) Create new file list: bin/' &
         //trim('filelist_'//casename)//trim(membertag)
       if (len_trim(membertag) .gt. 0) then
-        call SYSTEM('find '//trim(ibasedir)//'/'//trim(casename) &
-          //'/{ice,ocn} ' &
+        call execute_command_line('find '//trim(ibasedir)//'/'//trim(casename) &
+          //'/ocn ' &
           //'-mindepth 2 -maxdepth 2 -path "*/hist/*" -name "*.*_'//trim(membertag) &
           //'.h*.nc" | sort > '//trim('filelist_'//casename) &
           //trim(membertag))
+        if (verbose) write(*,*) 'find '//trim(ibasedir)//'/'//trim(casename) &
+          //'/ocn ' &
+          //'-mindepth 2 -maxdepth 2 -path "*/hist/*" -name "*.*_'//trim(membertag) &
+          //'.h*.nc" | sort > '//trim('filelist_'//casename) &
+          //trim(membertag)
       else
-!       call SYSTEM('find '//trim(ibasedir)//'/'//trim(casename) &
+!       call execute_command_line('find '//trim(ibasedir)//'/'//trim(casename) &
 !         //'/{atm,ice,lnd,ocn,rof}' &
 !         //' \( -path "*/hist/*" -or ' &
 !         //'    -path "*/hist_true/*" \)' &
-        call SYSTEM('find '//trim(ibasedir)//'/'//trim(casename) &
-          //'/{ice,ocn} ' &
+        call execute_command_line('find '//trim(ibasedir)//'/'//trim(casename) &
+          //'/ocn ' &
           //'-mindepth 2 -maxdepth 2' &
           //' -path "*/hist/*"' &
           //' -name "*.nc"' &
           //' | sort > '//trim('filelist_'//casename))
 
-        write(*,*) 'find '//trim(ibasedir)//'/'//trim(casename) &
-          //'/{ice,ocn} ' &
+        if (verbose) write(*,*) 'find '//trim(ibasedir)//'/'//trim(casename) &
+          //'/ocn ' &
           //'-mindepth 2 -maxdepth 2 ' &
           //'-path "*/hist/*" ' &
           //'-name "*.nc" ' &
@@ -59,7 +64,7 @@ program main
       end if
 
     else
-      write(*,*) 'get_file_info: read existing file list ' &
+      if (verbose) write(*,*) '(get_file_info) Read existing file list: bin/' &
         //trim('filelist_'//casename)//trim(membertag)
     end if
 #ifdef MPI

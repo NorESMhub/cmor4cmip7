@@ -6,6 +6,12 @@ module m_namelists
 ! integer, parameter :: r4 = selected_real_kind(6,30)
 ! integer, parameter :: r8 = selected_real_kind(14,30)
 
+  ! Round-off fraction
+  real(r8)              :: eps = 1.0e-10
+
+  ! _FillValue
+  real(r4)              :: missing = 1.e20
+
   ! Namelist limits
   integer, parameter :: rowmax = 200, slenmax = 1024
 
@@ -16,49 +22,60 @@ module m_namelists
     forcefilescan, verbose
 
   ! Model namelist
-  character(len=slenmax), save  :: model_id, institute_id
+  character(len=slenmax), save  :: source_id, institute_id
   character(len=slenmax), save  :: institution, source, references, contact
   character(len=slenmax), save  :: tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc
                                    
   character(len=slenmax), save  :: secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
                                    ocnregnfile
-  character(len=slenmax), save  :: parent_source_id, coordtable, json_file_attributes, &
+  character(len=slenmax), save  :: coordtable, json_file_attributes, &
                                    ocngrid, ocngrid_label, ocngrid_resolution
+  ! conditionally required global attributes
+! character(len=slenmax), save  :: external_variables
 
   logical, save                 :: lshiftgrid   ! shift c-stggering grid from low-left to upper-right stencil
 
-  namelist /model/ model_id, institute_id, &
+  namelist /model/ source_id, institute_id, &
     institution, source, references, contact, &
     tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc, &
     secindexfile, ocngridfile, ocninitfile, ocnmertfile, ocnregnfile, &
-    parent_source_id, coordtable, json_file_attributes, &
+    coordtable, json_file_attributes, &
     ocngrid, ocngrid_label, ocngrid_resolution, &
     lshiftgrid
 
   ! Experiment namelist
-  character(len=slenmax), save :: casename, experiment_id, parent_experiment_id, &
+  character(len=slenmax), save  :: casename, experiment_id, &
                                   parent_experiment_rip, isubdir, osubdir, membertag
-  character(len=slenmax), save :: history, comment, forcing
-  integer, save                                 :: realization, exprefyear, year1, yearn, month1, monthn
-  real(r8), save                            :: branch_time
+  character(len=slenmax), save  :: history, comment
+  integer, save                 :: exprefyear, year1, yearn, month1, monthn
+  real(r8), save                :: branch_time
   logical, save :: dry_run, plevdummy, readdummy, add_fill_day, scanallfiles
   integer, save :: physics_version = 1, initialization_method = 1
-  character(len=slenmax), save  :: activity_id, parent_variant_label, &
-                                   parent_mip_era, mip_era, sub_experiment_id, parent_sub_experiment, &
-                                   parent_activity_id, branch_method, parent_time_units, tracking_prefix, &
-                                   variant_label, source_type
-  real(r8), save            :: branch_time_in_child, branch_time_in_parent
+  ! CMIP7 DRS elements
+  character(len=slenmax), save  :: activity_id, &
+                                   mip_era, tracking_prefix, &
+                                   variant_label
   character(len=slenmax), save  :: forcing_index, physics_index, realization_index, &
                                    initialization_index
-  namelist /experiment/ casename, experiment_id, parent_experiment_id, &
+  ! conditionally required global attributes
+  real(r8), save                :: branch_time_in_child,  &
+                                   branch_time_in_parent
+  character(len=slenmax), save  :: parent_activity_id,    &
+                                   parent_experiment_id,  &
+                                   parent_mip_era,        &
+                                   parent_source_id,      &
+                                   parent_time_units,     &
+                                   parent_variant_label
+
+  namelist /experiment/ casename, experiment_id, parent_experiment_id, parent_source_id, &
     parent_experiment_rip, isubdir, osubdir, membertag, &
-    history, comment, forcing, &
-    realization, exprefyear, year1, yearn, month1, monthn, &
+    history, comment, &
+    exprefyear, year1, yearn, month1, monthn, &
     branch_time, &
     dry_run, plevdummy, readdummy, add_fill_day, scanallfiles, &
     activity_id, parent_variant_label, parent_mip_era, mip_era, &
-    sub_experiment_id, parent_sub_experiment, parent_activity_id, branch_method, &
-    parent_time_units, tracking_prefix, variant_label, source_type, &
+    parent_activity_id, &
+    parent_time_units, tracking_prefix, variant_label, &
     branch_time_in_child, branch_time_in_parent, &
     forcing_index, physics_index, realization_index, initialization_index
 
@@ -126,6 +143,7 @@ contains
     add_fill_day = .false.
     !newcolumnorder= .true.
     scanallfiles = .true.
+    tracking_prefix = 'hdl:21.14107'
 
     casename = ' '
     experiment_id = ' '
@@ -136,15 +154,15 @@ contains
     history = ' '
     comment = ' '
     references = ' '
-    model_id = ' '
-    forcing = ' '
-    realization = 1
+    source_id = ' '
     branch_time = 0.0
     parent_experiment_id = ' '
     parent_experiment_rip = ' '
     isubdir = ' '
     osubdir = ' '
     membertag = ' '
+    parent_source_id = ' '
+    exprefyear = 1
 
     compound_names = ''
 
@@ -152,7 +170,7 @@ contains
 
     ! Read namelists
     if (iargc() /= 4) then
-      write (*, *) 'Usage: noresm2cmor <system nml-file> <model nml-file>'// &
+      write (*, *) 'Usage: cmor4cmip7 <system nml-file> <model nml-file>'// &
         '<exp nml-file> <variable nml-file>'
       stop
     end if
@@ -253,8 +271,7 @@ contains
 
     ! Modify output path and create output folder
     obasedir = trim(obasedir)//'/'//trim(osubdir)
-    write (*, *) 'obsedir:', trim(obasedir)
-    call system('mkdir -p '//trim(obasedir))
+    call execute_command_line('mkdir -p '//trim(obasedir))
 
   end subroutine read_namelists
 
@@ -270,16 +287,14 @@ contains
     write (*, *) 'System namelist:'
     write (*, *) ' input directory  = ', trim(ibasedir)
     write (*, *) ' output directory = ', trim(obasedir)
-    write (*, *) ' table directory  = ', trim(tabledir)
+!   write (*, *) ' table directory  = ', trim(tabledir)
     write (*, *) ' grid data dir.   = ', trim(griddata)
     write (*, *) ' create sub-dirs  = ', createsubdirs
     write (*, *) ' verbose          = ', verbose
     write (*, *)
     write (*, *) 'Model namelist:'
-    write (*, *) ' institution      = ', trim(institution)
-    write (*, *) ' model id         = ', trim(model_id)
-    write (*, *) ' source           = ', trim(source)
-    write (*, *) ' references       = ', trim(references)
+!   write (*, *) ' institution      = ', trim(institution)
+    write (*, *) ' source id         = ', trim(source_id)
     write (*, *) ' contact          = ', trim(contact)
     write (*, *) ' tag annual ocn   = ', trim(tagoyr)
     write (*, *) ' tag annual bgc   = ', trim(tagoyrbgc)
@@ -289,8 +304,8 @@ contains
     write (*, *) ' tag daily bgc    = ', trim(tagodaybgc)
     write (*, *) ' ocean grid file  = ', trim(ocngridfile)
     write (*, *) ' ocean ini file   = ', trim(ocninitfile)
-    write (*, *) ' ocean sec file   = ', trim(secindexfile)
-    write (*, *) ' ocean moc file   = ', trim(ocnmertfile)
+!   write (*, *) ' ocean sec file   = ', trim(secindexfile)
+!   write (*, *) ' ocean moc file   = ', trim(ocnmertfile)
     write (*, *) ' ocean reg file   = ', trim(ocnregnfile)
     !write(*, *) ' allow line break = ', linebreaks
 
@@ -299,21 +314,24 @@ contains
     write (*, *) ' case name        = ', trim(casename)
     write (*, *) ' experiment id    = ', trim(experiment_id)
     write (*, *) ' history          = ', trim(history)
-    write (*, *) ' comment          = ', trim(comment)
-    write (*, *) ' forcing          = ', trim(forcing)
-    write (*, *) ' realization      = ', realization
+!   write (*, *) ' comment          = ', trim(comment)
+    write (*, *) ' realization_index= ', trim(realization_index)
+    write (*, *) ' initialization_index= ', trim(initialization_index)
+    write (*, *) ' physics_index= ', trim(physics_index)
+    write (*, *) ' forcing_index= ', trim(forcing_index)
     write (*, *) ' start year       = ', year1
     write (*, *) ' end year         = ', yearn
     write (*, *) ' start month      = ', month1
     write (*, *) ' end month        = ', monthn
-    write (*, *) ' add dummy day    = ', add_fill_day
-    write (*, *) ' dry run          = ', dry_run
+!   write (*, *) ' add dummy day    = ', add_fill_day
+!   write (*, *) ' dry run          = ', dry_run
 
     write (*, *)
-    print *, 'Variable list:'
+    print *, 'List of datasets to be CMORized:'
     do n = 1, n_datasets
       print *, trim(compound_names(n))
     end do
+    print *, ''
 
   end subroutine print_namelists
 

@@ -14,27 +14,42 @@ Example steps to run cmorization for a `piControl` simulation by NorESM3-LM
 
 ## 1. Clone and build
 ```bash
-cd ~/
-tag=v20260827-beta
-git clone git@github.com:NorESMhub/cmor4cmip7.git
+cd ~/                                             # Install under home as default
+tag=v20260914-beta                                # Chose [the latest release](https://github.com/NorESMhub/cmor4cmip7/tags)
+git clone git@github.com:NorESMhub/cmor4cmip7.git # Clone the source code
 cd cmor4cmip7
-git checkout -b $tag tags/$tag
-git switch -c $tag
-git submodule update --init --recursive
-cd build
-./build.sh
+git checkout -b $tag tags/$tag                    # Checout the tag
+git switch -c $tag                                # Make it as a branch
+git submodule update --init --recursive           # Get the submodules
+cd build                                          # Build direcotry
+./build.sh                                        # Build by default without parallel with Intel compiler, see more with `./build.sh -h`
 ```
 
 ## 2. Update recipes
-update the information under `cmor4cmip7/recipes/template`, where find necessary
-* experiment.nml    : about the experiment
-    - casesname     : the case name
-    - osubdir       : the output directory, the version number needs to be the same as the `tag`.
-* model.nml         : about the model
-* system.nml        : about data input/output
-    - ibasedir      : root directory where the case is stored
-    - obasedir      : root directory when the cmorized data is stored
-* variables.nml     : activate/deactivate variables to be cmorized; add ! to ignore the variable
+The receipe templates are found under `cmor4cmip7/recipes/template`:
+```bash
+cmor4cmip7/recipes/template
+├── experiment.nml
+├── mapping.json
+├── model.nml
+├── system.nml
+└── variables.nml
+```
+
+Update these Fortran namelist files, where find necessary:
+* `experiment.nml`
+    Configuration for the experiment.
+    - **casesname**     : the case name
+    - **osubdir**       : the output directory, the version number needs to be the same as the [release tag of the program](https://github.com/NorESMhub/cmor4cmip7/tags).
+* `model.nml`
+    Configuration for the model.
+* `system.nml`
+    Configuratoin for the data storage and processing data input and output.
+    - **ibasedir**      : root directory where the case is stored
+    - **obasedir**      : root directory when the cmorized data is stored
+* `variables.nml`
+    List of variables (as [CMIP7 compound name](https://wcrp-cmip.github.io/cmip7-guidance/docs/CMIP7/Branded_Variables/#variable-names)) to be cmorized.
+    Use `!` as a Fortran comment mark to skip the line (thus variable(s)).
 
 As for a test, you will only need to replace `obasedir` in the `system.nml` with a directory you intent to store the CMOR output, e.g., `/scracht/<your_user_name>/cmorout`.
 
@@ -43,7 +58,7 @@ Note, these are Fortran namelist files, so general Fortran rule applies when mod
 ## 3. Run the cmorization
 ```bash
 cd ~/cmor4cmip7/bin
-
+source load_modules_intel.sh
 pnml=$HOME/cmor4cmip7/recipes/template
 ./cmor ${pnml}/system.nml ${pnml}/model.nml ${pnml}/experiment.nml ${pnml}/variables.nml
 ```

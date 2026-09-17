@@ -9,7 +9,7 @@ module m_jsons
 contains
 
   ! -----------------------------------------------------------------
-  subroutine json_write_attributes(grid, grid_label, grid_resolution, varname)
+  subroutine json_write_attributes(grid_label, grid_resolution, varname)
 
     !use json_module
 
@@ -20,76 +20,96 @@ contains
     integer :: mpirank, mpisize, mpierror
 #endif
 
-    character(len=*), intent(in) :: grid, grid_label, grid_resolution, varname
+    character(len=*), intent(in) :: grid_label, grid_resolution, varname
     character :: yyyymm1*6, yyyymm2*6, c2*2, r3*3
     type(json_core) :: json
     type(json_value), pointer :: p
+    integer   :: itmp
 
     !write(*,*) 'varname:',trim(varname)
     call json%initialize()
     call json%create_object(p, '')
 
-    ! mapped from cmor2
+    ! Directory Structure Template, Filenames
     call json%add(p, 'outpath', trim(obasedir))
-    call json%add(p, 'experiment_id', trim(experiment_id))
-    call json%add(p, 'institution_id', trim(institute_id))
-    call json%add(p, 'institution', trim(institution))
-    call json%add(p, 'source_id', trim(model_id))
-    call json%add(p, 'source', trim(source))
-    call json%add(p, 'calendar', trim(calendar))
-    call json%add(p, 'realization_index', trim(realization_index))
-    call json%add(p, 'physics_index', trim(physics_index))
-    call json%add(p, 'initialization_index', trim(initialization_index))
-!   call json%add(p, 'contact', trim(contact))
-    call json%add(p, 'history', trim(history))
-!   call json%add(p, 'comment', trim(comment))
-    call json%add(p, 'references', trim(references))
-    call json%add(p, 'model_id', trim(model_id))
-    call json%add(p, 'run_variant', trim(forcing))
-    call json%add(p, 'branch_time', branch_time)
-    call json%add(p, 'parent_experiment_id', trim(parent_experiment_id))
-    ! new for cmor3
-    call json%add(p, 'forcing_index', trim(forcing_index))
-    call json%add(p, 'parent_variant_label', trim(parent_variant_label))
-    call json%add(p, '_controlled_vocabulary_file', 'cmor-cvs.json')
-    call json%add(p, '_AXIS_ENTRY_FILE', 'CMIP7_coordinate.json')
-    call json%add(p, '_FORMULA_VAR_FILE', 'CMIP7_formula_terms.json')
-    call json%add(p, '_cmip7_option', 1)
-
-    ! required global atrtributes
-    call json%add(p, 'activity_id', trim(activity_id))
-    !!call json%add(p, 'area_label', trim(area_label))
-!   call json%add(p, 'source_type', trim(source_type))
-!   call json%add(p, 'sub_experiment_id', trim(sub_experiment_id))
-    call json%add(p, 'parent_sub_experiment_id', trim(parent_sub_experiment))
-    call json%add(p, 'parent_mip_era', trim(parent_mip_era))
-    call json%add(p, 'mip_era', trim(mip_era))
-    call json%add(p, 'parent_activity_id', trim(parent_activity_id))
-    call json%add(p, 'parent_source_id', trim(parent_source_id))
-!   call json%add(p, 'grid', trim(grid))
-    call json%add(p, 'grid_label', trim(grid_label))
-    call json%add(p, 'nominal_resolution', trim(grid_resolution))
-!   call json%add(p, 'branch_method', trim(branch_method))
-    call json%add(p, 'branch_time_in_child', branch_time_in_child)
-    call json%add(p, 'branch_time_in_parent', branch_time_in_parent)
-    call json%add(p, 'parent_time_units', trim(parent_time_units))
-    call json%add(p, 'tracking_prefix', trim(tracking_prefix))
     call json%add(p, 'output_path_template', &
                   '<mip_era><activity_id><source_id><region><frequency><experiment_id><variant_label>'// &
                   '<variable_id><branding_suffix><grid_label><version>')
     call json%add(p, 'output_file_template', &
                   '<variable_id><branding_suffix><frequency><region><grid_label><source_id><experiment_id><variant_label>')
-    call json%add(p, 'license_id', 'CC-BY-4.0')
-    call json%add(p, 'archive_id', 'WCRP')
 
+    ! CMIP7 CMIP7 DRS elements
+    call json%add(p, 'activity_id', trim(activity_id))
+!   call json%add(p, 'branding_suffix', '')
+    call json%add(p, 'experiment_id', trim(experiment_id))
     call json%add(p, 'frequency', trim(frequency))
+    call json%add(p, 'grid_label', trim(grid_label))
+    call json%add(p, 'institution_id', trim(institute_id))
+    call json%add(p, 'mip_era', trim(mip_era))
     call json%add(p, 'region', trim(region_label))
+    call json%add(p, 'source_id', trim(source_id))
+
+    call json%add(p, 'tracking_id', trim(tracking_prefix))
+
+    call json%add(p, 'calendar', trim(calendar))
+!   call json%add(p, 'contact', trim(contact))
+!   call json%add(p, 'comment', trim(comment))
+
+    ! CMOR library needed
+    call json%add(p, '_controlled_vocabulary_file', '../tables-cvs/cmor-cvs.json')
+    call json%add(p, '_AXIS_ENTRY_FILE', 'CMIP7_coordinate.json')
+    call json%add(p, '_FORMULA_VAR_FILE', 'CMIP7_formula_terms.json')
+    call json%add(p, '_cmip7_option', 1)
+
+    ! required global atrtributes
+    !! Elements of the variant_label attribute
+    call json%add(p, 'realization_index', trim(realization_index))
+    call json%add(p, 'physics_index', trim(physics_index))
+    call json%add(p, 'initialization_index', trim(initialization_index))
+    call json%add(p, 'forcing_index', trim(forcing_index))
+    !! Elements of the branded variable name
     call json%add(p, 'branded_variable', trim(varname))
-    call json%add(p, 'drs_specs', 'MIP-DRS7')
+   !call json%add(p, 'temporal_label','')
+   !call json%add(p, 'vertical_label','')
+   !call json%add(p, 'area_label', trim(area_label))
+   !call json%add(p, 'horizontal_label',
+    !! Version of standards applied
+   !call json%add(p, 'Conventions',
+   !call json%add(p, 'drs_specs', 'MIP-DRS7')   ! automatic
+    !! other
+    call json%add(p, 'nominal_resolution', trim(grid_resolution))
+   !call json%add(p, 'realm','')
+    call json%add(p, 'license_id', 'CC-BY-4.0')
+   !call json%add(p, 'product','')
+
+
+    ! conditionally required global atrtributes
+    ! external_variables will be added automatically according to cell_measures
+!   if (len_trim(external_variables) > 0 ) then
+!     call json%add(p, 'external_variables', 'external_variables')
+!   end if
+    if (len_trim('parent_experiment_id') > 0) then
+      call json%add(p, 'branch_time_in_child', branch_time_in_child)
+      call json%add(p, 'branch_time_in_parent', branch_time_in_parent)
+      call json%add(p, 'parent_activity_id', trim(parent_activity_id))
+      call json%add(p, 'parent_experiment_id', trim(parent_experiment_id))
+      call json%add(p, 'parent_mip_era', trim(parent_mip_era))
+      if (len_trim(parent_source_id) < 3) parent_source_id = source_id
+      call json%add(p, 'parent_source_id', trim(parent_source_id))
+      call json%add(p, 'parent_time_units', trim(parent_time_units))
+      call json%add(p, 'parent_variant_label', trim(parent_variant_label))
+    end if
+
+    ! optional global atrtributes
+!   call json%add(p, 'institution', trim(institution))
+    call json%add(p, 'history', trim(history))
+!   call json%add(p, 'references', trim(references))
+!   call json%add(p, 'source', trim(source))
 
     write (yyyymm1, '(I4.4,I2.2)') year1, month1
     write (yyyymm2, '(I4.4,I2.2)') yearn, monthn
-    write (r3, '(I3.3)') realization
+    read(realization_index(2:), *) itmp
+    write (r3, '(I3.3)') itmp
 #ifdef MPI
     call mpi_comm_rank(mpi_comm_world, mpirank, mpierror)
     write (c2, '(I2.2)') mpirank

@@ -1,4 +1,4 @@
-# Intro
+# Introduction
 
 `cmor4cmip7` is a program to process [NorESM3](https://noresm-docs.readthedocs.io/en/main) output for [CMIP7](https://wcrp-cmip.org/cmip-phases/cmip7) with the Climate Model Output Rewriter ([CMOR](https://github.com/PCMDI/cmor)) interface.
 

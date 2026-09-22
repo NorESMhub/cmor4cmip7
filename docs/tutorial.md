@@ -1,17 +1,10 @@
-# cmor4cmip7
+# Tutorial
 
-*************************************************************************************
+This tutorial shows a complete workflow for CMORizing a NorESM3 simulation with `cmor4cmip7` and preparing it for CMIP7-style output.
 
-**This version is now under development for CMIP7, and the following documentation is prilemiary**
+The example below assumes a `piControl` experiment for the `NorESM3-LM` model, but the workflow is the same for other experiments and model configurations.
 
-*************************************************************************************
-
-`cmor4cmip7` is a program to process NorESM3 output for CMIP7 with the Climate Model Output Rewriter ([CMOR](https://github.com/PCMDI/cmor)) interface.
-
-
----
-The example below assumes a `piControl` experiment for the `UKESM-3-LL` model, but the workflow is the same for other experiments and model configurations.
-
+(clone-build)=
 ## 1. Clone the source and build the program
 
 ```bash
@@ -25,6 +18,9 @@ git submodule update --init --recursive           # Get the submodules
 cd build                                          # Build direcotry
 ./build.sh                                        # Build (by default) with Intel compiler as a serial program, see more with `./build.sh -h`
 ```
+:::{seealso}
+See [Installation/cmor4cmip7](install/cmor4cmip7.md) for build options and compiler-specific instructions.
+:::
 
 ## 2. Prepare a recipe directory for the experiment
 
@@ -43,8 +39,8 @@ Create a dedicated recipe directory for your experiment:
 
 ```bash
 cd ~/cmor4cmip7/recipes
-mkdir -p UKESM-3-LL/piControl
-cp -r template/* UKESM-3-LL/piControl/
+mkdir -p NorESM3-LM/piControl
+cp -r template/* NorESM3-LM/piControl/
 ```
 
 This keeps the default templates intact and gives you a clean experiment-specific recipe set.
@@ -88,7 +84,7 @@ This file defines the model identity and model-specific configuration.
 
 Key entries:
 
-- `source_id`: the CMIP7 model/source identifier, for example `UKESM-3-LL`
+- `source_id`: the CMIP7 model/source identifier, for example `NorESM3-LM`
 - `institute_id`: institution acronym
 - `ocngrid_label`: grid label such as `g143`
 - `ocngrid_resolution`: nominal model resolution
@@ -114,7 +110,7 @@ Example:
 ```fortran
 &experiment
  casename               = 'n1850.ne16pg3_tn14.noresm3_0_beta22.bdmc2_1p2.20260811',
- osubdir                = 'UKESM-3-LL/piControl/v20260917',
+ osubdir                = 'NorESM3-LM/piControl/v20260917',
  experiment_id          = 'piControl',
  activity_id            = 'CMIP',
  mip_era                = 'CMIP7',
@@ -162,7 +158,7 @@ Once the namelists are correct, run the program from the executable directory:
 cd ~/cmor4cmip7/bin
 source load_modules_intel.sh
 
-pnml=$HOME/cmor4cmip7/recipes/UKESM-3-LL/piControl
+pnml=$HOME/cmor4cmip7/recipes/NorESM3-LM/piControl
 ./cmor ${pnml}/system.nml ${pnml}/model.nml ${pnml}/experiment.nml ${pnml}/variables.nml
 ```
 
@@ -199,13 +195,15 @@ The configuration needs to match your experiment, for example in `params.yml`:
 
 ```yaml
 cmorout         : /scratch/yanchun/cmorout
-source_id       : UKESM-3-LL
+source_id       : NorESM3-LM
 experiment_id   : piControl
 variant_label   : r1i1p1f1
 grid_label      : g143
 version         : v20260917
 ```
+:::{note}
 The data version number in the `params.yml` needs to be updated as the same as in the `experiment.nml`.
+:::
 
 Then run the validation and check the generated report.
 **Build and execute the validation**

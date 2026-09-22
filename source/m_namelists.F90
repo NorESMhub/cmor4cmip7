@@ -16,9 +16,9 @@ module m_namelists
   integer, parameter :: rowmax = 200, slenmax = 1024
 
   ! System namelist
-  character(len=slenmax), save  :: ibasedir, obasedir, tabledir, griddata, mapfile
+  character(len=slenmax), save  :: ibasedir, obasedir, tabledir, griddata
   logical, save                 :: createsubdirs, forcefilescan, verbose
-  namelist /sys/ ibasedir, obasedir, tabledir, griddata, mapfile, createsubdirs, &
+  namelist /sys/ ibasedir, obasedir, tabledir, griddata, createsubdirs, &
     forcefilescan, verbose
 
   ! Model namelist
@@ -80,13 +80,13 @@ module m_namelists
     forcing_index, physics_index, realization_index, initialization_index
 
   ! Variables
-  character(len=slenmax), save  :: pomon
+  character(len=slenmax), save  :: pomon, mapfile
   integer, save                 :: n_datasets
   character(len=slenmax), dimension(rowmax), save :: compound_names, branded_names, &
                                                      realms, frequencies, regions
   character(len=slenmax) :: realm, frequency, region_label
 
-  namelist /variables/ compound_names
+  namelist /variables/ mapfile, compound_names
 
   ! Misc
   integer :: istatus, funit
@@ -170,7 +170,7 @@ contains
 
     ! Read namelists
     if (iargc() /= 4) then
-      write (*, *) 'Usage: noresm2cmor <system nml-file> <model nml-file>'// &
+      write (*, *) 'Usage: cmor4cmip7 <system nml-file> <model nml-file>'// &
         '<exp nml-file> <variable nml-file>'
       stop
     end if

@@ -703,7 +703,7 @@ contains
         end do
 
         ! uatm to Pa
-      case ('muatm2Pa')
+      case ('muatm2pa')
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii

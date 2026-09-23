@@ -400,9 +400,6 @@
                 "rfi": 1.0,
                 "fmltfz": 1.0
             },
-            "preprocs": {
-                "units": "kg m-2 s-1"
-            },
             "history": "wfo = lip+sop+eva+rnf+rfi+fmltfz"
         },
         "ocean.wmo.tavg-ol-hxy-sea.mon.glb": {

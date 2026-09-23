@@ -28,8 +28,7 @@ NETCDFF=$(EBROOTNETCDFMINFORTRAN)
 LIBS=-L$(CMOR)/lib -L$(JSONF)/lib -L$(GSW)/lib64 -Wl,-rpath=$(JSONF)/lib -Wl,-rpath=$(GSW)/lib64 -lcmor -lnetcdff -lnetcdf -luuid -ludunits2 -ljson-c -ljsonfortran -lgsw
 
 # Compiler flags
-FFLAGS=-O2 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
-#FFLAGS:=$(FFLAGS) -fdefault-real-8
+FFLAGS=-O2 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE -DMPI
 # for debug
 #FFLAGS:=$(FFLAGS) -g -fcheck=all
 #FFLAGS:=$(FFLAGS) -Wunused-Wcompare-reals -Wconversion-Wmaybe-uninitialized -Wunused-dummy-argument

@@ -29,7 +29,6 @@ LIBS=-L$(CMOR)/lib -L$(JSONF)/lib -L$(GSW)/lib64 -Wl,-rpath=$(JSONF)/lib -Wl,-rp
 
 # Compiler flags
 FFLAGS=-O2 -I$(SRCDIR) -I$(CMOR)/include -I$(NETCDFF)/include -I$(JSONF)/include -I$(GSW)/include -DDEFLATE
-#FFLAGS:=$(FFLAGS) -fdefault-real-8
 # for debug
 #FFLAGS:=$(FFLAGS) -g -fcheck=all
 #FFLAGS:=$(FFLAGS) -Wunused-Wcompare-reals -Wconversion-Wmaybe-uninitialized -Wunused-dummy-argument

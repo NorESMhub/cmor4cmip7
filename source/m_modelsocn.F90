@@ -82,14 +82,27 @@ contains
     ! 120-year of yearly data, etc
     integer :: rmax = 120
 
+#ifdef MPI
+  include 'mpif.h'
+  integer :: mpierror, mpirank
+#endif
+
     badrec = .false.
 
     ! Print start information
+#ifdef MPI
+    call MPI_COMM_RANK(MPI_COMM_WORLD, mpirank, mpierror)
+    if (mpirank .eq. 0) then
+#endif
     write (*, *)
     write (*, *) '---------------------------------------'
     write (*, *) '--- Process ocean and ocnBgc output ---'
     write (*, *) '---------------------------------------'
     write (*, *)
+#ifdef MPI
+    end if
+    call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
+#endif
 
     itags = [tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday]
 
@@ -703,7 +716,7 @@ contains
         end do
 
         ! uatm to Pa
-      case ('muatm2Pa')
+      case ('muatm2pa')
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii

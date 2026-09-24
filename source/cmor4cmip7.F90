@@ -80,13 +80,28 @@ program main
   ! call glc2cmor
    
 #ifdef MPI
+<<<<<<< Updated upstream
   ! --- Finalise mpi
   call MPI_FINALIZE(mpierror)
    
+=======
+  call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
+  call MPI_COMM_RANK(MPI_COMM_WORLD, mpirank, mpierror)
+  if (mpirank .eq. 0) then
+>>>>>>> Stashed changes
 #endif
   write(*,*)
   write(*,*) '===================='
   write(*,*) '   ALL JOBS DONE'
   write(*,*) '===================='
   write(*,*)
+<<<<<<< Updated upstream
+=======
+#ifdef MPI
+  end if
+  ! --- Finalise mpi
+  call MPI_FINALIZE(mpierror)
+#endif
+
+>>>>>>> Stashed changes
 end program main

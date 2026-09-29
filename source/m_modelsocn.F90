@@ -639,14 +639,14 @@ contains
         do j = 1, jj
           do i = 1, ii
             if (abs(fld(i, j, 1) - missing) > eps) then
-              fldtmp(i, j, 1) = (min(300., pdepth(i, j), depth_bnds(2, 1)) &
-                                 - min(300., pdepth(i, j), depth_bnds(1, 1)))
+              fldtmp(i, j, 1) = min(300., pdepth(i, j), depth_bnds(2, 1)) &
+                                 - min(300., pdepth(i, j), depth_bnds(1, 1))
               fld(i, j, 1) = fld(i, j, 1)*fldtmp(i, j, 1)
             end if
             do k = 2, kk
               if (abs(fld(i, j, k) - missing) > eps) then
-                fldtmp(i, j, k) = (min(300., pdepth(i, j), depth_bnds(2, k)) &
-                                   - min(300., pdepth(i, j), depth_bnds(1, k)))
+                fldtmp(i, j, k) = min(300., pdepth(i, j), depth_bnds(2, k)) &
+                                   - min(300., pdepth(i, j), depth_bnds(1, k))
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fldtmp(i, j, k)
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
@@ -662,14 +662,14 @@ contains
         do j = 1, jj
           do i = 1, ii
             if (abs(fld(i, j, 1) - missing) > eps) then
-              fldtmp(i, j, 1) = (min(700., pdepth(i, j), depth_bnds(2, 1)) &
-                                 - min(700., pdepth(i, j), depth_bnds(1, 1)))
+              fldtmp(i, j, 1) = min(700., pdepth(i, j), depth_bnds(2, 1)) &
+                                 - min(700., pdepth(i, j), depth_bnds(1, 1))
               fld(i, j, 1) = fld(i, j, 1)*fldtmp(i, j, 1)
             end if
             do k = 2, kk
               if (abs(fld(i, j, k) - missing) > eps) then
-                fldtmp(i, j, k) = (min(700., pdepth(i, j), depth_bnds(2, k)) &
-                                   - min(700., pdepth(i, j), depth_bnds(1, k)))
+                fldtmp(i, j, k) = min(700., pdepth(i, j), depth_bnds(2, k)) &
+                                   - min(700., pdepth(i, j), depth_bnds(1, k))
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fldtmp(i, j, k)
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
@@ -685,14 +685,14 @@ contains
         do j = 1, jj
           do i = 1, ii
             if (abs(fld(i, j, 1) - missing) > eps) then
-              fldtmp(i, j, 1) = (min(2000., pdepth(i, j), depth_bnds(2, 1)) &
-                                 - min(2000., pdepth(i, j), depth_bnds(1, 1)))
+              fldtmp(i, j, 1) = min(2000., pdepth(i, j), depth_bnds(2, 1)) &
+                                 - min(2000., pdepth(i, j), depth_bnds(1, 1))
               fld(i, j, 1) = fld(i, j, 1)*fldtmp(i, j, 1)
             end if
             do k = 2, kk
               if (abs(fld(i, j, k) - missing) > eps) then
-                fldtmp(i, j, k) = (min(2000., pdepth(i, j), depth_bnds(2, k)) &
-                                   - min(2000., pdepth(i, j), depth_bnds(1, k)))
+                fldtmp(i, j, k) = min(2000., pdepth(i, j), depth_bnds(2, k)) &
+                                   - min(2000., pdepth(i, j), depth_bnds(1, k))
                 fld(i, j, 1) = fld(i, j, 1) + fld(i, j, k)*fldtmp(i, j, k)
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
@@ -1152,6 +1152,11 @@ contains
     else if (dims(1:30) == 'longitude,latitude,time,olayer') then
       vtype = 'olayer'
       kk = 1
+      if (dimlens(3) .eq. kdm .and. kdm>0) THEN
+        kk = kdm
+      else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
+        kk = ddm
+      end if
     else if (dims == 'longitude,latitude,time,op20bar') then
       vtype = 'op20bar'
       kk = 1

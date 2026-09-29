@@ -52,7 +52,7 @@ contains
     call json%add(p, 'tracking_id', trim(tracking_prefix))
 
     call json%add(p, 'calendar', trim(calendar))
-!   call json%add(p, 'contact', trim(contact))
+    call json%add(p, 'contact', 'noresm-ncc@met.no')
 !   call json%add(p, 'comment', trim(comment))
 
     ! CMOR library needed
@@ -81,6 +81,7 @@ contains
    !call json%add(p, 'realm','')
     call json%add(p, 'license_id', 'CC-BY-4.0')
    !call json%add(p, 'product','')
+   call json%add(p, 'EMD','https://emd.wcrp-cmip.org/docs/Model/?model=noresm3-lm')
 
 
     ! conditionally required global atrtributes

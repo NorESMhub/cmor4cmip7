@@ -30,7 +30,7 @@ module m_modelsocn
   character(len=slenmax), allocatable, save, dimension(:)   :: region1, section1
   character, allocatable, save, dimension(:, :)             :: region, section
   character(len=slenmax), save                              :: tcoord, zcoord, hcoord, s1
-  character(len=slenmax), save                              :: grid, grid_label
+  character(len=slenmax), save                              :: grid_label
 
   ! Gravity
   real(r8), parameter :: g = 9.80665, ginv = 1.0/g, sref = 35.0
@@ -1218,7 +1218,7 @@ contains
     status = nf90_get_att(ncid, rhid, 'coordinates', hcoord)
     if (status /= nf90_noerr) hcoord(1:1) = ivnm(1:1)
     if (hcoord(1:1) .ne. 'p' .and. hcoord(1:1) .ne. 'u' .and. &
-        hcoord(1:1) .ne. 'v') then
+        hcoord(1:1) .ne. 'v' .and. hcoord(1:1) .ne. 'q') then
       hcoord(1:1) = 'p'
     end if
     if (verbose) write(*,*) 'C-grid point: ',hcoord(1:1)
@@ -1263,21 +1263,14 @@ contains
 
     ! Define output dataset
     grid_label = ocngrid_label
-    grid = trim(ocngrid)
-    if (trim(vtype) == 'layer' ) then
-      grid = trim(ocngrid)//', vertical density coordinate'
-    else if (trim(vtype) == 'olayer' ) then
-      grid = trim(ocngrid)//', at specified vertical depth'
-    else if (trim(vtype) == '1d' ) then
-      grid = 'global mean or integral'
-    else if (trim(vtype) == 'level' ) then
-      grid = trim(ocngrid)//', hybrid coordinate remapped to z-levels'
-    else if (trim(vtype) == 'merk' .or. trim(vtype) == 'merd' .or. trim(vtype) == 'mert') then
-          !grid_label = 'grz'
-          grid = 'zonal mean or integral'
-    else if (trim(vtype) == 'sect') then
-          !grid_label = 'grs'
-          grid = 'section mean or integral' 
+    if (hcoord(1:1) == 'p') then
+      grid_label = 'g202'
+    else if (hcoord(1:1) == 'u') then
+      grid_label = 'g241'
+    else if (hcoord(1:1) == 'v') then
+      grid_label = 'g240'
+    else
+      write(*, *) 'ERROR: unknow horizontal grid: '//hcoord(1:1)
     end if
     call json_write_attributes(grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)

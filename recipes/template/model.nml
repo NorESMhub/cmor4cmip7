@@ -1,6 +1,6 @@
 &model
- source_id     = 'UKESM1-3-LL',
- institute_id  = 'MOHC',
+ source_id     = 'NorESM3-LM',
+ institute_id  = 'NCC',
  contact       = 'Please send any requests or bug reports to noresm-ncc@met.no.',
  ocngrid       = 'tripolar grid with 1deg nominal resolution',
  ocngrid_label = 'g143', 

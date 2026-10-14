@@ -52,7 +52,7 @@ contains
     call json%add(p, 'tracking_id', trim(tracking_prefix))
 
     call json%add(p, 'calendar', trim(calendar))
-    call json%add(p, 'contact', 'noresm-ncc@met.no')
+    call json%add(p, 'contact', trim(contact))
 !   call json%add(p, 'comment', trim(comment))
 
     ! CMOR library needed

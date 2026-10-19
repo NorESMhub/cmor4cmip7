@@ -1555,6 +1555,9 @@ contains
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
+        ! override default the data chunk
+        ! (however this is done with cmip7repack as a post-processing)
+        ! status = cmor_set_chunking(varid, (/12, 384, 360/))    !
       else if (trim(vtype) == 'layer' .or. trim(vtype) == 'level' .or. vtype(1:6) == 'olayer' &
         .or. trim(vtype) == 'ols' .or. trim(vtype) == 'op20bar') then
         varid = cmor_variable( &

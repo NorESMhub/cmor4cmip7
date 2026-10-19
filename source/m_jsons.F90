@@ -74,7 +74,7 @@ contains
    !call json%add(p, 'area_label', trim(area_label))
    !call json%add(p, 'horizontal_label',
     !! Version of standards applied
-   !call json%add(p, 'Conventions',
+   call json%add(p, 'Conventions','CF-1.11')
    !call json%add(p, 'drs_specs', 'MIP-DRS7')   ! automatic
     !! other
     call json%add(p, 'nominal_resolution', trim(grid_resolution))

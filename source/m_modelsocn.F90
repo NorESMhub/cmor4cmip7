@@ -902,6 +902,19 @@ contains
     call handle_ncerror(status)
     status = nf90_get_att(ncid, rhid, 'units', calunits)
     call handle_ncerror(status)
+    n = len_trim(calunits)
+    ! minor fix of calendar unit
+    if (n >=6 .and. calunits(n-5:n) == ' 00:00') then
+        if (verbose) then
+            write(*,*) 'Warning: calendar unit is changed from:'
+            write(*,*) trim(calunits)
+            write(*,*) 'to'
+        end if
+        calunits(n+1:n+3) = ':00'
+        if (verbose) then
+            write(*,*) trim(calunits)
+        end if
+    end if
     read (calunits(12:15), '(i4.4)') exprefyear
 
     ! Close first file

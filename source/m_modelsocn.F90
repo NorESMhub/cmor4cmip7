@@ -1463,8 +1463,9 @@ contains
               table_entry='osurf', &
               units='', &
               length=1, &
-              coord_vals=(/0./), &
-              cell_bounds=(/0., 0./))
+              coord_vals=(/0./))
+              !coord_vals=(/0./), &
+              !cell_bounds=(/0., 0./))
     else if (trim(vtype) == 'merd') then
       kaxid = cmor_axis( &
               table=trim(tablepath), &

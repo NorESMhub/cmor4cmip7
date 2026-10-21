@@ -1287,7 +1287,7 @@ contains
     end if
     call json_write_attributes(grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)
-    !call system('rm '//trim(json_file_attributes))
+    call system('rm '//trim(json_file_attributes))
 
     ! Define horizontal axes
     !write(*, *) 'Define horizontal axes'
@@ -1558,7 +1558,7 @@ contains
                 positive=trim(vpositive))
         ! override default the data chunk
         ! (however this is done with cmip7repack as a post-processing)
-        ! status = cmor_set_chunking(varid, (/12, 384, 360/))    !
+        ! status = cmor_set_chunking(varid, (/kk, jj, ii/))    !
       else if (trim(vtype) == 'layer' .or. trim(vtype) == 'level' .or. vtype(1:6) == 'olayer' &
         .or. trim(vtype) == 'ols' .or. trim(vtype) == 'op20bar') then
         varid = cmor_variable( &
@@ -1571,6 +1571,7 @@ contains
                 positive=trim(vpositive), &
                 history=trim(vhistory), &
                 comment=trim(vcomment))
+        ! status = cmor_set_chunking(varid, (/kk, jj, ii/))    !
       else if (vtype(1:4) == 'merd' .or. vtype(1:4) == 'merk') then
         varid = cmor_variable( &
                 table=trim(tablepath), &

@@ -94,5 +94,6 @@ program main
   ! --- Finalise mpi
   call MPI_FINALIZE(mpierror)
 #endif
+  call system('rm '//trim('filelist_'//casename)//trim(membertag))
 
 end program main

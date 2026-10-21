@@ -15,7 +15,7 @@ FC=ifx
 LD=$(FC)
 
 # Libraries
-CMOR=/nird/datalake/NS16000B/CMOR/cmorlib/3.15.3/intel
+CMOR=/nird/datalake/NS16000B/CMOR/cmorlib/3.16.0/intel
 JSONF=/nird/datalake/NS16000B/CMOR/json-fortran/9.2.1-intellvm
 GSW=/nird/datalake/NS16000B/CMOR/GSW-Fortran/v3.05-7-intel
 NETCDFF=$(EBROOTNETCDFMINFORTRAN)

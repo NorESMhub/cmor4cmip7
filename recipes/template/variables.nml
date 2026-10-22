@@ -1,12 +1,12 @@
 !
 ! --- --- --- --- --- ---
 ! list of variables to be cmorized;
-! use Fortran comment to activate/deactivate any of themgc
-!   'ocean.agessc.tavg-ol-hxy-sea.mon.glb'              ! add note here
+! use Fortran comment to activate/deactivate datasets
+!   'ocean.agessc.tavg-ol-hxy-sea.mon.glb'   ! comment here
 ! --- --- --- --- --- ---
 !
 &variables
-mapfile         = '../recipes/template/mapping.json',
+mapfile         = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/recipes/template/mapping.json',
 compound_names  = 
     'ocean.agessc.tavg-ol-hxy-sea.mon.glb'
     'ocean.areacello.ti-u-hxy-u.fx.glb'

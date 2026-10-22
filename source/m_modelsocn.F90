@@ -902,6 +902,19 @@ contains
     call handle_ncerror(status)
     status = nf90_get_att(ncid, rhid, 'units', calunits)
     call handle_ncerror(status)
+    n = len_trim(calunits)
+    ! minor fix of calendar unit
+    if (n >=6 .and. calunits(n-5:n) == ' 00:00') then
+        if (verbose) then
+            write(*,*) 'Warning: calendar unit is changed from:'
+            write(*,*) trim(calunits)
+            write(*,*) 'to'
+        end if
+        calunits(n+1:n+3) = ':00'
+        if (verbose) then
+            write(*,*) trim(calunits)
+        end if
+    end if
     read (calunits(12:15), '(i4.4)') exprefyear
 
     ! Close first file
@@ -1542,6 +1555,9 @@ contains
                 history=trim(vhistory), &
                 comment=trim(vcomment), &
                 positive=trim(vpositive))
+        ! override default the data chunk
+        ! (however this is done with cmip7repack as a post-processing)
+        ! status = cmor_set_chunking(varid, (/12, 384, 360/))    !
       else if (trim(vtype) == 'layer' .or. trim(vtype) == 'level' .or. vtype(1:6) == 'olayer' &
         .or. trim(vtype) == 'ols' .or. trim(vtype) == 'op20bar') then
         varid = cmor_variable( &

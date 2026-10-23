@@ -15,7 +15,6 @@
  yearn                  = 0010,
  month1                 = 1,
  monthn                 = 12,
- activity_id            = 'CMIP',
  parent_activity_id     = 'CMIP',
  parent_variant_label   = 'r1i1p1f1',
  parent_mip_era         = 'CMIP7',

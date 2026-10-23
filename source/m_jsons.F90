@@ -39,7 +39,7 @@ contains
                   '<variable_id><branding_suffix><frequency><region><grid_label><source_id><experiment_id><variant_label>')
 
     ! CMIP7 CMIP7 DRS elements
-    call json%add(p, 'activity_id', trim(activity_id))
+!   call json%add(p, 'activity_id', trim(activity_id))
 !   call json%add(p, 'branding_suffix', '')
     call json%add(p, 'experiment_id', trim(experiment_id))
     call json%add(p, 'frequency', trim(frequency))
@@ -89,7 +89,7 @@ contains
 !   if (len_trim(external_variables) > 0 ) then
 !     call json%add(p, 'external_variables', 'external_variables')
 !   end if
-    if (len_trim('parent_experiment_id') > 0) then
+    if (len_trim(parent_experiment_id) > 0) then
       call json%add(p, 'branch_time_in_child', branch_time_in_child)
       call json%add(p, 'branch_time_in_parent', branch_time_in_parent)
       call json%add(p, 'parent_activity_id', trim(parent_activity_id))

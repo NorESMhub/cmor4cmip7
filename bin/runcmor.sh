@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ------------------ USER INPUT SECTION ------------------------------------
-pnml=../recipes/NorESM3-LM/piControl/v20261021
+pnml=../recipes/NorESM3-LM/piControl/v20261022
 
 sysnml=${pnml}/system.nml
 modnml=${pnml}/model.nml
@@ -9,8 +9,8 @@ expnml=${pnml}/experiment.nml
 varnml=${pnml}/variables.nml
 #varnml=${pnml}/variables_miss.nml
 
-compiler=intel      # gnu or intel
-runtype=serial      # serial, parallel or debug
+compiler=gnu            # gnu or intel
+runtype=parallel        # serial, parallel or debug
 
 num_threads=8       # number of threads, only for parallel run type
 # --------------------------------------------------------------------------

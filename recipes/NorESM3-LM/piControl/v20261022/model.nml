@@ -1,0 +1,17 @@
+&model
+ source_id     = 'NorESM3-LM',
+ institute_id  = 'NCC',
+ contact       = 'Please send any requests or bug reports to noresm-ncc@met.no.',
+ ocngrid       = 'tripolar grid with 1deg nominal resolution',
+ ocngrid_label = 'g143', 
+ ocngrid_resolution = '100 km',
+ tagoyr        = 'blom.hy',
+ tagoyrbgc     = 'blom.hbgcy',
+ tagomon       = 'blom.hm',
+ tagomonbgc    = 'blom.hbgcm',
+ tagoday       = 'blom.hd',
+ tagodaybgc    = 'blom.hbgcd',
+ ocngridfile   = 'grid_tnx1v4.nc',
+ ocnregnfile   = 'ocean_regions_tnx1v4.nc',
+ ocninitfile   = 'inicon_tnx1v4.nc'
+/

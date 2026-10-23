@@ -84,6 +84,7 @@ program main
   call MPI_COMM_RANK(MPI_COMM_WORLD, mpirank, mpierror)
   if (mpirank .eq. 0) then
 #endif
+  call system('rm '//trim('filelist_'//casename)//trim(membertag))
   write(*,*)
   write(*,*) '===================='
   write(*,*) '   ALL JOBS DONE'
@@ -94,6 +95,5 @@ program main
   ! --- Finalise mpi
   call MPI_FINALIZE(mpierror)
 #endif
-  call system('rm '//trim('filelist_'//casename)//trim(membertag))
 
 end program main

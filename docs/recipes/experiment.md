@@ -6,29 +6,28 @@ The CMIP7 guidance defines these as part of the required and conditionally requi
 
 ```fortran
 &experiment
- casename               = 'n1850.ne16pg3_tn14.noresm3_0_beta22.bdmc2_1p2.20260811',
- osubdir                = 'NorESM3-LM/piControl/v20260914',
+ casename               = 'n1850GHGGaxg.LM.nor30b27.002.20261016',
+ osubdir                = 'NorESM3-LM/piControl/v20261028',
  experiment_id          = 'piControl',
  parent_experiment_id   = 'piControl-spinup',
  parent_experiment_rip  = 'r1i1p1',
- parent_time_units      = 'days since 0421-01-01',
+ parent_time_units      = 'days since 0001-01-01 00:00:00',
  history                = '',
  realization_index      = 'r1',
  initialization_index   = 'i1',
  physics_index          = 'p1',
  forcing_index          = 'f1',
  branch_time            = 0.,
- year1                  = 1346,
- yearn                  = 1395,
+ year1                  = 0001,
+ yearn                  = 0050,
  month1                 = 1,
  monthn                 = 12,
- activity_id            = 'CMIP',
  parent_activity_id     = 'CMIP',
  parent_variant_label   = 'r1i1p1f1',
  parent_mip_era         = 'CMIP7',
  mip_era                = 'CMIP7',
  branch_time_in_child   = 0.0D0,
- branch_time_in_parent  = 430700.0D0,
+ branch_time_in_parent  = 620500.0D0,
  scanallfiles           = .false.
 /
 ```

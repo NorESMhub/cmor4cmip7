@@ -1,5 +1,6 @@
 # cmor4cmip7
 
+## Introduction
 `cmor4cmip7` is a program to process [NorESM3](https://noresm-docs.readthedocs.io/en/main) output for [CMIP7](https://wcrp-cmip.org/cmip-phases/cmip7) with the Climate Model Output Rewriter ([CMOR](https://github.com/PCMDI/cmor)) interface.
 
 Formats and metadata of scientific data genererated by different Earth System Models (ESM) can differs sustantially among each other. The [CMIP7 Data Request](https://wcrp-cmip.org/cmip-phases/cmip7/cmip7-data-request/) is developed to hamonise data analysis for climate studies with different model output. The [PCMDI CMOR library](https://cmor.llnl.gov) is provided as a software interface (with C, Fortran and Python languages) between the data request and the model output.
@@ -13,9 +14,13 @@ $ ./cmor4cmip7 system.nml model.nml experiment.nml variables
 
 The full documentaion is at [https://cmor4cmip7.readthedocs.io](https://cmor4cmip7.readthedocs.io).
 
-Table of contents:
+## Table of contents:
 * [Tutorial](https://cmor4cmip7.readthedocs.io/en/latest/tutorial.html)
 * [Installation](https://cmor4cmip7.readthedocs.io/en/latest/install/intro.html)
 * [Receipes](https://cmor4cmip7.readthedocs.io/en/latest/recipes/intro.html)
 * [Developer’s Guide](https://cmor4cmip7.readthedocs.io/en/latest/develop/intro.html)
 * [FAQ](https://cmor4cmip7.readthedocs.io/en/latest/FAQ.html)
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

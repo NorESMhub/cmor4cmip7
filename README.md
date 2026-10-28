@@ -12,14 +12,14 @@ The program runs as a command line tool:
 $ ./cmor4cmip7 system.nml model.nml experiment.nml variables
 ```
 
-The full documentaion is at [https://cmor4cmip7.readthedocs.io](https://cmor4cmip7.readthedocs.io).
+The full documentaion is at [https://cmor4cmip7.readthedocs.io](https://cmor4cmip7.readthedocs.io/en/stable/index.html).
 
 ## Table of contents:
-* [Tutorial](https://cmor4cmip7.readthedocs.io/en/latest/tutorial.html)
-* [Installation](https://cmor4cmip7.readthedocs.io/en/latest/install/intro.html)
-* [Receipes](https://cmor4cmip7.readthedocs.io/en/latest/recipes/intro.html)
-* [Developer’s Guide](https://cmor4cmip7.readthedocs.io/en/latest/develop/intro.html)
-* [FAQ](https://cmor4cmip7.readthedocs.io/en/latest/FAQ.html)
+* [Tutorial](https://cmor4cmip7.readthedocs.io/en/stable/tutorial.html)
+* [Installation](https://cmor4cmip7.readthedocs.io/en/stable/install/intro.html)
+* [Receipes](https://cmor4cmip7.readthedocs.io/en/stable/recipes/intro.html)
+* [Developer’s Guide](https://cmor4cmip7.readthedocs.io/en/stable/develop/intro.html)
+* [FAQ](https://cmor4cmip7.readthedocs.io/en/stable/FAQ.html)
 
 ## License
 

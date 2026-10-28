@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
+set -e
 
 # ----------------------- Description --------------------------------
 # Script to generate a subset of variables (e.g., $varfile_miss)
 # by comparing the cmorized datasets with the full list $varfile_full
 
 # ----------------------- USER EDIT ----------------------------------
-# cmorized output
-cmordir=/scratch/yanchun/cmorout/NorESM3-LM/piControl/v20261021
+# set the path where cmorized output is stored
+cmordir=/scratch/yanchun/cmorout/NorESM3-LM/piControl/v20261028
 
-# full variable list
+# set the full variable name list which was used for the CMORization
 varfile_full=/diagnostics/CMOR/cmor4cmip7/recipes/NorESM3-LM/piControl/v20261021/variables.nml
 
-# list of missing variables (to keep doing cmorization)
-varfile_miss=/diagnostics/CMOR/cmor4cmip7/recipes/NorESM3-LM/piControl/v20261021/variables_miss.nml
+# set the name of list for missing variables after CMORization. This list  will be generated, and will be used for an incremental CMORisation.
+varfile_miss=/diagnostics/CMOR/cmor4cmip7/recipes/NorESM3-LM/piControl/v20261028/variables_miss.nml
 # ----------------------- --------- ---------------------------
 
 # Create list of missing variables

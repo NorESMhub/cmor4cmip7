@@ -29,7 +29,7 @@ So for example:
 * `./build.sh -p true -c intel`, the same but with MPI enabled.
 
 :::{caution}
-As of Thu 17 Sept. 2026, the MPI version with Intel compiler does not work properly.
+As of Tue 27 Oct. 2026, the MPI version with Intel compiler does not work properly. See issue on the [MPI for Intel compiler](https://github.com/NorESMhub/cmor4cmip7/issues/21).
 :::
 
 :::{tip}

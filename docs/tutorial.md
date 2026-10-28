@@ -39,14 +39,14 @@ cp -r template/*.nml NorESM3-LM/piControl/template
 
 This keeps the default templates intact and gives you a clean experiment-specific recipe template.
 
-Then you create a recipe from the case template for a certain data version. For example:
+Then you create a recipe from the case template for each `variant_label` (e.g., `r1i1p1f1`) with a certain data version. For example:
 ```bash
 cd ~/cmor4cmip7/recipes/NorESM3-LM/piControl
-mkdir v20261028
-cp -r template/*.nml v20261028/
+mkdir r1i1p1f1/v20261028
+cp -r template/*.nml r1i1p1f1/v20261028/
 ```
 
-The following sections will instruct how to update these nameslists for this data version `NorESM3-LM/piControl/v20261028`
+The following sections will instruct how to update these nameslists for this data version `NorESM3-LM/piControl/r1i1p1f1/v20261028`
 
 ## 3. Edit the namelist files
 
@@ -112,7 +112,7 @@ Example:
 ```fortran
 &experiment
  casename               = 'n1850GHGGaxg.LM.nor30b27.002.20261016',
- osubdir                = 'NorESM3-LM/piControl/v20261028',
+ osubdir                = 'NorESM3-LM/piControl/r1i1p1f1/v20261028',
  experiment_id          = 'piControl',
  parent_experiment_id   = 'piControl-spinup',
  parent_experiment_rip  = 'r1i1p1',
@@ -224,7 +224,7 @@ cmorout         : /scratch/yanchun/cmorout
 source_id       : NorESM3-LM
 experiment_id   : piControl
 variant_label   : r1i1p1f1
-version         : v20261027
+version         : v20261028
 ```
 :::{note}
 The data version number in the `params.yml` needs to be updated as the same as in the `experiment.nml`.

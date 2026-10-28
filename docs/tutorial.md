@@ -37,7 +37,16 @@ mkdir -p NorESM3-LM/piControl/template
 cp -r template/*.nml NorESM3-LM/piControl/template
 ```
 
-This keeps the default templates intact and gives you a clean experiment-specific recipe set.
+This keeps the default templates intact and gives you a clean experiment-specific recipe template.
+
+Then you create a recipe from the case template for a certain data version. For example:
+```bash
+cd ~/cmor4cmip7/recipes/NorESM3-LM/piControl
+mkdir v20261028
+cp -r template/*.nml v20261028/
+```
+
+The following sections will instruct how to update these nameslists for this data version `NorESM3-LM/piControl/v20261028`
 
 ## 3. Edit the namelist files
 

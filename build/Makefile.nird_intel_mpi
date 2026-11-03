@@ -9,7 +9,7 @@ SRCDIR=../source
 BINDIR=../bin
 
 # Fortran compiler
-FC=mpiifx
+FC=mpifort
 
 # Linker
 LD=$(FC)

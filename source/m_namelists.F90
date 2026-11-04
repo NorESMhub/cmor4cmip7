@@ -265,6 +265,7 @@ contains
       end if
     end do
 
+!   variant_label=realization_index//initialization_index//physics_index//forcing_index
     ! Extend input path if necessary
     if (len_trim(isubdir) > 0) &
       ibasedir = trim(ibasedir)//'/'//trim(isubdir)

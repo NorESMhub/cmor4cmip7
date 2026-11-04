@@ -33,13 +33,13 @@ contains
     ! Directory Structure Template, Filenames
     call json%add(p, 'outpath', trim(obasedir))
     call json%add(p, 'output_path_template', &
-                  '<mip_era><activity_id><source_id><region><frequency><experiment_id><variant_label>'// &
-                  '<variable_id><branding_suffix><grid_label><version>')
+                  '<drs_specs><mip_era><activity_id><institution_id><source_id><experiment_id><variant_label>'// &
+                  '<region><frequency><variable_id><branding_suffix><grid_label><version>')
     call json%add(p, 'output_file_template', &
                   '<variable_id><branding_suffix><frequency><region><grid_label><source_id><experiment_id><variant_label>')
 
     ! CMIP7 CMIP7 DRS elements
-    call json%add(p, 'activity_id', trim(activity_id))
+!   call json%add(p, 'activity_id', trim(activity_id))
 !   call json%add(p, 'branding_suffix', '')
     call json%add(p, 'experiment_id', trim(experiment_id))
     call json%add(p, 'frequency', trim(frequency))
@@ -74,8 +74,9 @@ contains
    !call json%add(p, 'area_label', trim(area_label))
    !call json%add(p, 'horizontal_label',
     !! Version of standards applied
-   call json%add(p, 'Conventions','CF-1.11')
-   !call json%add(p, 'drs_specs', 'MIP-DRS7')   ! automatic
+    call json%add(p, 'Conventions','CF-1.12')
+    call json%add(p, 'drs_specs', 'MIP-DRS7')
+   !call json%add(p, 'data_specs_version', 'MIP-DS7.1.0.0') !automatic
     !! other
     call json%add(p, 'nominal_resolution', trim(grid_resolution))
    !call json%add(p, 'realm','')
@@ -89,7 +90,7 @@ contains
 !   if (len_trim(external_variables) > 0 ) then
 !     call json%add(p, 'external_variables', 'external_variables')
 !   end if
-    if (len_trim('parent_experiment_id') > 0) then
+    if (len_trim(parent_experiment_id) > 0) then
       call json%add(p, 'branch_time_in_child', branch_time_in_child)
       call json%add(p, 'branch_time_in_parent', branch_time_in_parent)
       call json%add(p, 'parent_activity_id', trim(parent_activity_id))

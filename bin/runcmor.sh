@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ------------------ USER INPUT SECTION ------------------------------------
-pnml=../recipes/NorESM3-LM/piControl/v20261028
+pnml=../recipes/NorESM3-LM/piControl/r1i1p1f1/v20261028
 
 sysnml=${pnml}/system.nml
 modnml=${pnml}/model.nml

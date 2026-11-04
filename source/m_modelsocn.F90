@@ -12,15 +12,15 @@ module m_modelsocn
   integer, save         :: ii, jj, kk, ncid, rhid, dimid, status
 
   ! Grid dimensions and variables
-  real(r8), save                                :: voglb, aoglb
-  real(r8), save                                :: rhoglb0=0., rhoglb=0.
+  real(r8), save                                :: volgs, areaogs,rhoavg0, rhoavg, volsum0, volsum
   integer, save                                 :: idm, jdm, kdm = 0, ddm = 0, ldm = 0, rdm = 0, sdm = 0, slenmax2
   integer, parameter                            :: ncrns = 4
   integer, allocatable, save, dimension(:, :)   :: basin
   real(r8), allocatable, save, dimension(:)     :: xvec, yvec, kvec, kvechalf, &
                                                    sigma, sigmahalf, depth, slat
-  real(r8), allocatable, save, dimension(:, :)  :: parea, pmask, pdepth, plon, &
-                                                   plat, ulon, ulat, vlon, vlat, slat_bnds, sigma_bnds, sigmahalf_bnds, &
+  integer,  allocatable, save, dimension(:, :)  :: pmask
+  real(r8), allocatable, save, dimension(:, :)  :: parea, pdepth, plon, plat, &
+                                                   ulon, ulat, vlon, vlat, slat_bnds, sigma_bnds, sigmahalf_bnds, &
                                                    depth_bnds
   real(r8), allocatable, save, dimension(:, :, :)   :: plon_crns, plat_crns, &
                                                        ulon_crns, ulat_crns, vlon_crns, vlat_crns, plon_crnsp, plat_crnsp, &
@@ -33,7 +33,7 @@ module m_modelsocn
   character(len=slenmax), save                              :: grid_label
 
   ! Gravity
-  real(r8), parameter :: g = 9.80665, ginv = 1.0/g, sref = 35.0
+  real(r8), parameter :: grav = 9.80665, ginv = 1.0/grav, sref = 35.0
 
   ! Dataset related variables
   character(len=slenmax), save          :: ivnm, ovnm, vunits, vpositive, vtype
@@ -460,9 +460,9 @@ contains
 
     implicit none
 
-    integer     :: i, j, k, n
+    integer     :: i, j, k, n, jtmp
     real(r8)    :: ptoptmp, pbottmp
-    real(r8)    :: dptmp, ptmp
+    real(r8)    :: pmid, pcum, r, dv, dpk
 
     character(len=slenmax), dimension(:), allocatable  :: keys
     character(len=slenmax) :: key, val
@@ -539,35 +539,45 @@ contains
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
-              if (fld(i, j, k) < missing) fld(i, j, k) = fld(i, j, k)/9.806
+              if (fld(i, j, k) < missing) fld(i, j, k) = fld(i, j, k) * ginv
             end do
           end do
         end do
 
-        ! Compute global 2d average
-      case ('glbave2d')
-        fld(1, 1, 1) = sum(fld(:, :, 1)*parea)/sum(parea)
+        ! Compute global 2d average, only ocean or all? last halo row removed?
+!     case ('glbave2d')
+!       fld(1, 1, 1) = sum(fld(:, :, 1)*parea, mask=(pmask==1))/sum(parea, mask=(pmask==1))
 
         ! Compute thermo-steric sea level following Griffies et al., GMD 2016, H27
       case ('t2zostoga')
-        rhoglb = 0.
-        ptmp = 0.
-        dp = dp*1.e-4     ! pa->dbar
-        do j = 1, jdm
+        rhoavg = 0d0; volsum = 0d0
+        jtmp = jdm
+        if  (lshiftgrid) jtmp = jdm -1
+        do j = 1, jtmp
           do i = 1, idm
-            if (abs(pmask(i,j) - 0) < eps) cycle
-            dptmp = 0.
+            if (pmask(i,j) == 0) cycle
+            pmid = 0d0
+            pcum = 0d0
             do k = 1, kdm
-              if (fld(i,j,k)>=missing) cycle
-              dptmp  = dptmp+0.5*dp(i,j,k)  ! mid-level pressure
-              rhoglb = rhoglb + dp(i,j,k)*rho(dptmp, dble(fld(i,j,k)), sref)
-              ptmp = ptmp + dp(i,j,k)
+              dpk = dp(i,j,k)*1d-4  ! pa->dbar
+              if (fld(i,j,k) < missing) then
+                pmid  = pcum+0.5*dpk  ! mid-level pressure
+                r = rho(pmid, dble(fld(i,j,k)), sref)
+                dv = parea(i,j)*dp(i,j,k)/(r*grav)
+                rhoavg = rhoavg + parea(i,j)*dp(i,j,k)/grav   !  rhosum=rhosum+r*dv
+                volsum = volsum + dv
+              end if
+              pcum  = pcum+dpk        ! full-level pressure
             end do
           end do
         end do
-        rhoglb = rhoglb/ptmp
-
-        fld(1, 1, 1) = voglb/aoglb*(1-rhoglb/rhoglb0)
+        rhoavg = rhoavg/volsum
+        fld(1, 1, 1) = volsum0/areaogs*(1-rhoavg/rhoavg0)
+        if (verbose) then
+          write(*,*) 'rhoavg:',rhoavg
+          write(*,'(A, E23.15)') ' volsum:',volsum
+          write(*,*) 'zostoga:',fld(1,1,1)
+        end if
 
         ! Compute fixed cell volume of interpolated grid
       case ('volcello')
@@ -754,8 +764,8 @@ contains
     implicit none
 
 !   logical         :: check
-    integer         :: i, j, k, n
-    real(r8)        :: dptmp, ptmp
+    integer         :: i, j, k, n, jtmp
+    real(r8)        :: pmid, pcum, r, dv, dpk
 
     ! Open first input file
     call scan_files(reset=.true.)
@@ -958,7 +968,7 @@ contains
     call handle_ncerror(status)
     status = nf90_get_var(ncid, rhid, parea)
     call handle_ncerror(status)
-    parea = parea*pmask
+!   parea = parea*pmask
 
     ! Read coordinates
     status = nf90_inq_varid(ncid, 'plon', rhid)
@@ -1063,33 +1073,47 @@ contains
     ! global ocean volume and area
     status = nf90_inq_varid(ncid, 'volgs', rhid)
     call handle_ncerror(status)
-    status = nf90_get_var(ncid, rhid, voglb)
+    status = nf90_get_var(ncid, rhid, volgs)
     call handle_ncerror(status)
-    aoglb = sum(parea)
-!   write(*,*) 'volglb,aoglb:',voglb,aoglb
-!   write(*,*) 'volglb/aoglb:',voglb/aoglb
+    if (lshiftgrid) then
+      areaogs = sum(parea(:,1:jdm-1), mask=(pmask(:,1:jdm-1)==1))
+    else
+      areaogs = sum(parea(:,:), mask=(pmask==1))
+    end if
 
     status = nf90_close(ncid)
     call handle_ncerror(status)
 
     ! Compute nitial global mean density
-    rhoglb0 = 0.
-    ptmp = 0.
-    dpini = dpini*1.e-4     ! pa->dbar
-    do j = 1, jdm
+    rhoavg0 = 0d0
+    volsum0 = 0d0
+    jtmp = jdm
+    if (lshiftgrid) jtmp = jdm -1
+    do j = 1, jtmp
       do i = 1, idm
-        if (abs(pmask(i,j) - 0) < eps) cycle
-        dptmp = 0.
+        if (pmask(i,j) == 0 ) cycle
+        pmid = 0.
+        pcum = 0.
         do k = 1, kdm
-        if (tini(i,j,k)>=missing) cycle
-          dptmp  = dptmp+0.5*dpini(i,j,k)   ! mid-layer pressure
-          rhoglb0 = rhoglb0 + dpini(i,j,k)*rho(dptmp, dble(tini(i,j,k)), sref)
-          ptmp = ptmp + dpini(i,j,k)
+          dpk = dpini(i,j,k)*1d-4       ! pa->dbar
+          if (tini(i,j,k) < missing) then
+            pmid  = pcum + 0.5*dpk      ! mid-layer pressure
+            r = rho(pmid, dble(tini(i,j,k)), sref)
+            dv = parea(i,j)*dpini(i,j,k)/(r*grav)
+            rhoavg0 = rhoavg0 + parea(i,j)*dpini(i,j,k)/grav   !rhoavg0=rhoavg0+r*dv
+            volsum0 = volsum0 + dv      ! full-layer pressure
+          end if
+          pcum = pcum + dpk
         end do
       end do
     end do
-    rhoglb0 = rhoglb0/ptmp
-
+    rhoavg0 = rhoavg0/volsum0
+    if (verbose) then
+      write(*,*) 'rhoavg0:',rhoavg0
+      write(*,*) 'volgs:',volgs
+      write(*,'(A,E23.15)') 'volsum0:',volsum0
+      write(*,*) 'volsum0/areaogs:',volsum0/areaogs
+    end if
 
   end subroutine read_gridinfo_ifile
 

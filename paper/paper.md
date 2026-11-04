@@ -14,7 +14,7 @@ authors:
 affiliations:
  - name: Nansen Environment and Remote Sensing Center and Bjerknes Center for Climate Research, Bergen, Norway 
    index: 1
-date: 01 November 2026
+date: 04 November 2026
 bibliography: paper.bib
 ---
 

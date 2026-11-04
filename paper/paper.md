@@ -46,7 +46,7 @@ Climate model intercomparison depends on the output of many models being archive
 a single, machine-readable form. Each centre must deliver its simulations with
 prescribed variable definitions, units, coordinates, metadata, file names and
 directory structure, as specified by the CMIP7 data request [@Mackallah2026] and the
-CMIP7 controlled vocabularies. For a coupled Earth system model this conversion is
+CMIP7 controlled vocabularies[@cmip7-cvs]. For a coupled Earth system model this conversion is
 routine but demanding: the model writes output on native grids with model-specific
 variable names, vertical coordinates and time-axis conventions, while the data
 request defines more than a thousand variable specifications, each with its own
@@ -71,7 +71,7 @@ and they tend to break when the data request or the model output conventions cha
 
 Because CMOR provides APIs for C, Fortran and Python [@cmorlib], most recent tools
 build on one of them. Python tools include NCAR's `cmip7-prep` [@cmip7-prep], the
-`pycmor` package [@pycmor] and the EC-Earth `ece2cmor3` tool [@ece2cmor3]. These
+AWI/GEOMAR's `pycmor` package [@pycmor] and the EC-Earth `ece2cmor3` tool [@ece2cmor3]. These
 benefit from the mature Python ecosystem and are easy to extend, but they bring a
 long dependency chain to maintain on every platform, and interpreter and library
 overhead in a throughput-bound task.
@@ -131,14 +131,16 @@ recipes used for NorESM3 CMIP7 production. `cmor4cmip7` is developed at
 
 # Research impact statement
 
-`cmor4cmip7` is the tool used to produce the NorESM3 contribution to CMIP7, replacing
-bespoke conversion scripts that had to be checked again against every revision of the
-data request. Its output is verified and repacked for cloud access with the companion
-tool `cmip7validate` [@cmip7validate]. Faster and more reliable conversion lets CMIP7
-data be published on schedule, supporting the Assessment Fast Track [@Dunne2025] and
-the evaluations of the Rapid Evaluation Framework [@Hoffman2026]. Reusable recipes
-also ease repeating an experiment with a new model version or adapting the workflow
-to a related model.
+`cmor4cmip7` is the tool used to produce the NorESM3 contribution to CMIP7. By
+reducing a production task to a versioned recipe, it removes a repetitive manual step
+and keeps the archived data consistent with the data request across experiments,
+ensemble members and model versions. The resulting datasets are checked with the
+companion tool `cmip7validate` [@cmip7validate] and published through the Earth System
+Grid Federation [@Cinquini2014], where they are used by the Rapid Evaluation Framework
+of the CMIP7 Assessment Fast Track [@Hoffman2026]. Such multi-model archives are the
+basis for the analyses that address the science questions defined for CMIP7
+[@Dunne2025], including climate change assessment, adaptation and mitigation, and
+predictions on seasonal to decadal timescales.
 
 # AI usage disclosure
 

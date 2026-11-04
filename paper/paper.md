@@ -1,204 +1,159 @@
 ---
-# Use plain text in the title; do not use backticks for code formatting.
-title: 'Gala: A Python package for galactic dynamics'
+title: 'cmor4cmip7: a Fortran tool for producing CMIP7-compliant datasets from Earth System Model output'
 tags:
-  - Python
-  - astronomy
-  - dynamics
-  - galactic dynamics
-  - milky way
+  - CMIP7
+  - Earth system modelling
+  - ESGF
+  - NorESM3
 authors:
-  - name: Adrian M. Price-Whelan
-    orcid: 0000-0000-0000-0000
-    equal-contrib: true
-    affiliation: "1, 2" # (Multiple affiliations must be quoted)
-  - name: Author Without ORCID
-    equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
-    affiliation: 2
-  - name: Author with no affiliation
-    corresponding: true # (This is how to denote the corresponding author)
-    affiliation: 3
-  - given-names: Ludwig
-    dropping-particle: van
-    surname: Beethoven
-    affiliation: 3
+  - name: Yanchun He
+    corresponding: true
+    affiliation: 1
+  - name: NorESM contributors
+    affiliation: 1
 affiliations:
- - name: Lyman Spitzer, Jr. Fellow, Princeton University, United States
+ - name: Nansen Environment and Remote Sensing Center and Bjerknes Center for Climate Research, Bergen, Norway 
    index: 1
-   ror: 00hx57361
- - name: Institution Name, Country
-   index: 2
- - name: Independent Researcher, Country
-   index: 3
-date: 13 August 2017
+date: 01 November 2026
 bibliography: paper.bib
-
-# Optional fields for papers that are part of a joint submission.
-# For example, submitting to a AAS journal too, see this blog post:
-# https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
-#
-# If you are not making a joint submission you should remove these lines.
-#
-aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
-aas-journal: Astrophysical Journal <- The name of the AAS journal.
 ---
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration).
+`cmor4cmip7` is a command-line program that converts native output from Earth
+system models into the file format and metadata required by the Coupled Model
+Intercomparison Project phase 7 (CMIP7). It is written in Fortran and builds on the
+Fortran application programming interface of the Climate Model Output Rewriter
+(CMOR) library [@cmorlib]. A production task is described by a few Fortran namelist
+files — for the computing system, the model, the experiment and the variables — and a
+JSON file that maps native model fields to CMIP7 variable definitions. Together
+these files form a *recipe*: plain text that can be version-controlled, reviewed and
+repeated by others.
+
+For each requested variable, `cmor4cmip7` locates the native model field, applies the
+required units, dimensions, coordinates, cell methods and global attributes, and
+writes a CF-compliant NetCDF file with the CMIP7 file naming and directory structure.
+The datasets can be validated and published through the Earth System Grid Federation
+[@Cinquini2014].
+The software was developed for the Norwegian Earth System Model (NorESM3) but is
+structured so that it can be adapted to models with a comparable component layout.
+It is released under the MIT license at <https://github.com/NorESMhub/cmor4cmip7>,
+with documentation at <https://cmor4cmip7.readthedocs.io>.
 
 # Statement of need
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
+Climate model intercomparison depends on the output of many models being archived in
+a single, machine-readable form. Each centre must deliver its simulations with
+prescribed variable definitions, units, coordinates, metadata, file names and
+directory structure, as specified by the CMIP7 data request [@Mackallah2026] and the
+CMIP7 controlled vocabularies. For a coupled Earth system model this conversion is
+routine but demanding: the model writes output on native grids with model-specific
+variable names, vertical coordinates and time-axis conventions, while the data
+request defines more than a thousand variable specifications, each with its own
+realm, frequency, region and cell methods. The step is repeated for every experiment,
+ensemble member and data version, and in a multi-petabyte archive there is little
+room for manual correction afterwards.
 
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
+`cmor4cmip7` provides a dedicated tool for this step, reducing it to a few namelist
+configurations so that the decisions of a production run — which variables, from
+which simulations, with which metadata — are written down explicitly rather than
+embedded in ad hoc scripts. Recipes are version-controlled and can be compared,
+reviewed and reused, which makes runs auditable and reproducible and allows selective
+reprocessing, for example after a bug fix.
 
-# State of the field                                                                                                                  
+# State of the field
 
-Several tools exist for galactic dynamics computations:                                                     
-`galpy` [@Bovy:2015] is a Python package with similar goals,
-providing orbit integration and potential classes for galactic dynamics.                                                              
-`NEMO` [@Teuben:1995] is a well-established, comprehensive stellar dynamics                                                           
-toolbox written primarily in C, offering extensive functionality but with a                                                           
-steeper learning curve and less integration with modern Python workflows.                                                             
-Other tools like `GalPot` provide specific Milky Way potential models but lack                                                        
-the broader dynamical analysis capabilities.                                                                                          
-                                                                                                                                        
-`Gala` was built rather than contributing to existing projects for several                                                            
-reasons. First, `Gala` was designed from the ground up to integrate seamlessly                                                        
-with the Astropy ecosystem, using `astropy.units` and `astropy.coordinates`                                                           
-as core dependencies rather than optional features. This tight integration                                                            
-enables natural workflows for astronomers already using Astropy. Second,                                                              
-`Gala`'s object-oriented API with consistent interfaces across subpackages                                                            
-(potentials, integrators, dynamics) provides a more modular and extensible                                                            
-design than alternatives available at the time. Third, `Gala` fills a specific                                                        
-niche between simple demonstration codes and full N-body simulation packages                                                          
-like `Gadget` [@Springel:2005] – it focuses on the common tasks in galactic                                                             
-dynamics research (orbit integration, potential evaluation, coordinate                                                                
-transformations) while maintaining both performance through C implementations                                                         
-and usability through its Python interface.  
+Data producers have several options for preparing CMIP-style output. Some centres
+combine generic post-processing tools, such as the CMOR functionality of CDO
+[@cdocmor], with custom scripts and manual metadata editing. Such workflows can be
+sufficient for a single experiment, but they are difficult to reproduce and to audit,
+and they tend to break when the data request or the model output conventions change.
+
+Because CMOR provides APIs for C, Fortran and Python [@cmorlib], most recent tools
+build on one of them. Python tools include NCAR's `cmip7-prep` [@cmip7-prep], the
+`pycmor` package [@pycmor] and the EC-Earth `ece2cmor3` tool [@ece2cmor3]. These
+benefit from the mature Python ecosystem and are easy to extend, but they bring a
+long dependency chain to maintain on every platform, and interpreter and library
+overhead in a throughput-bound task.
+
+The CMOR library is written in C, and a tool built directly on the C API would in
+principle have the lowest overhead; in practice, C is rarely used in the Earth system
+modelling community, and no such tool exists. The Fortran API of CMOR is a thin
+wrapper around the C library, and Fortran remains the dominant language of climate
+and weather models. `cmor4cmip7` fills this gap, harnessing the CMOR Fortran API through
+namelist configuration and keeping the dependency chain close to that of CMOR
+itself.
 
 # Software design
 
-`Gala`'s design philosophy is based on three core principles: (1) to provide a
-user-friendly, modular, object-oriented API, (2) to use community tools and
-standards (e.g., Astropy for coordinates and units handling), and (3) to use
-low-level code (C/C++/Cython) for performance while keeping the user interface
-in Python. Within each of the main subpackages in `gala` (`gala.potential`,
-`gala.dynamics`, `gala.integrate`, etc.), we try to maintain a consistent API
-for classes and functions. For example, all potential classes share a common
-base class and implement methods for computing the potential, forces, density,
-and other derived quantities at given positions. This also works for
-compositions of potentials (i.e., multi-component potential models), which
-share the potential base class but also act as a dictionary-like container for
-different potential components. As another example, all integrators implement a
-common interface for numerically integrating orbits. The integrators and core
-potential functions are all implemented in C without support for units, but the
-Python layer handles unit conversions and prepares data to dispatch to the C
-layer appropriately.Within the coordinates subpackage, we extend Astropy's
-coordinate classes to add more specialized coordinate frames and
-transformations that are relevant for Galactic dynamics and Milky Way research.
+`cmor4cmip7` is organised around the model realms represented in an Earth system
+simulation (atmosphere, ocean, sea ice and land) and around the distinction between
+model-specific and CMIP7-specific information. Everything that is specific to a
+model lives in a JSON mapping file that associates native field names and grid
+information with CMIP7 variable definitions; everything that is specific to a
+production task lives in the namelist files, which the program reads from the
+command line:
+
+```bash
+$ ./cmor4cmip7 system.nml model.nml experiment.nml variables.nml
+```
+
+The dictionaries of CMIP7 variables, dimensions and controlled vocabulary terms are
+taken from the official CMIP7 CMOR tables [@cmip7-data-request], so that revisions
+of the data request are absorbed by updating the tables rather than by editing the
+source code.
+
+For each requested variable, the program locates the native field, checks the
+available time steps, and passes the field, its dimensions and its metadata to the
+CMOR Fortran API, which applies the CMIP7 variable definitions and writes one
+CF-compliant NetCDF file per variable, frequency and time slice.
+
+The separation of model, task and CMIP7-specific information keeps the workflow small
+and gives it the following properties:
+
+* **Minimal dependencies** — a single executable linked to CMOR, NetCDF Fortran,
+  json-fortran and GSW-Fortran, with no scripting runtime.
+* **One workflow for all realms and frequencies** — the same namelist structure and
+  code path produce atmosphere, ocean, sea ice and land output.
+* **Selective processing** — any subset of variables can be regenerated, as is needed
+  for operational bug fixes.
+* **Simple parallelisation** — variables are independent, so the optional MPI build
+  adds throughput without extra infrastructure.
+* **No intermediate data copies** — time slices are written directly from native model
+  output into CMIP7-compliant files.
+
+The software is compiled with a small makefile for GNU or Intel compilers; module,
+build and run scripts for the Norwegian HPC systems are included. The repository also
+contains unit tests for the JSON and namelist handling, a template recipe, and sample
+recipes used for NorESM3 CMIP7 production. `cmor4cmip7` is developed at
+<https://github.com/NorESMhub/cmor4cmip7>, documented at
+<https://cmor4cmip7.readthedocs.io> and released under the MIT license.
 
 # Research impact statement
 
-`Gala` has demonstrated significant research impact and grown both its user base
-and contributor community since its initial release. The package has evolved
-through contributions from over 18 developers beyond the original core developer
-(@adrn), with community members adding new features, reporting bugs, and
-suggesting new features.
-
-While `Gala` started as a tool primarily to support the core developer's
-research, it has expanded organically to support a range of applications across
-domains in astrophysics related to Milky Way and galactic dynamics. The package
-has been used in over 400 publications (according to Google Scholar) spanning
-topics in galactic dynamics such as modeling stellar streams [@Pearson:2017],
-Milky Way mass modeling, and interpreting kinematic and stellar population
-trends in the Galaxy. `Gala` is integrated within the Astropy ecosystem as an
-affiliated package and has built functionality that extends the widely-used
-`astropy.units` and `astropy.coordinates` subpackages. `Gala`'s impact extends
-beyond citations in research: Because of its focus on usability and user
-interface design, `Gala` has also been incorporated into graduate-level galactic
-dynamics curricula at multiple institutions.
-
-`Gala` has been downloaded over 100,000 times from PyPI and conda-forge yearly
-(or ~2,000 downloads per week) over the past few years, demonstrating a broad
-and active user community. Users span career stages from graduate students to
-faculty and other established researchers and represent institutions around the
-world. This broad adoption and active participation validate `Gala`'s role as
-core community infrastructure for galactic dynamics research.
-
-# Mathematics
-
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations:
-
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text.
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
-
-# Figures
-
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
+`cmor4cmip7` is the tool used to produce the NorESM3 contribution to CMIP7, replacing
+bespoke conversion scripts that had to be checked again against every revision of the
+data request. Its output is verified and repacked for cloud access with the companion
+tool `cmip7validate` [@cmip7validate]. Faster and more reliable conversion lets CMIP7
+data be published on schedule, supporting the Assessment Fast Track [@Dunne2025] and
+the evaluations of the Rapid Evaluation Framework [@Hoffman2026]. Reusable recipes
+also ease repeating an experiment with a new model version or adapting the workflow
+to a related model.
 
 # AI usage disclosure
 
-No generative AI tools were used in the development of this software, the writing
-of this manuscript, or the preparation of supporting materials.
+The authors wrote this manuscript and reviewed it for scientific and technical
+accuracy. Commercial large language model writing assistants were used to edit the
+text and improve its readability. No generative AI system was used to produce
+scientific claims, results or software documentation, and all AI-assisted text was
+revised by the authors.
 
 # Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
-Oh, and support from Kathryn Johnston during the genesis of this project.
+The authors thank PCMDI/LLNL [@cmorlib] for providing the CMOR Fortran API and its
+examples. The computations were performed on resources provided by Sigma2 — the
+National Infrastructure for High-Performance Computing and Data Storage in Norway —
+through the NS16000B and NS9560K projects, and the authors are grateful for the
+prompt and professional support of the Sigma2 support team.
 
 # References

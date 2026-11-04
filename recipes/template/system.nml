@@ -3,7 +3,7 @@
  obasedir      = '/nird/datapeak/NS9034K/CMIP7',
  griddata      = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/griddata',
  tabledir      = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/cmor/cmip7-cmor-tables/tables',
- createsubdirs = .true.,
+ createsubdirs = .false.,
  forcefilescan = .true.,  
  verbose       = .false.,
 /

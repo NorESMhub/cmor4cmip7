@@ -33,8 +33,8 @@ contains
     ! Directory Structure Template, Filenames
     call json%add(p, 'outpath', trim(obasedir))
     call json%add(p, 'output_path_template', &
-                  '<drs_specs><mip_era><activity_id><institution_id><source_id><experiment_id><variant_label><region><frequency>'// &
-                  '<variable_id><branding_suffix><grid_label><version>')
+                  '<drs_specs><mip_era><activity_id><institution_id><source_id><experiment_id><variant_label>'// &
+                  '<region><frequency><variable_id><branding_suffix><grid_label><version>')
     call json%add(p, 'output_file_template', &
                   '<variable_id><branding_suffix><frequency><region><grid_label><source_id><experiment_id><variant_label>')
 

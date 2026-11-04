@@ -1,10 +1,10 @@
-# Targets 
+# Targets
 TARGET=cmor4cmip7_mpi
 
 # Objects
 OBJ=m_namelists.o m_utilities.o m_jsons.o m_modelsocn.o cmor4cmip7.o
 
-# Paths 
+# Paths
 SRCDIR=../source
 BINDIR=../bin
 
@@ -48,7 +48,7 @@ clean:
 
 $(TARGET): $(OBJ)
 	$(LD) -o $(TARGET) $(OBJ) $(LDFLAGS)
-	mkdir -p $(BINDIR) 
+	mkdir -p $(BINDIR)
 	mv $(TARGET) $(BINDIR)
 	rm -f *.o *.h *.inc m_*.mod
 

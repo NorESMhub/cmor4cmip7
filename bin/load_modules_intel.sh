@@ -3,8 +3,6 @@
 module purge
 module load GCCcore/13.2.0
 module load iompi/2023b
-#module load intel/2023b               # intel chain w   mpi
-#module load intel-compilers/2023.2.1 # intel chain w/o mpi
 module load HDF5/1.14.3-iompi-2023b
 module load UDUNITS/2.2.28-GCCcore-13.2.0
 module load expat/2.5.0-GCCcore-13.2.0

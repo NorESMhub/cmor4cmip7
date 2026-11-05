@@ -155,8 +155,8 @@ revised by the authors.
 # Acknowledgements
 
 The authors thank PCMDI/LLNL [@cmorlib] for providing the CMOR Fortran API and its
-examples, and Dr. I.Benke for his great contribution to the [@noresm2cmor3] software,
-which this tool is largly built on.
+examples, and Dr. I.Benke for his great contribution to the *noresm2cmor* tool [@noresm2cmor],
+which this software is largly built on.
 The work is supported by Research Council of Norway's FORINFRA project (no. 350390).
 The computations and storages were performed on resources provided by Sigma2
 -- the National Infrastructure for High-Performance Computing and Data Storage in Norway

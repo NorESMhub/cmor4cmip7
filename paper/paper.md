@@ -9,12 +9,14 @@ authors:
   - name: Yanchun He
     corresponding: true
     affiliation: 1
-  - name: NorESM contributors
-    affiliation: 1
+  - name: Alok K. Gupta
+    affiliation: 2
 affiliations:
  - name: Nansen Environment and Remote Sensing Center and Bjerknes Center for Climate Research, Bergen, Norway 
    index: 1
-date: 04 November 2026
+ - name: Norwegian Research Centre and Bjerknes Center for Climate Research, Bergen, Norway 
+   index: 2
+date: 05 November 2026
 bibliography: paper.bib
 ---
 

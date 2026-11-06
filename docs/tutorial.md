@@ -29,7 +29,7 @@ cmor4cmip7/recipes/template
 └── variables.nml
 ```
 
-Create a dedicated recipe directory for your experiment:
+Create a dedicated recipe directory for your experiment, e.g., for the `piControl` of the `NorESM3-LM` version:
 
 ```bash
 cd ~/cmor4cmip7/recipes
@@ -69,7 +69,7 @@ Example:
 ```fortran
 &sys
  ibasedir      = '/nird/datalake/NS9560K/noresm3/cases'
- obasedir      = '/scratch/$USER/cmorout'
+ obasedir      = '/nird/datapeak/NS9034K/CMIP7'
  griddata      = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/griddata'
  tabledir      = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/cmor/cmip7-cmor-tables/tables'
  createsubdirs = .false.
@@ -78,7 +78,15 @@ Example:
 /
 ```
 
-For a first test run, it is often enough to change `obasedir` to a writable directory under your scratch or home space.
+The `obasedir      = '/nird/datapeak/NS9034K/CMIP7'` is location for CMIP7 production to be published to ESGF. For a first test run, it is often enough to change `obasedir` to a writable directory under your scratch or home space, .e.g,:
+```fortran
+ obasedir      = '/scratch/$USER/cmorout'
+```
+
+`createsubdirs = .true.` will create a hierachy of CMIP7 data structure direcotries , e.g.:
+```
+MIP-DRS7/CMIP7/CMIP/NCC/NorESM3-LM/piControl/r1i1p1f1/glb/mon/tos/tavg-u-hm-sea/g202/v20261102/tos_tavg-u-hm-sea_mon_glb_g202_NorESM3-LM_piControl_r1i1p1f1_000101-001012.nc
+```
 
 ### 3.2 `model.nml`
 
@@ -196,6 +204,10 @@ which basically invokes the program as command line:
 
 The program will read the namelists, identify the target inputs, and generate CMIP7-style output files in the configured output directory.
 
+:::{caution}
+When running in parallel mode, it is not recommended to use more than 8 threads to avoid memory leakage risk.
+:::
+
 ## 6. Inspect the output
 
 After the run, check the output directory you set in `obasedir`, for example:
@@ -220,12 +232,22 @@ git clone git@github.com:NorESMhub/cmip7validate.git
 The configuration needs to match your experiment, for example in `params.yml`:
 
 ```yaml
-cmorout         : /scratch/yanchun/cmorout
-source_id       : NorESM3-LM
-experiment_id   : piControl
-variant_label   : r1i1p1f1
-version         : v20261028
+datasets:
+  cmorout         : /nird/datapeak/NS9034K/CMIP7      # root of cmorized out
+  source_id       : NorESM3-LM
+  experiment_id   : piControl
+  variant_label   : r1i1p1f1
+  version         : v20261028
+webpage:
+  www_root        : /nird/datalake/NS9560K/www/diagnostics/cmip7validate
+cache:
+  root            : /scratch/yanchun/cmip7validate    # root of cmip7validate climo/ts cache
+  overwrite       : False                             # logic switch to overwrite ca
+ched climatologies and time series
 ```
+
+The validation process involves intensive computation of climatoglies and time series of large number of datasets, it is therefore always recommended to set `overwrite` as `false` to speed up the performance, if the datasets is not changed. To overwrite specific datasets/variables, one can delete mannually the cache under the `cache.root`.
+
 :::{note}
 The data version number in the `params.yml` needs to be updated as the same as in the `experiment.nml`.
 :::
@@ -249,6 +271,11 @@ Find the generated book/webpage by default at:
 ```
 https://ns9560k.web.sigma2.no/datalake/diagnostics/cmip7validate
 ```
+
+:::{note}
+Only the person who create the subdirectory of certain data version of experiment will have write permission, under the default `www_root`, to ensure the validation for each dataset is unique (though can be updated). For test purpose, one can set another `www_root` to point your own directory.
+:::
+
 ## 8. Workflow checklist
 
 Before a full production run, confirm the following:

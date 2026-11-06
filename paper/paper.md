@@ -1,5 +1,5 @@
 ---
-title: 'cmor4cmip7: a Fortran tool for producing CMIP7-compliant datasets from Earth System Model output'
+title: 'cmor4cmip7: an integrated workflow for producing CMIP7-compliant datasets from Earth System Model output'
 tags:
   - CMIP7
   - Earth system modelling
@@ -9,36 +9,32 @@ authors:
   - name: Yanchun He
     corresponding: true
     affiliation: 1
-  - name: NorESM contributors
-    affiliation: 1
+  - name: Alok K. Gupta
+    affiliation: 2
 affiliations:
  - name: Nansen Environment and Remote Sensing Center and Bjerknes Center for Climate Research, Bergen, Norway 
    index: 1
-date: 04 November 2026
+ - name: Norwegian Research Centre and Bjerknes Center for Climate Research, Bergen, Norway 
+   index: 2
+date: 06 November 2026
 bibliography: paper.bib
 ---
 
 # Summary
 
-`cmor4cmip7` is a command-line program that converts native output from Earth
-system models into the file format and metadata required by the Coupled Model
-Intercomparison Project phase 7 (CMIP7). It is written in Fortran and builds on the
+`cmor4cmip7` is an integrated workflow to convert, repack and validate the native
+Earth System Models (ESMs) output into the file format and metadata required by
+the Coupled Model Intercomparison Project phase 7 (CMIP7). 
+The conversion tool as a command line  is written in Fortran and builds on the
 Fortran application programming interface of the Climate Model Output Rewriter
-(CMOR) library [@cmorlib]. A production task is described by a few Fortran namelist
-files — for the computing system, the model, the experiment and the variables — and a
-JSON file that maps native model fields to CMIP7 variable definitions. Together
-these files form a *recipe*: plain text that can be version-controlled, reviewed and
-repeated by others.
+(CMOR) library [@cmorlib]. The converted ESMs output in the CMIP7 format is furtherd
+repacked with consolidated metadata and larger data chunks using the Python-based community tool
+`cmip7repack`[@Hassell2026] to ensure efficient cloud-based data access.
+The datasets are scientifically validated with the companion tool `cmip7validate`[@cmip7validate]
+developed with Jupyterbook as part of the workflow before it is published through the Earth System Grid Federation [ESGF; @Cinquini2014]. 
 
-For each requested variable, `cmor4cmip7` locates the native model field, applies the
-required units, dimensions, coordinates, cell methods and global attributes, and
-writes a CF-compliant NetCDF file with the CMIP7 file naming and directory structure.
-The datasets can be validated and published through the Earth System Grid Federation
-[@Cinquini2014].
-The software was developed for the Norwegian Earth System Model (NorESM3) but is
-structured so that it can be adapted to models with a comparable component layout.
 It is released under the MIT license at <https://github.com/NorESMhub/cmor4cmip7>,
-with documentation at <https://cmor4cmip7.readthedocs.io>.
+and documentated at <https://cmor4cmip7.readthedocs.io>.
 
 # Statement of need
 
@@ -46,8 +42,9 @@ Climate model intercomparison depends on the output of many models being archive
 a single, machine-readable form. Each centre must deliver its simulations with
 prescribed variable definitions, units, coordinates, metadata, file names and
 directory structure, as specified by the CMIP7 data request [@Mackallah2026] and the
-CMIP7 controlled vocabularies[@cmip7-cvs]. For a coupled Earth system model this conversion is
-routine but demanding: the model writes output on native grids with model-specific
+CMIP7 controlled vocabularies[@cmip7-cvs].
+For a coupled Earth system model this conversion is routine but demanding:
+the model writes output on native grids with model-specific
 variable names, vertical coordinates and time-axis conventions, while the data
 request defines more than a thousand variable specifications, each with its own
 realm, frequency, region and cell methods. The step is repeated for every experiment,
@@ -71,10 +68,10 @@ and they tend to break when the data request or the model output conventions cha
 
 Because CMOR provides APIs for C, Fortran and Python [@cmorlib], most recent tools
 build on one of them. Python tools include NCAR's `cmip7-prep` [@cmip7-prep], the
-AWI/GEOMAR's `pycmor` package [@pycmor] and the EC-Earth `ece2cmor3` tool [@ece2cmor3]. These
-benefit from the mature Python ecosystem and are easy to extend, but they bring a
-long dependency chain to maintain on every platform, and interpreter and library
-overhead in a throughput-bound task.
+AWI/GEOMAR's `pycmor` package [@pycmor] and the EC-Earth `ece2cmor3` tool [@ece2cmor3].
+These benefit from the mature Python ecosystem and are easy to extend,
+but they bring a long dependency chain to maintain on every platform,
+and interpreter and library overhead in a throughput-bound task.
 
 The CMOR library is written in C, and a tool built directly on the C API would in
 principle have the lowest overhead; in practice, C is rarely used in the Earth system
@@ -87,13 +84,14 @@ itself.
 # Software design
 
 `cmor4cmip7` is organised around the model realms represented in an Earth system
-simulation (atmosphere, ocean, sea ice and land) and around the distinction between
-model-specific and CMIP7-specific information. Everything that is specific to a
-model lives in a JSON mapping file that associates native field names and grid
-information with CMIP7 variable definitions; everything that is specific to a
-production task lives in the namelist files, which the program reads from the
-command line:
-
+simulation and around the distinction between model-specific and CMIP7-specific information. 
+Everything that is specific to a model lives in a JSON mapping file
+that associates native field names and grid information with CMIP7 variable definitions;
+everything that is specific to a production task lives in a few Fortran namelist files —
+for the computing system, the model, the experiment and the variables.
+Together these files form a *recipe*:
+plain text that can be version-controlled, reviewed and repeated by others.
+The program reads the recipe from the command line:
 ```bash
 $ ./cmor4cmip7 system.nml model.nml experiment.nml variables.nml
 ```
@@ -103,10 +101,12 @@ taken from the official CMIP7 CMOR tables [@cmip7-data-request], so that revisio
 of the data request are absorbed by updating the tables rather than by editing the
 source code.
 
-For each requested variable, the program locates the native field, checks the
-available time steps, and passes the field, its dimensions and its metadata to the
-CMOR Fortran API, which applies the CMIP7 variable definitions and writes one
-CF-compliant NetCDF file per variable, frequency and time slice.
+For each requested variable, `cmor4cmip7` locates the native model field, applies the
+required units, dimensions, coordinates, cell methods and global attributes,
+and then pass the fields and its metadata to the CMOR Fortran API and
+writes a CF-compliant NetCDF file with the CMIP7 file naming and directory structure.
+The datasets can be validated and published through the Earth System Grid Federation
+[@Cinquini2014].
 
 The separation of model, task and CMIP7-specific information keeps the workflow small
 and gives it the following properties:
@@ -122,25 +122,36 @@ and gives it the following properties:
 * **No intermediate data copies** — time slices are written directly from native model
   output into CMIP7-compliant files.
 
-The software is compiled with a small makefile for GNU or Intel compilers; module,
+The `cmor4cmip7` is compiled with a small makefile for GNU or Intel compilers; module,
 build and run scripts for the Norwegian HPC systems are included. The repository also
 contains unit tests for the JSON and namelist handling, a template recipe, and sample
 recipes used for NorESM3 CMIP7 production. `cmor4cmip7` is developed at
 <https://github.com/NorESMhub/cmor4cmip7>, documented at
 <https://cmor4cmip7.readthedocs.io> and released under the MIT license.
 
+The converted ESMs output in the CMIP7 format is furtherd
+repacked with consolidated metadata and larger data chunks using the Python-based community tool
+`cmip7repack`[@Hassell2026] to ensure efficient cloud-based data access.
+The datasets are scientifically validated with the companion tool `cmip7validate`[@cmip7validate]
+developed with Jupyterbook as part of the workflow, as demostrated in \autoref{fig:cmip7validate}, before it is published through the Earth System Grid Federation [ESGF; @Cinquini2014]
+
+![Sample dashboard of the dataset validation.\label{fig:cmip7validate}](figure.png){ width=60% }
+
+The software was developed for the Norwegian Earth System Model (NorESM3), and currently be operational only for its ocean and ocean biogeochemistry components. However, this integrated workflow and tools are highly modulized, efficient and flexible, it can be adapted to other model components and models with a comparable component layout.
+
 # Research impact statement
 
-`cmor4cmip7` is the tool used to produce the NorESM3 contribution to CMIP7. By
-reducing a production task to a versioned recipe, it removes a repetitive manual step
+By reducing a production task to a versioned recipe,
+the integrated workflow `cmor4cmip7` removes a repetitive manual step
 and keeps the archived data consistent with the data request across experiments,
 ensemble members and model versions. The resulting datasets are checked with the
-companion tool `cmip7validate` [@cmip7validate] and published through the Earth System
-Grid Federation [@Cinquini2014], where they are used by the Rapid Evaluation Framework
+companion tool `cmip7validate` [@cmip7validate] and published through the ESGF,
+where they are used by the Rapid Evaluation Framework
 of the CMIP7 Assessment Fast Track [@Hoffman2026]. Such multi-model archives are the
 basis for the analyses that address the science questions defined for CMIP7
 [@Dunne2025], including climate change assessment, adaptation and mitigation, and
-predictions on seasonal to decadal timescales.
+predictions on seasonal to decadal timescales. The results will be one of major scientific evidence
+from modelling perspective for the upcoming Seventh Assessment Report by the Intergovernmental Panel on Climate Change (IPCC AR7).
 
 # AI usage disclosure
 
@@ -152,10 +163,14 @@ revised by the authors.
 
 # Acknowledgements
 
-The authors thank PCMDI/LLNL [@cmorlib] for providing the CMOR Fortran API and its
-examples. The computations were performed on resources provided by Sigma2 — the
-National Infrastructure for High-Performance Computing and Data Storage in Norway —
-through the NS16000B and NS9560K projects, and the authors are grateful for the
-prompt and professional support of the Sigma2 support team.
+The authors thank PCMDI/LLNL [@cmorlib] for providing the CMOR Fortran API and its examples,
+and Dr. I.Benke for his great contribution to the tool `noresm2cmor` [@noresm2cmor],
+which this software is largly built on.
+The work is supported by Research Council of Norway's FORINFRA project (no. 350390).
+The computations and storages were performed on resources provided by Sigma2
+-- the National Infrastructure for High-Performance Computing and Data Storage in Norway
+-- through the NS16000B and NS9560K projects, and the authors are grateful for the
+prompt and professional support of the Sigma2 support team, including but not limited to
+T. Toutain, M. Jenssen and B.Baniya.
 
 # References

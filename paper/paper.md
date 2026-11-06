@@ -135,7 +135,7 @@ repacked with consolidated metadata and larger data chunks using the Python-base
 The datasets are scientifically validated with the companion tool `cmip7validate`[@cmip7validate]
 developed with Jupyterbook as part of the workflow, as demostrated in \autoref{fig:cmip7validate}, before it is published through the Earth System Grid Federation [ESGF; @Cinquini2014]
 
-![Sample dashboard of the dataset validation.\label{fig:cmip7validate}](./figure.png)
+![Sample dashboard of the dataset validation.\label{fig:cmip7validate}](figure.png)
 
 The software was developed for the Norwegian Earth System Model (NorESM3), and currently be operational only for its ocean and ocean biogeochemistry components. However, this integrated workflow and tools are highly modulized, efficient and flexible, it can be adapted to other model components and models with a comparable component layout.
 

@@ -133,7 +133,9 @@ The converted ESMs output in the CMIP7 format is furtherd
 repacked with consolidated metadata and larger data chunks using the Python-based community tool
 `cmip7repack`[@Hassell2026] to ensure efficient cloud-based data access.
 The datasets are scientifically validated with the companion tool `cmip7validate`[@cmip7validate]
-developed with Jupyterbook as part of the workflow, as demostrated in \autoref{fig:example}, before it is published through the Earth System Grid Federation [ESGF; @Cinquini2014]
+developed with Jupyterbook as part of the workflow, as demostrated in \autoref{fig:cmip7validate}, before it is published through the Earth System Grid Federation [ESGF; @Cinquini2014]
+
+![Sample dashboard of the dataset validation.\label{fig:cmip7validate}](figure.png)
 
 ![Sample dashboard of the dataset validation.\label{fig:cmip7validate}](figure.png){ width=50% }
 

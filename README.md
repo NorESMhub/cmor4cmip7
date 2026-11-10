@@ -9,7 +9,7 @@ The `cmor4cmip7` is built with the CMOR Fortran interface, the *PCMDI CMOR libra
 
 The program runs as a command line tool:
 ```bash
-$ ./cmor4cmip7 system.nml model.nml experiment.nml variables
+$ ./cmor4cmip7 system.nml model.nml experiment.nml variables.nml
 ```
 
 The full documentaion is at [https://cmor4cmip7.readthedocs.io](https://cmor4cmip7.readthedocs.io/en/stable/index.html).

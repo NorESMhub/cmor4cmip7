@@ -103,14 +103,6 @@ load_module_gnu(){
 load_module_${compiler}
 #module list
 
-if [ $mpi_flag == 'true' ] && [ $compiler == 'intel' ]; then
-  echo "--- -------------------------------------------------------------- ---"
-  echo "    Warning: parallel compilation with Intel is not supported yet!    "
-  #echo "EXIT..."
-  #exit 1
-  echo "--- -------------------------------------------------------------- ---"
-fi
-
 # and build
 make clean -f $Makefile
 make -f $Makefile

@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - paper/paper.*
+      - paper/*.png
       - .github/workflows/draft-pdf.yml
 
 jobs:

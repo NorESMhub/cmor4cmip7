@@ -10,8 +10,10 @@ varnml=${pnml}/variables.nml
 #varnml=${pnml}/variables_dev.nml
 #varnml=${pnml}/variables_miss.nml
 
-compiler=intel      # gnu or intel
-runtype=serial      # serial, parallel or debug
+# gnu or intel
+compiler=intel
+# serial, parallel or debug
+runtype=serial
 
 num_threads=8       # number of threads, only for parallel run type
 # --------------------------------------------------------------------------

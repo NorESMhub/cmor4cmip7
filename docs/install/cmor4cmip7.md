@@ -28,10 +28,6 @@ So for example:
 * `./build.sh -p false -c intel`, the same but with Intel compiler.
 * `./build.sh -p true -c intel`, the same but with MPI enabled.
 
-:::{caution}
-As of Tue 27 Oct. 2026, the MPI version with Intel compiler does not work properly. See issue on the [MPI for Intel compiler](https://github.com/NorESMhub/cmor4cmip7/issues/21).
-:::
-
 :::{tip}
 Modify the corresponding flags of `Makefile` under `cmor4cmip7/build` to change the build options, e.g. with debug `-g` and optimization level `-O2`.
 :::

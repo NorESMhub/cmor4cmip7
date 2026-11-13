@@ -110,6 +110,7 @@ contains
       itag = itags(n)
       call scan_files(reset=.true.)
 
+      if (verbose) write(*,*) 'found fnm: ', trim(fnm)
       if (len_trim(fnm) == 0) then
         if (verbose) write (*, *) &
           'WARNING: no file found for case dir|tag|year1|month1|yearn|monthn: ', &
@@ -122,6 +123,7 @@ contains
     !write(*, *) 'Read grid information from input files'
     itag=tagomon    ! ensure read grid info from monthly output
     call scan_files(reset=.true.)
+    if (verbose) write(*,*) 'found fnm: ', trim(fnm)
 
     ! Read grid info
     if (verbose) write(*,*) 'Read grid information'
@@ -769,6 +771,7 @@ contains
 
     ! Open first input file
     call scan_files(reset=.true.)
+    if (verbose) write(*,*) "Reading grid info from file: ", trim(fnm)
 
     status = nf90_open(fnm, nf90_nowrite, ncid)
     call handle_ncerror(status)

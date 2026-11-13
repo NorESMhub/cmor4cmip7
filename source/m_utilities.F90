@@ -97,15 +97,15 @@ contains
 !   isloop = .true.
 
 !   do while (isloop)
-      if (present(reset).and.reset) then
-        call get_file_info(casename, itag, fnm, year1, month1, &
-                           yearn, monthn, exprefyear, reset, rec, tval(1), tbnd, &
-                           mbnd, year, month)
-      else
-        call get_file_info(casename, itag, fnm, year1, month1, &
-                           yearn, monthn, exprefyear, .false., rec, tval(1), tbnd, &
-                           mbnd, year, month)
-      end if
+    if (present(reset).and.reset) then
+      call get_file_info(casename, itag, fnm, year1, month1, &
+                         yearn, monthn, exprefyear, reset, rec, tval(1), tbnd, &
+                         mbnd, year, month)
+    else
+      call get_file_info(casename, itag, fnm, year1, month1, &
+                         yearn, monthn, exprefyear, .false., rec, tval(1), tbnd, &
+                         mbnd, year, month)
+    end if
 
 !     isloop = .false.
 !   end do
@@ -238,8 +238,8 @@ contains
       dnumhi = ndays
       call nccaln(trim(calendar), y1, m1, 1, yr, 1, 1, ndays)
       toff = dnumlo - ndays
-
-      ltimebnds = .true.
+     !set as default to avoid issue as reported in BLOM #781 before get fixed
+      ltimebnds = .false.
       status = nf90_inq_varid(ncid, 'time_bnds', rhid2)
       if (status /= nf90_noerr) then
         status = nf90_inq_varid(ncid, 'time_bounds', rhid2)

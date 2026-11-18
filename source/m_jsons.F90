@@ -24,7 +24,7 @@ contains
     character :: yyyymm1*6, yyyymm2*6, c2*2, r3*3
     type(json_core) :: json
     type(json_value), pointer :: p
-    integer   :: itmp
+    character(len=slenmax)    :: variant_label
 
     !write(*,*) 'varname:',trim(varname)
     call json%initialize()
@@ -110,8 +110,10 @@ contains
 
     write (yyyymm1, '(I4.4,I2.2)') year1, month1
     write (yyyymm2, '(I4.4,I2.2)') yearn, monthn
-    read(realization_index(2:), *) itmp
-    write (r3, '(I3.3)') itmp
+    variant_label = trim(realization_index)// &
+                    trim(initialization_index)// &
+                    trim(physics_index)// &
+                    trim(forcing_index)
 #ifdef MPI
     call mpi_comm_rank(mpi_comm_world, mpirank, mpierror)
     write (c2, '(I2.2)') mpirank
@@ -120,7 +122,8 @@ contains
 #endif
 
     json_file_attributes = 'attributes_'//trim(casename)//'_'// &
-                           trim(varname)//'_'//yyyymm1//'-'//yyyymm2//'_'//r3//'_'//c2//'.json'
+                           trim(varname)//'_'//yyyymm1//'-'//yyyymm2//'_'// &
+                           trim(variant_label)//'_'//c2//'.json'
     call json%print(p, json_file_attributes)
     call json%destroy(p)            ! cleanup
     !write(*, *) 'json-namelist file: ', trim(json_file_attributes)

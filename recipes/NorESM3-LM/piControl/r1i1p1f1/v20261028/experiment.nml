@@ -3,7 +3,6 @@
  osubdir                = 'NorESM3-LM/piControl/r1i1p1f1/v20261028',
  experiment_id          = 'piControl',
  parent_experiment_id   = 'piControl-spinup',
- parent_experiment_rip  = 'r1i1p1',
  parent_time_units      = 'days since 0001-01-01 00:00:00',
  history                = '',
  realization_index      = 'r1',

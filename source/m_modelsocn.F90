@@ -1314,7 +1314,9 @@ contains
     end if
     call json_write_attributes(grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)
-    call system('rm '//trim(json_file_attributes))
+    if (deletejson) then
+      call system('rm '//trim(json_file_attributes))
+    end if
 
     ! Define horizontal axes
     !write(*, *) 'Define horizontal axes'
@@ -1519,7 +1521,7 @@ contains
 
     ! Define time axis
     if (.not. fxflag) then
-      if(verbose) then
+      if (verbose) then
         write(*, *) 'Define time axis '
         if (verbose) then
           write (*, *) 'Time coord:', trim(tcoord)

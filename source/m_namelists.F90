@@ -17,9 +17,9 @@ module m_namelists
 
   ! System namelist
   character(len=slenmax), save  :: ibasedir, obasedir, tabledir, griddata
-  logical, save                 :: createsubdirs, forcefilescan, verbose
+  logical, save                 :: createsubdirs, forcefilescan, verbose, deletejson
   namelist /sys/ ibasedir, obasedir, tabledir, griddata, createsubdirs, &
-    forcefilescan, verbose
+    forcefilescan, verbose, deletejson
 
   ! Model namelist
   character(len=slenmax), save  :: source_id, institute_id
@@ -137,6 +137,7 @@ contains
     createsubdirs = .true.
     forcefilescan = .true.
     verbose = .true.
+    deletejson = .true.
     dry_run = .false.
     plevdummy = .false.
     readdummy = .false.
@@ -292,6 +293,7 @@ contains
     write (*, *) ' grid data dir.   = ', trim(griddata)
     write (*, *) ' create sub-dirs  = ', createsubdirs
     write (*, *) ' verbose          = ', verbose
+    write (*, *) ' deletejson       = ', deletejson
     write (*, *)
     write (*, *) 'Model namelist:'
 !   write (*, *) ' institution      = ', trim(institution)

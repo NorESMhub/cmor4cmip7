@@ -6,4 +6,5 @@
  createsubdirs = .false.,
  forcefilescan = .true.,  
  verbose       = .false.,
+ deletejson    = .false.
 /

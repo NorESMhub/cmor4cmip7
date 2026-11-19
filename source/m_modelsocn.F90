@@ -1154,6 +1154,18 @@ contains
     ! initalise
     cell_measures = '' 
 
+    ! reset the CMOR handles so that a stale id from the previous dataset
+    ! cannot mask a failure of the calls below
+    iaxid = -1
+    jaxid = -1
+    kaxid = -1
+    laxid = -1
+    raxid = -1
+    saxid = -1
+    taxid = -1
+    grdid = -1
+    varid = -1
+
     ! Check if output variable should have time coordinate
     fxflag = .false.
     if (present(fx)) then
@@ -1354,6 +1366,10 @@ contains
     end if
     call json_write_attributes(grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)
+    if (error_flag /= 0) then
+      write (*, *) 'ERROR: cmor_dataset_json failed for ', trim(ovnm)
+      stop
+    end if
     if (deletejson) then
       call system('rm '//trim(json_file_attributes))
     end if
@@ -1698,6 +1714,32 @@ contains
     else
       if (cell_measures == 'area: areacello volume: volcello') then
         status = cmor_set_variable_attribute(varid, "cell_measures", 'area: areacello volume: volcello')
+      end if
+    end if
+    if (status /= 0) then
+      write (*, *) 'ERROR: cmor_set_variable_attribute failed for ', trim(ovnm)
+      stop
+    end if
+
+    ! A failed cmor_axis/cmor_grid/cmor_variable returns a negative handle
+    ! (CMOR itself only warns, depending on exit_control), which would
+    ! otherwise surface much later as an empty or broken output file.
+    if (varid < 0) then
+      write (*, *) 'ERROR: cmor_variable failed for ', trim(ovnm)
+      stop
+    end if
+    if (vtype(1:3) /= 'mer' .and. vtype(1:3) /= 'sec') then
+      if (iaxid < 0 .or. jaxid < 0) then
+        write (*, *) 'ERROR: cmor_axis (horizontal) failed for ', trim(ovnm)
+        stop
+      end if
+      if (grdid < 0) then
+        write (*, *) 'ERROR: cmor_grid failed for ', trim(ovnm)
+        stop
+      end if
+      if (.not. fxflag .and. taxid < 0) then
+        write (*, *) 'ERROR: cmor_axis (time) failed for ', trim(ovnm)
+        stop
       end if
     end if
 
@@ -2098,6 +2140,10 @@ contains
                      data=fld(:,:,:))
       end if
     end if
+    if (error_flag /= 0) then
+      write (*, *) 'ERROR: cmor_write failed for ', trim(ovnm)
+      stop
+    end if
 
   end subroutine write_field
 
@@ -2257,6 +2303,10 @@ contains
                        time_bnds=tbnds)
         end if
       end if
+    end if
+    if (error_flag /= 0) then
+      write (*, *) 'ERROR: cmor_write failed for ', trim(ovnm)
+      stop
     end if
 
   end subroutine write_tslice

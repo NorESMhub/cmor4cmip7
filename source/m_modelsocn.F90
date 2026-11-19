@@ -1179,6 +1179,8 @@ contains
 
     integer, parameter              :: ndimmax = 10
     integer                 :: n, ndims, dimids(ndimmax), dimlens(ndimmax)
+    integer                 :: dimid_time
+    logical                 :: lvert3
 !   character(len=slenmax)  :: coord
 
     character(len=slenmax)          :: cell_measures
@@ -1225,6 +1227,17 @@ contains
       status = nf90_inquire_dimension(ncid, dimids(n), len=dimlens(n))
       call handle_ncerror(status)
     end do
+    ! Is the third dimension of the input variable a vertical (level/depth)
+    ! dimension rather than time?
+    lvert3 = .false.
+    if (ndims >= 3) then
+      status = nf90_inq_dimid(ncid, 'time', dimid_time)
+      if (status /= nf90_noerr) then
+        lvert3 = .true.                        ! no time dimension in this file
+      else
+        lvert3 = dimids(3) /= dimid_time
+      end if
+    end if
     if (.not. allocated(dp)) allocate (dp(idm, jdm, kdm))
     if (allocated(fld)) deallocate (fld, fld2, fldacc, fldtmp)
     ii = idm
@@ -1234,6 +1247,10 @@ contains
       write (*, '(1X, A, 4I5)') 'Horizontal dimension of  model input:', dimlens(1:4)
       write(*, '(1X, A, I5)') 'Vertical dimension of model input:', kdm
     end if
+    ! The third dimension is only a vertical one if it is not time; if it is
+    ! time (e.g. a 2-D field whose record count happens to equal kdm or ddm)
+    ! it must not be used to select kk in the branches below.
+    if (.not. lvert3) dimlens(3) = 1
     if (dims(1:25) == 'longitude,latitude,olevel') then
       vtype = 'level'
       kk = ddm

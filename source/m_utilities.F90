@@ -512,15 +512,23 @@ contains
     integer, intent(in) :: year, month, day
     integer, intent(out) :: ndays
 
-    integer :: y
+    integer :: y, ical
+    character(len=16) :: cal
     integer, parameter :: yoffset = 1000000, yr1 = 365, yr4 = 1461, &
                           yr100 = 36524, yr400 = 146097
     integer :: acc_leap(12), acc_noleap(12)
     data acc_leap/0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335/
     data acc_noleap/0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334/
 
+    ! evaluate a blank padded copy, so that cal(1:3) cannot run past the
+    ! end of a short calendar string
+    cal = ' '
+    ical = min(len_trim(calendar), len(cal))
+    if (ical > 0) cal(1:ical) = calendar(1:ical)
+
+    ndays = -1
     y = year + yoffset
-    if (calendar(1:3) == 'pro') then
+    if (cal(1:3) == 'pro') then
       ndays = int((y - 1)/400)*yr400 &
               + int(mod((y - 1), 400)/100)*yr100 &
               + int(mod(mod((y - 1), 400), 100)/4)*yr4 &
@@ -530,19 +538,25 @@ contains
       else
         ndays = ndays + acc_noleap(month) + day
       end if
-    elseif (calendar(1:3) == 'jul') then
+    elseif (cal(1:3) == 'jul') then
       ndays = int((y - 1)/4)*yr4 + mod(y, 4)*yr1
       if (month > 2 .and. mod(y, 4) == 0) then
         ndays = ndays + acc_leap(month) + day
       else
         ndays = ndays + acc_noleap(month) + day
       end if
-    elseif (calendar(1:3) == '360') then
+    elseif (cal(1:3) == '360') then
       ndays = (y - 1)*360 + 30*(month - 1) + day
-    elseif (calendar(1:2) == 'no' .or. calendar(1:3) == '365') then
+    elseif (cal(1:2) == 'no' .or. cal(1:3) == '365') then
       ndays = (y - 1)*365 + acc_noleap(month) + day
-    elseif (calendar(1:3) == 'all' .or. calendar(1:3) == '366') then
+    elseif (cal(1:3) == 'all' .or. cal(1:3) == '366') then
       ndays = (y - 1)*366 + acc_leap(month) + day
+    else
+      ! an unrecognised calendar used to leave ndays undefined, and the
+      ! undefined value then propagated into the time axis of the output
+      ! files; fail loudly instead
+      write (*, *) 'ERROR: unknown calendar "'//trim(calendar)//'"'
+      stop
     end if
 
   end subroutine ncdnum
@@ -573,10 +587,20 @@ contains
     integer, intent(in) :: y1, m1, d1, y2, m2, d2
     integer, intent(out) :: ndays
 
-    integer :: n1, n2, nd1, nd2, nd3
+    integer :: n1, n2, nd1, nd2, nd3, ical
+    character(len=16) :: cal
 
-    if (calendar(1:3) == 'sta' .or. calendar(1:3) == 'mix' .or. &
-        calendar(1:3) == 'gre') then
+    ! in CF a missing calendar attribute means "standard"; evaluate a blank
+    ! padded copy, so that cal(1:3) cannot run past the end of a short string
+    cal = 'standard'
+    ical = min(len_trim(calendar), len(cal))
+    if (ical > 0) then
+      cal = ' '
+      cal(1:ical) = calendar(1:ical)
+    end if
+
+    if (cal(1:3) == 'sta' .or. cal(1:3) == 'mix' .or. &
+        cal(1:3) == 'gre') then
       if (y1 < 1582 .or. (y1 == 1582 .and. m1 < 10) .or. &
           (y1 == 1582 .and. m1 == 10 .and. d1 <= 15)) then
         call ncdnum('julian', y1, m1, d1, n1)
@@ -596,8 +620,8 @@ contains
         n2 = nd1 - nd2 + nd3 - 10
       end if
     else
-      call ncdnum(calendar, y1, m1, d1, n1)
-      call ncdnum(calendar, y2, m2, d2, n2)
+      call ncdnum(cal, y1, m1, d1, n1)
+      call ncdnum(cal, y2, m2, d2, n2)
     end if
     ndays = n2 - n1
 

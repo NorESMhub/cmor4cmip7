@@ -147,7 +147,11 @@ contains
 
     main_loop: do n = 1, size(idx)
 
-      if (skip_dataset(n, n_datasets)) cycle
+      ! distribute datasets over the MPI ranks by their index in the namelist
+      ! (not by their position in the filtered list), so that a dataset always
+      ! maps to the same rank and the bounds check in skip_dataset is meaningful
+!     if (skip_dataset(n, n_datasets)) cycle
+      if (skip_dataset(idx(n), n_datasets)) cycle
 
       realm = trim(realms(idx(n)))
 

@@ -173,6 +173,7 @@ contains
       hcoord = ''
       vunits = ''
       original_name = ''
+      vtype = ''
 
       ! Select file tag according to realm and frequency
       call set_ocn_tag(realm, frequency, itag)
@@ -1218,12 +1219,38 @@ contains
       else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
         kk = ddm
       end if
+    else if (dims == 'longitude,latitude,time1') then
+      vtype = '2d'
+      kk = 1
+      if (dimlens(3) .eq. kdm .and. kdm>0) THEN
+        kk = kdm
+      else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
+        kk = ddm
+      end if
+    else if (dims(1:27) == 'longitude,latitude,oplayer4') then
+      vtype = 'olayer'
+      kk = 1
+      if (dimlens(3) .eq. kdm .and. kdm>0) THEN
+        kk = kdm
+      else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
+        kk = ddm
+      end if
     else if (dims == 'latitude,rho,basin,time') then
       vtype = 'merk'
       ii = ldm
       jj = kdm
       kk = rdm
+    else if (dims == 'gridlatitude,rho,basin,time') then
+      vtype = 'merk'
+      ii = ldm
+      jj = kdm
+      kk = rdm
     else if (dims == 'latitude,olevel,basin,time') then
+      vtype = 'merd'
+      ii = ldm
+      jj = ddm
+      kk = rdm
+    else if (dims == 'gridlatitude,olevel,basin,time') then
       vtype = 'merd'
       ii = ldm
       jj = ddm
@@ -1251,7 +1278,10 @@ contains
         kk = ddm
       end if
     else
-      write (*, *) 'Undefined variable type, please check!'
+      write (*, *) 'ERROR: unsupported CMOR dimensions: ', trim(dims)
+      write (*, *) '       for variable: ', trim(bvnm)
+      write (*, *) '       cannot determine the grid type, aborting'
+      stop
     end if
     if (verbose) then
       write (*, *) 'CMOR output variable type:', trim(vtype)

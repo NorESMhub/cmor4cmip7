@@ -171,6 +171,8 @@ contains
       tcoord = ''
       zcoord = ''
       hcoord = ''
+      vunits = ''
+      original_name = ''
 
       ! Select file tag according to realm and frequency
       call set_ocn_tag(realm, frequency, itag)
@@ -189,13 +191,21 @@ contains
 
 
       ! Get variable attributes from table and mapfile
-      call json_get_units(trim(tabledir)//trim(table), trim(ovnm), vunits)
+      call json_get_units(trim(tabledir)//trim(table), trim(ovnm), vunits, lfound=found)
+      if (.not. found) then
+        write(*,*) 'ERROR: no units in CMOR table for ', trim(bvnm)
+        cycle main_loop
+      end if
       call json_get_zcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
 
       ! Get sources and factors from mapfile
       if (allocated(sources)) deallocate(sources)
       if (allocated(factors)) deallocate(factors)
-      call json_get_original_name(trim(mapfile), trim(cvnm), original_name)
+      call json_get_original_name(trim(mapfile), trim(cvnm), original_name, lfound=found)
+      if (.not. found) then
+        write(*,*) 'ERROR: no original_name in mapfile for ', trim(cvnm)
+        cycle main_loop
+      end if
       call json_get_sources(trim(mapfile), trim(cvnm), sources, lfound=found)
       if (found) then
         allocate(factors(size(sources)))

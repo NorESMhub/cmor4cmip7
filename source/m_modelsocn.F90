@@ -1812,6 +1812,13 @@ contains
     end if
 
     if (index(special, 'dp.avg') > 0) then
+      ! sources(2) holds the dp weight; a mapfile entry with a single
+      ! source would index past the array bound here
+      if (size(sources) < 2) then
+        write (*, *) 'ERROR: special dp.avg needs two sources: ', trim(cvnm)
+        write (*, *) '       only found: ', trim(sources(1))
+        stop
+      end if
       fld = 0.
       call add_tslice(sources(2), factors(2), rec1, fid)
       fld2 = fld

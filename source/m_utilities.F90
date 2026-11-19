@@ -145,6 +145,16 @@ contains
     ! rather than start=(/1,n/) count=(/2,1/)
     logical             :: ltrans
 
+    ! never return undefined INTENT(OUT) values: if no file/record is found
+    ! below, the caller must see "no data" instead of leftovers/garbage
+    fnam = ' '
+    irec = 0
+    tval = 0._r8
+    tbnd = 0._r8
+    mbnd = 0._r8
+    year = yr
+    month = 1
+
     ! check whether to start file list read from beginning or to resume
     idx = index(ftag, '.')
     str1 = ftag(1:idx - 1)
@@ -359,6 +369,12 @@ contains
     integer :: y1, m1, y2, m2, ndays, ndayslast
     y1 = 1
     m1 = 1
+
+    ! always assign the INTENT(OUT) arguments, also on the early return
+    tbnd(1) = 0._r8
+    tbnd(2) = 0._r8
+    year = yref
+    month = 1
 
     if (tval < 0.) return
 

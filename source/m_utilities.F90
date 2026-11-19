@@ -315,7 +315,7 @@ contains
           irec = n
           tval = tval + toff
           tbnd = tbnd + toff
-          tbndold = tbnd + toff
+          tbndold = tbnd
           ldone = .true.
           exit
         elseif (tbnd(1) >= dnumhi) then

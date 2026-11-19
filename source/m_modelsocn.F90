@@ -699,8 +699,14 @@ contains
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
             end do
-            if (abs(fld(i, j, 1) - missing) > eps ) &
-              fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+            if (abs(fld(i, j, 1) - missing) > eps ) then
+              ! the layer thickness can be zero (cell shallower than 300 m)
+              if (fldtmp(i, j, 1) > 0.) then
+                fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+              else
+                fld(i, j, 1) = missing
+              end if
+            end if
           end do
         end do
 
@@ -722,8 +728,14 @@ contains
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
             end do
-            if (abs(fld(i, j, 1) - missing) > eps) &
-              fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+            if (abs(fld(i, j, 1) - missing) > eps) then
+              ! the layer thickness can be zero (cell shallower than 700 m)
+              if (fldtmp(i, j, 1) > 0.) then
+                fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+              else
+                fld(i, j, 1) = missing
+              end if
+            end if
           end do
         end do
 
@@ -745,8 +757,14 @@ contains
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
             end do
-            if (abs(fld(i, j, 1) - missing) > eps) &
-              fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+            if (abs(fld(i, j, 1) - missing) > eps) then
+              ! the layer thickness can be zero (cell shallower than 2000 m)
+              if (fldtmp(i, j, 1) > 0.) then
+                fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+              else
+                fld(i, j, 1) = missing
+              end if
+            end if
           end do
         end do
 

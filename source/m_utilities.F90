@@ -251,10 +251,31 @@ contains
       call handle_ncerror(nf90_inq_varid(ncid, 'time', rhid))
       units = ' '
       call handle_ncerror(nf90_get_att(ncid, rhid, 'units', units))
-      call ncsevl(units, n, sstartend)
-      read (units(sstartend(1, 3):sstartend(1, 3) + 3), *) yref
-      read (units(sstartend(1, 4):sstartend(1, 4) + 1), *) mref
-      read (units(sstartend(1, 5):sstartend(1, 5) + 1), *) dref
+      call ncsevl(units, n, sstartend, size(sstartend))
+      ! the units attribute has to read '<unit> since <yyyy>-<mm>-<dd> ...';
+      ! ncsevl splits at ' ', '-' and ':', so the reference date is given by
+      ! sub-strings 3, 4 and 5. If it cannot be determined, the file cannot be
+      ! placed on the time axis and is skipped (before, the stale, saved
+      ! sstartend values of the previously scanned file were used instead)
+      yref = -1
+      mref = -1
+      dref = -1
+      if (n >= 5) then
+        read (units(sstartend(1, 3):sstartend(2, 3)), *, iostat=status) yref
+        if (status /= 0) yref = -1
+        read (units(sstartend(1, 4):sstartend(2, 4)), *, iostat=status) mref
+        if (status /= 0) mref = -1
+        read (units(sstartend(1, 5):sstartend(2, 5)), *, iostat=status) dref
+        if (status /= 0) dref = -1
+      end if
+      if (yref < 0 .or. mref < 0 .or. dref < 0) then
+        write (*, *) 'WARNING: no reference date in time units "'// &
+          trim(units)//'" of '//trim(fnam)//', file skipped'
+        nskip = nskip + 1
+        irecold = 0
+        call handle_ncerror(nf90_close(ncid))
+        cycle
+      end if
       calendar = ' '
       call handle_ncerror(nf90_get_att(ncid, rhid, 'calendar', calendar))
 
@@ -420,7 +441,7 @@ contains
 
   ! -----------------------------------------------------------------
 
-  subroutine ncsevl(strg, strgn, strgind)
+  subroutine ncsevl(strg, strgn, strgind, nmax)
 
     ! Description:
     !   Finds the number and the locations of sub-strings.
@@ -431,18 +452,24 @@ contains
     !   int strgn      (out) - number of sub-strings
     !   int strgind(*) (out) - start/end locations of sub-strings (the
     !                         dimension must at least equal to strgn*2)
+    !   int nmax       (in,opt) - size of strgind; the scan stops here instead
+    !                         of writing beyond the end of the array
 
     implicit none
 
     character(len=*), intent(in) :: strg
     integer, intent(out) :: strgn, strgind(*)
+    integer, intent(in), optional :: nmax
 
     character :: charold, charnew
-    integer :: i
+    integer :: i, nlim
 
+    nlim = huge(1)
+    if (present(nmax)) nlim = nmax
     charold = ' '
     strgn = 0
     do i = 1, len(strg)
+      if (strgn >= nlim) exit
       charnew = strg(i:i)
       if ((charold == ' ' .or. charold == '-' .or. charold == ':') .and. &
           (charnew /= ' ' .and. charnew /= '-' .and. charnew /= ':')) then
@@ -456,8 +483,13 @@ contains
       charold = charnew
     end do
     if (mod(strgn, 2) == 1) then
-      strgn = strgn + 1
-      strgind(strgn) = len(strg)
+      if (strgn < nlim) then
+        strgn = strgn + 1
+        strgind(strgn) = len(strg)
+      else
+        ! no room left to terminate the last sub-string: drop it
+        strgn = strgn - 1
+      end if
     end if
     strgn = strgn/2
 

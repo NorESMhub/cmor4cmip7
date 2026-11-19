@@ -1921,15 +1921,25 @@ contains
       status = nf90_get_att(fid, rhid, 'add_offset', offs)
       if (status /= nf90_noerr) offs = 0.
       status = nf90_get_att(fid, rhid, '_FillValue', fill)
-      do j = 1, jj
-        do i = 1, ii
-          if (abs(sealv(i, j) - fill) < eps) then
-            sealv(i, j) = missing
-          else
-            sealv(i, j) = sealv(i, j)*sfac + offs
-          end if
+      if (status == nf90_noerr) then
+        do j = 1, jj
+          do i = 1, ii
+            if (abs(sealv(i, j) - fill) < eps) then
+              sealv(i, j) = missing
+            else
+              sealv(i, j) = sealv(i, j)*sfac + offs
+            end if
+          end do
         end do
-      end do
+      else
+        ! no _FillValue: do not mask against a value left over from another
+        ! variable, just apply scale/offset
+        do j = 1, jj
+          do i = 1, ii
+            sealv(i, j) = sealv(i, j)*sfac + offs
+          end do
+        end do
+      end if
     end if
 
     ! Read bottom pressure if necessary
@@ -1946,15 +1956,25 @@ contains
       status = nf90_get_att(fid, rhid, 'add_offset', offs)
       if (status /= nf90_noerr) offs = 0.
       status = nf90_get_att(fid, rhid, '_FillValue', fill)
-      do j = 1, jj
-        do i = 1, ii
-          if (abs(pbot(i, j) - fill) < eps) then
-            pbot(i, j) = missing
-          else
-            pbot(i, j) = pbot(i, j)*sfac + offs
-          end if
+      if (status == nf90_noerr) then
+        do j = 1, jj
+          do i = 1, ii
+            if (abs(pbot(i, j) - fill) < eps) then
+              pbot(i, j) = missing
+            else
+              pbot(i, j) = pbot(i, j)*sfac + offs
+            end if
+          end do
         end do
-      end do
+      else
+        ! no _FillValue: do not mask against a value left over from another
+        ! variable, just apply scale/offset
+        do j = 1, jj
+          do i = 1, ii
+            pbot(i, j) = pbot(i, j)*sfac + offs
+          end do
+        end do
+      end if
     end if
 
     status = nf90_close(fid)

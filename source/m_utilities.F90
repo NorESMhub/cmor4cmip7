@@ -136,8 +136,14 @@ contains
     character(len=1024)         :: units, calendar
     integer, save       :: n, nrec, unlimdimid, ncid, rhid, rhid2, &
                            status, sstartend(2, 10), nskip, irecold, toff, ndays
+    integer             :: ndims_bnds, dimids_bnds(2), ndim1, ndim2
     real(r8), save  :: dnumlo, dnumhi, tbndold(2) = (/-999999., -999999./)
     logical, save       :: ltimebnds, ldone
+    ! ltrans = "logical, transposed": set when the time-bounds variable of the
+    ! current file is stored as (time,bnds) instead of the usual (bnds,time),
+    ! so that the bounds are read with start=(/n,1/) count=(/1,2/)
+    ! rather than start=(/1,n/) count=(/2,1/)
+    logical             :: ltrans
 
     ! check whether to start file list read from beginning or to resume
     idx = index(ftag, '.')
@@ -238,22 +244,61 @@ contains
       dnumhi = ndays
       call nccaln(trim(calendar), y1, m1, 1, yr, 1, 1, ndays)
       toff = dnumlo - ndays
-     !set as default to avoid issue as reported in BLOM #781 before get fixed
+      ! Look for time bounds; accept both (bnds,time) and (time,bnds) order.
       ltimebnds = .false.
+      ltrans = .false.
       status = nf90_inq_varid(ncid, 'time_bnds', rhid2)
       if (status /= nf90_noerr) then
         status = nf90_inq_varid(ncid, 'time_bounds', rhid2)
-        if (status /= nf90_noerr) ltimebnds = .false.
+      end if
+      if (status == nf90_noerr) then
+        status = nf90_inquire_variable(ncid, rhid2, ndims=ndims_bnds)
+        if (status == nf90_noerr .and. ndims_bnds == 2) then
+          status = nf90_inquire_variable(ncid, rhid2, dimids=dimids_bnds)
+        end if
+        if (status == nf90_noerr) then
+          status = nf90_inquire_dimension(ncid, dimids_bnds(1), len=ndim1)
+        end if
+        if (status == nf90_noerr) then
+          status = nf90_inquire_dimension(ncid, dimids_bnds(2), len=ndim2)
+        end if
+        if (status == nf90_noerr) then
+          if (ndim1 == 2) then
+            ltimebnds = .true.
+          else if (ndim2 == 2) then
+            ltimebnds = .true.
+            ltrans = .true.
+          end if
+        end if
       end if
 
+      ! Files with broken bounds are handled below by falling back to tval
+      ! (cf. issue reported in BLOM #781).
+      ! force set ltimebnds = .false. for now 
+
+      ltimebnds = .false.
       do n = irecold + 1, nrec
         irecold = n
         call handle_ncerror(nf90_get_var(ncid, rhid, tval, start=(/n/)))
+        tbnd = tval
         if (ltimebnds) then
-          call handle_ncerror(nf90_get_var(ncid, rhid2, tbnd, &
-                                           start=(/1, n/), count=(/2, 1/)))
-        else
-          tbnd = tval
+          if (ltrans) then
+            status = nf90_get_var(ncid, rhid2, tbnd, &
+                                  start=(/n, 1/), count=(/1, 2/))
+          else
+            status = nf90_get_var(ncid, rhid2, tbnd, &
+                                  start=(/1, n/), count=(/2, 1/))
+          end if
+          ! discard unusable bounds and fall back to the instantaneous value
+          if (status /= nf90_noerr) then
+            tbnd = tval
+          else if (tbnd(1) > tbnd(2) .or. &
+                   tval < tbnd(1) - 1.e-6_r8 .or. tval > tbnd(2) + 1.e-6_r8) then
+            if (verbose) write (*, *) &
+              'WARNING: inconsistent time bounds in '//trim(fnam)// &
+              ', using the time value instead'
+            tbnd = tval
+          end if
         end if
 
         ! check if time value lies within limits

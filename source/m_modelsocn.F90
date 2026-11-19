@@ -308,6 +308,11 @@ contains
           if (verbose) write(*,*) 'read_tslice: ', &
             trim(fnm(index(fnm, '/', back=.true.)+1:))
           call read_tslice(rec, badrec, fnm)
+          if (badrec) then
+            if (verbose) write (*, *) 'WARNING: skipping bad record ', rec, &
+              ' of ', trim(fnm(index(fnm, '/', back=.true.)+1:))
+            cycle
+          end if
 
           !! calcluate tval and tbnds
           select case (frequency)
@@ -1810,6 +1815,8 @@ contains
 
   subroutine read_tslice(rec, badrec, fname)
 
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+
     implicit none
 
     integer, intent(in)             :: rec
@@ -1817,6 +1824,10 @@ contains
     character(len=*), intent(in), optional  :: fname
     integer, save                   :: fid
     integer                         :: i, j, k, rec1
+    real(r8)                        :: tvalfile
+
+    ! badrec is INTENT(OUT): always define it, whatever path is taken below
+    badrec = .false.
 
     ! Exception for fill day
     rec1 = max(rec, 1)
@@ -1830,20 +1841,30 @@ contains
       call handle_ncerror(status)
     end if
 
-    if (.false.) then
-      ! Read time information
-      status = nf90_inq_varid(fid, 'time', rhid)
+    ! Validate the requested record: its time value must be readable and
+    ! finite.  This is a consistency check only - the time axis written to
+    ! the output is taken from get_file_info (tval already shifted by toff)
+    ! and from mbnd, so tval/tbnds must not be overwritten here.
+    status = nf90_inq_varid(fid, 'time', rhid)
+    if (status /= nf90_noerr) then
+      badrec = .true.
+    else
+      status = nf90_get_var(fid, rhid, tvalfile, start=(/rec1/))
       if (status /= nf90_noerr) then
-        write (*, *) 'cannot find time variable'
-        stop
+        badrec = .true.
+      else if (.not. ieee_is_finite(tvalfile)) then
+        badrec = .true.
       end if
-      status = nf90_get_var(fid, rhid, tval, (/rec1/), (/1/))
-      if (status /= nf90_noerr) badrec = .true.
+    end if
+    if (badrec) then
+      if (present(fname)) then
+        write (*, *) 'WARNING: unusable time record ', rec1, ' in ', trim(fname)
+      else
+        write (*, *) 'WARNING: unusable time record ', rec1, ' in ', trim(fnm)
+      end if
+      status = nf90_close(fid)
       call handle_ncerror(status)
-      if (rec == 0) tval = tval - 1
-
-      tbnds(1, 1) = max(0., tbnds(1, 1))
-      tval = 0.5*(tbnds(1, 1) + tbnds(2, 1))
+      return
     end if
 
     ! Read data

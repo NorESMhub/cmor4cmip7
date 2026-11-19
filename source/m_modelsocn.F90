@@ -2019,9 +2019,15 @@ contains
     else
       if (lshiftgrid) then
         if (hcoord(1:1) == 'p') then
+          ! cmor_write expects contiguous data; fld(:,1:jj-1,:) is strided
+          ! when kk>1 (level stride jj, section stride jj-1), which shifts
+          ! every level by one j-row. Copy to a contiguous buffer first.
+          allocate(fldtmp2(ii,jj-1,kk))
+          fldtmp2 = fld(:,1:jj-1,:)
           error_flag = cmor_write( &
                        var_id=varid, &
-                       data=fld(:,1:jj-1,:))
+                       data=fldtmp2(:,:,:))
+          deallocate(fldtmp2)
         else if (hcoord(1:1) == 'u') then
           allocate(fldtmp2(ii,jj-1,kk))
           fldtmp2 = cshift(fld(:,1:jj-1,:), 1, 1)
@@ -2030,9 +2036,12 @@ contains
                        data=fldtmp2(:,:,:))
           deallocate(fldtmp2)
         else if (hcoord(1:1) == 'v') then
-           error_flag = cmor_write( &
-                        var_id=varid, &
-                        data=fld(:, 2:jj, :))
+          allocate(fldtmp2(ii,jj-1,kk))
+          fldtmp2 = fld(:,2:jj,:)
+          error_flag = cmor_write( &
+                       var_id=varid, &
+                       data=fldtmp2(:,:,:))
+          deallocate(fldtmp2)
         else
           write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
         end if
@@ -2158,12 +2167,17 @@ contains
       else
         if (lshiftgrid) then
           if (hcoord(1:1) == 'p') then
+            ! cmor_write expects contiguous data; fld(:,1:jj-1,:) is strided
+            ! when kk>1, which shifts every level by one j-row.
+            allocate(fldtmp2(ii,jj-1,kk))
+            fldtmp2 = fld(:,1:jj-1,:)
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=fld(:,1:jj-1,:), &
+                         data=fldtmp2(:,:,:), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
+            deallocate(fldtmp2)
           else if (hcoord(1:1) == 'u') then
             allocate(fldtmp2(ii,jj-1,kk))
             fldtmp2 = cshift(fld(:,1:jj-1,:), 1, 1)
@@ -2175,12 +2189,15 @@ contains
                          time_bnds=tbnds)
             deallocate(fldtmp2)
           else if (hcoord(1:1) == 'v') then
+            allocate(fldtmp2(ii,jj-1,kk))
+            fldtmp2 = fld(:,2:jj,:)
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=fld(:,2:jj,:), &
+                         data=fldtmp2(:,:,:), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
+            deallocate(fldtmp2)
           else
             write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
           end if

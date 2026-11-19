@@ -1396,6 +1396,8 @@ contains
     if (.not. fxflag) call json_get_tcoord(trim(tablepath), ovnm, tcoord)
 
     ! Call CMOR setup
+    ! DS: verbose must only change the verbosity, not the failure semantics:
+    ! exit_control is the same in both branches
     if (verbose) then
       if (createsubdirs) then
         error_flag = cmor_setup(inpath=trim(ibasedir), &
@@ -1412,10 +1414,12 @@ contains
       if (createsubdirs) then
         error_flag = cmor_setup(inpath=trim(ibasedir), &
                                 netcdf_file_action=CMOR_REPLACE_4, set_verbosity=CMOR_QUIET, &
+                                exit_control=CMOR_EXIT_ON_WARNING, &
                                 create_subdirectories=1)
       else
         error_flag = cmor_setup(inpath=trim(ibasedir), &
                                 netcdf_file_action=CMOR_REPLACE_4, set_verbosity=CMOR_QUIET, &
+                                exit_control=CMOR_EXIT_ON_WARNING, &
                                 create_subdirectories=0)
       end if
     end if

@@ -2078,17 +2078,7 @@ contains
 
     implicit none
 
-    integer :: i, j, k
     real(r4), allocatable, dimension(:, :, :)   :: fldtmp2
-
-    ! Set zero on ocean grid cells
-    do k = 1, kk
-      do j = 1, jj
-        do i = 1, ii
-          if (abs(fld(i, j, k)) > 2e20) fld(i, j, k) = 0.
-        end do
-      end do
-    end do
 
     ! Store variable
     if (vtype == '2d') then

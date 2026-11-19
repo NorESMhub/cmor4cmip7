@@ -525,12 +525,13 @@ contains
         end do
         fld = fldacc
 
-        ! Set ice free points to missing value
+        ! Set zero (land) points to missing value
       case ('zero2missing')
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
-              if (abs(fld(i, j, k)) < 1e-6) fld(i, j, k) = missing
+              if (pmask(i, j) == 0 .or. abs(fld(i, j, k)) < 1e-6) &
+                fld(i, j, k) = missing
             end do
           end do
         end do

@@ -370,6 +370,13 @@ contains
                 sealv, xvec, yvec, kvec, pbot, &
                 dpini, sini, tini, &
                 kvechalf, basin, stat=status)
+    if (status /= 0) &
+      write (*, *) 'WARNING: deallocation of the grid variables failed'
+
+    ! release the field buffers and the per-dataset helpers as well
+    if (allocated(fldtmp)) deallocate (fld, fld2, fldacc, fldtmp)
+    if (allocated(dp)) deallocate (dp)
+    if (allocated(dimensions)) deallocate (dimensions)
 
     if (allocated(idx)) deallocate (idx)
 

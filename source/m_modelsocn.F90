@@ -600,8 +600,17 @@ contains
             end do
           end do
         end do
-        rhoavg = rhoavg/volsum
-        fld(1, 1, 1) = volsum0/areaogs*(1-rhoavg/rhoavg0)
+        if (volsum > 0._r8) then
+          rhoavg = rhoavg/volsum
+        else
+          rhoavg = rhoavg0
+        end if
+        if (rhoavg0 > 0._r8 .and. areaogs > 0._r8) then
+          fld(1, 1, 1) = volsum0/areaogs*(1-rhoavg/rhoavg0)
+        else
+          write (*, *) 'ERROR: cannot compute zostoga, zero area/rhoavg0'
+          fld(1, 1, 1) = missing
+        end if
         if (verbose) then
           write(*,*) 'rhoavg:',rhoavg
           write(*,'(A, E23.15)') ' volsum:',volsum
@@ -1137,12 +1146,22 @@ contains
         end do
       end do
     end do
-    rhoavg0 = rhoavg0/volsum0
+    if (volsum0 > 0._r8) then
+      rhoavg0 = rhoavg0/volsum0
+    else
+      write (*, *) 'ERROR: initial global ocean volume is zero, check ', &
+        trim(griddata)//trim(ocninitfile)
+      stop
+    end if
     if (verbose) then
       write(*,*) 'rhoavg0:',rhoavg0
       write(*,*) 'volgs:',volgs
       write(*,'(A,E23.15)') 'volsum0:',volsum0
-      write(*,*) 'volsum0/areaogs:',volsum0/areaogs
+      if (areaogs > 0._r8) then
+        write(*,*) 'volsum0/areaogs:',volsum0/areaogs
+      else
+        write(*,*) 'WARNING: global ocean area is zero'
+      end if
     end if
 
   end subroutine read_gridinfo_ifile

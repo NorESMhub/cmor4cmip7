@@ -213,12 +213,27 @@ contains
       end if
 
       ! skip files beyond year1 - yearn (with one-year halo)
+      ! the year is the 4-digit field in front of the file suffix
+      ! (<case>.<tag>.<yyyy>.nc); if it cannot be parsed the file is skipped
       if (.not. scanallfiles) then
+        yyyy = -1
         idx = scan(fnam, ".", back=.true.)
-        str1 = fnam(1:idx - 1)
-        idx = scan(str1, ".", back=.true.)
-        str2 = str1(idx + 1:idx + 4)
-        read (str2, "(i4)") yyyy
+        if (idx > 1) then
+          str1 = trim(fnam(1:idx - 1))
+          idx = scan(str1, ".", back=.true.)
+          if (idx > 0 .and. len_trim(str1) >= idx + 4) then
+            str2 = str1(idx + 1:idx + 4)
+            read (str2, "(i4)", iostat=status) yyyy
+            if (status /= 0) yyyy = -1
+          end if
+        end if
+        if (yyyy < 0) then
+          if (verbose) write (*, *) &
+            'WARNING: no year in file name, skipped: '//trim(fnam)
+          nskip = nskip + 1
+          irecold = 0
+          cycle
+        end if
         if (yyyy < y1 - 1 .or. yyyy > y2 + 1) then
           nskip = nskip + 1
           irecold = 0
@@ -738,7 +753,11 @@ contains
         end do
       end do
     end do
-    rhoglb = rhoglb/pacc
+    if (pacc > 0.) then
+      rhoglb = rhoglb/pacc
+    else
+      rhoglb = missing
+    end if
 
   end subroutine calc_rho_glb
 

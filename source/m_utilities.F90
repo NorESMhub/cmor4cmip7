@@ -187,12 +187,26 @@ contains
     end if
 
     ! loop over files
-    open (funit, file=trim('filelist_'//cnam)//trim(membertag), form='formatted')
+    ! DS: the list file is created by the caller; open it read-only and fail
+    ! loudly if it is missing (the default status='unknown' would silently
+    ! create an empty list, i.e. pretend that there is no data at all)
+    open (funit, file=trim('filelist_'//cnam)//trim(membertag), form='formatted', &
+          status='old', action='read', iostat=status)
+    if (status /= 0) then
+      write (*, *) 'ERROR: cannot open file list '// &
+        trim('filelist_'//cnam)//trim(membertag)
+      stop 1
+    end if
 
     ! skip all files that have already been scanned
     do n = 1, nskip
       read (funit, '(a1024)', iostat=status) fnam
-      if (status /= 0) stop 'unexpected end of list file'
+      if (status /= 0) then
+        write (*, *) 'ERROR: unexpected end of file list '// &
+          trim('filelist_'//cnam)//trim(membertag)
+        close (funit)
+        stop 1
+      end if
     end do
 
     ! continue with files that have not yet been scanned

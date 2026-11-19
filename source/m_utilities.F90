@@ -252,7 +252,7 @@ contains
       units = ' '
       call handle_ncerror(nf90_get_att(ncid, rhid, 'units', units))
       call ncsevl(units, n, sstartend, size(sstartend))
-      ! the units attribute has to read '<unit> since <yyyy>-<mm>-<dd> ...';
+      ! DS: the units attribute has to read '<unit> since <yyyy>-<mm>-<dd> ...';
       ! ncsevl splits at ' ', '-' and ':', so the reference date is given by
       ! sub-strings 3, 4 and 5. If it cannot be determined, the file cannot be
       ! placed on the time axis and is skipped (before, the stale, saved
@@ -289,7 +289,8 @@ contains
       end if
       dnumhi = ndays
       call nccaln(trim(calendar), y1, m1, 1, yr, 1, 1, ndays)
-      toff = dnumlo - ndays
+      ! DS: dnumlo is exact, but the real->integer conversion must be explicit
+      toff = nint(dnumlo) - ndays
       ! Look for time bounds; accept both (bnds,time) and (time,bnds) order.
       ltimebnds = .false.
       ltrans = .false.

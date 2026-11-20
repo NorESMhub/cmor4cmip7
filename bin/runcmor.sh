@@ -69,7 +69,7 @@ case $runtype in
       ;;
     "debug")
       export LD_LIBRARY_PATH=/cluster/software/GCCcore/13.2.0/lib64:$LD_LIBRARY_PATH
-      run_command gdb --args ./cmor4cmip7 "$sysnml" "$modnml" "$expnml" "$varnml"
+      gdb --args ./cmor4cmip7 "$sysnml" "$modnml" "$expnml" "$varnml"
 esac
 
 echo "-------------------------------"

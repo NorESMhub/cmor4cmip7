@@ -1476,7 +1476,7 @@ contains
                 coord_vals=yvec)
       end if
 
-      !write(*, *) 'Define horizontal grid '//hcoord(1:1)
+      if (verbose) write(*, *) 'Define horizontal grid '//trim(hcoord)
       if (hcoord(1:1) == 'p') then
         if (lshiftgrid) then
           grdid = cmor_grid( &
@@ -1810,7 +1810,7 @@ contains
         write (*, *) 'ERROR: cmor_axis (horizontal) failed for ', trim(ovnm)
         stop
       end if
-      if (grdid < 0) then
+      if (grdid > 0) then
         write (*, *) 'ERROR: cmor_grid failed for ', trim(ovnm)
         stop
       end if

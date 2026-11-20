@@ -101,7 +101,6 @@ compound_names  =
     'ocean.zos.tavg-u-hxy-sea.mon.glb'
     'ocean.zossq.tavg-u-hxy-sea.mon.glb'
     'ocean.zostoga.tavg-u-hm-sea.mon.glb'
-!
     'ocnBgchem.calc.tavg-ols-hxy-sea.mon.glb'
     'ocnBgchem.calc.tavg-ol-hxy-sea.mon.glb'
     'ocnBgchem.chl.tavg-ols-hxy-sea.day.glb'

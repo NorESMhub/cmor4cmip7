@@ -925,8 +925,15 @@ contains
       status = nf90_get_var(ncid, rhid, region, (/1, 1/), (/slenmax2, rdm/))
       call handle_ncerror(status)
       region1 = ' '
+      ! region1 is declared with len=slenmax (m_namelists), which is unrelated
+      ! to the 'slenmax' dimension of the input file; copying the full file
+      ! width would write past the end of the strings
+      if (slenmax2 > len(region1)) then
+        write (*, *) 'WARNING: region names truncated to ', len(region1), &
+          ' characters (file uses ', slenmax2, ')'
+      end if
       do i = 1, rdm
-        do j = 1, slenmax2
+        do j = 1, min(slenmax2, len(region1))
           region1(i) (j:j) = region(j, i)
         end do
       end do
@@ -952,9 +959,14 @@ contains
       call handle_ncerror(status)
       !write(*, *) 'section:', section
       section1 = ' '
+      ! same for the section names: s1 is a slenmax-long scratch buffer
+      if (slenmax2 > len(s1)) then
+        write (*, *) 'WARNING: section names truncated to ', len(s1), &
+          ' characters (file uses ', slenmax2, ')'
+      end if
       do i = 1, sdm
         s1 = ' '
-        do j = 1, slenmax2
+        do j = 1, min(slenmax2, len(s1))
           s1(j:j) = section(j, i)
         end do
         if (trim(s1) == 'taiwan_and_luzon_straits') then

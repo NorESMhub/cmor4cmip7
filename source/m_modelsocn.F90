@@ -137,7 +137,9 @@ contains
     fnm = pomon
 
     ! filter only ocean variables, facilitate parallisation
-    n = count(realms == 'ocean' .or. realms == 'ocnBgchem')
+    ! only the first n_datasets entries of realms() are defined
+    n = count(realms(1:n_datasets) == 'ocean' .or. &
+              realms(1:n_datasets) == 'ocnBgchem')
     allocate (idx(n))
     k = 1
     do n = 1, n_datasets

@@ -159,7 +159,12 @@ contains
     parent_source_id = ' '
     exprefyear = 1
 
+    ! Initialise arrays. 
     compound_names = ''
+    branded_names = ''
+    realms = ''
+    frequencies = ''
+    regions = ''
 
     pomon = ''
 

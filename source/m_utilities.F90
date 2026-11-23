@@ -137,7 +137,7 @@ contains
     integer, save       :: n, nrec, unlimdimid, ncid, rhid, rhid2, &
                            status, sstartend(2, 10), nskip, irecold, toff, ndays
     integer             :: ndims_bnds, dimids_bnds(2), ndim1, ndim2
-    real(r8), save  :: dnumlo, dnumhi, tbndold(2) = (/-999999., -999999./)
+    real(r8), save      :: dnumlo, dnumhi, tbndold(2) = (/-999999., -999999./)
     logical, save       :: ltimebnds, ldone
     ! ltrans = "logical, transposed": set when the time-bounds variable of the
     ! current file is stored as (time,bnds) instead of the usual (bnds,time),

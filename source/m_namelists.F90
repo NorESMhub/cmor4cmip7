@@ -49,8 +49,7 @@ module m_namelists
   character(len=slenmax), save  :: history, comment
   integer, save                 :: exprefyear, year1, yearn, month1, monthn
   real(r8), save                :: branch_time
-  logical, save :: dry_run, plevdummy, readdummy, add_fill_day, scanallfiles
-  integer, save :: physics_version = 1, initialization_method = 1
+  logical, save                 :: scanallfiles
   ! CMIP7 DRS elements
   character(len=slenmax), save  :: activity_id, &
                                    mip_era, tracking_prefix, &
@@ -72,7 +71,7 @@ module m_namelists
     history, comment, &
     exprefyear, year1, yearn, month1, monthn, &
     branch_time, &
-    dry_run, plevdummy, readdummy, add_fill_day, scanallfiles, &
+    scanallfiles, &
     activity_id, parent_variant_label, parent_mip_era, mip_era, &
     parent_activity_id, &
     parent_time_units, tracking_prefix, variant_label, &
@@ -138,11 +137,6 @@ contains
     forcefilescan = .true.
     verbose = .true.
     deletejson = .true.
-    dry_run = .false.
-    plevdummy = .false.
-    readdummy = .false.
-    add_fill_day = .false.
-    !newcolumnorder= .true.
     scanallfiles = .true.
     tracking_prefix = 'hdl:21.14107'
 
@@ -326,8 +320,6 @@ contains
     write (*, *) ' end year         = ', yearn
     write (*, *) ' start month      = ', month1
     write (*, *) ' end month        = ', monthn
-!   write (*, *) ' add dummy day    = ', add_fill_day
-!   write (*, *) ' dry run          = ', dry_run
 
     write (*, *)
     print *, 'List of datasets to be CMORized:'

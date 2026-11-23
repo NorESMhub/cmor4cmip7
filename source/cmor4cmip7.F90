@@ -16,6 +16,10 @@ program main
    
   ! --- Initialise mpi
   call MPI_INIT(mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_INIT failed (ierror=', mpierror, ')'
+    stop 1
+  end if
 #endif
    
   ! --- Read namelists
@@ -24,6 +28,10 @@ program main
   ! --- Create file list if it does not exist
 #ifdef MPI
   call MPI_COMM_RANK(MPI_COMM_WORLD, mpirank, mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_COMM_RANK failed (ierror=', mpierror, ')'
+    stop 1
+  end if
   if (mpirank .eq. 0) then
 #endif
     if (verbose) call print_namelists
@@ -70,6 +78,10 @@ program main
 #ifdef MPI
   end if
   call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_BARRIER failed (ierror=', mpierror, ')'
+    stop 1
+  end if
 #endif
    
   ! --- Run cmor processing for individual components
@@ -81,7 +93,15 @@ program main
    
 #ifdef MPI
   call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_BARRIER failed (ierror=', mpierror, ')'
+    stop 1
+  end if
   call MPI_COMM_RANK(MPI_COMM_WORLD, mpirank, mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_COMM_RANK failed (ierror=', mpierror, ')'
+    stop 1
+  end if
   if (mpirank .eq. 0) then
 #endif
   call system('rm '//trim('filelist_'//casename)//trim(membertag))
@@ -94,6 +114,10 @@ program main
   end if
   ! --- Finalise mpi
   call MPI_FINALIZE(mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_FINALIZE failed (ierror=', mpierror, ')'
+    stop 1
+  end if
 #endif
 
 end program main

@@ -243,23 +243,34 @@ contains
       'WARNING: compound_names not in namelist file.'
     close (funit)
 
+    ! compound_names entries have the form
+    !   <realm>.<branded_base>.<branded_suffix>.<frequency>.<region>
+    ! e.g. 'ocean.agessc.tavg-ol-hxy-sea.mon.glb'. The fields are split off
+    ! with index(); when a separator is missing index() returns 0 and the old
+    ! code then took substring (1:-1) (a legal empty string) and shifted every
+    ! following field, so a typo silently produced a dataset with an empty
+    ! realm or a wrong region instead of an error.
     n_datasets = 0
     do n = 1, rowmax
       nstr = len_trim(compound_names(n))
       if (nstr /= 0) then
         substr = compound_names(n)
         pos = index(substr, '.')
+        if (pos <= 1) call bad_compound(n)
         realms(n) = substr(1:pos - 1)
         substr = substr(pos + 1:nstr)
         pos = index(substr, '.')
+        if (pos <= 1) call bad_compound(n)
         tmpstr = substr(1:pos - 1)
         substr = substr(pos + 1:nstr)
         pos = index(substr, '.')
+        if (pos <= 1) call bad_compound(n)
         branded_names(n) = trim(tmpstr)//'_'//substr(1:pos - 1)
         substr = substr(pos + 1:nstr)
         pos = index(substr, '.')
+        if (pos <= 1 .or. pos >= len_trim(substr)) call bad_compound(n)
         frequencies(n) = substr(1:pos - 1)
-        regions(n) = substr(pos + 1:nstr)
+        regions(n) = substr(pos + 1:)
         n_datasets = n_datasets + 1
       else
         exit
@@ -274,6 +285,27 @@ contains
     ! Modify output path. The directory itself is created by the caller
     ! (cmor4cmip7.F90), so that under MPI only rank 0 creates it.
     obasedir = trim(obasedir)//'/'//trim(osubdir)
+
+  contains
+
+    ! -----------------------------------------------------------------
+
+    subroutine bad_compound(idx)
+
+      ! A malformed compound_names entry cannot be interpreted, and guessing
+      ! would CMORize the wrong quantities into the wrong realm, so stop with
+      ! a message that names the entry.
+
+      implicit none
+
+      integer, intent(in) :: idx
+
+      write (*, *) 'ERROR: malformed compound_names entry, expected'
+      write (*, *) '       <realm>.<branded_base>.<branded_suffix>.<frequency>.<region>'
+      write (*, *) '       entry ', idx, ': '//trim(compound_names(idx))
+      stop 1
+
+    end subroutine bad_compound
 
   end subroutine read_namelists
 

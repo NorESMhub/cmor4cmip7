@@ -1,7 +1,7 @@
 program main
    
   use m_namelists, only: verbose, read_namelists, print_namelists, &
-    ibasedir, casename, forcefilescan, membertag
+    ibasedir, obasedir, casename, forcefilescan, membertag
   !use m_modelsatm, only: atm2cmor
   !use m_modelslnd, only: lnd2cmor
   !use m_modelsice, only: ice2cmor
@@ -35,6 +35,9 @@ program main
   if (mpirank .eq. 0) then
 #endif
     if (verbose) call print_namelists
+    ! Create the output directory once, on rank 0 only
+    ! makes the directory visible to all ranks before CMOR starts.
+    call execute_command_line('mkdir -p '//trim(obasedir))
     inquire(file='filelist_'//trim(casename)//trim(membertag), &
       exist=fileexists)
     if (.not. fileexists .or. forcefilescan) then

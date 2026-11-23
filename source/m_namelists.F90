@@ -271,9 +271,9 @@ contains
     if (len_trim(isubdir) > 0) &
       ibasedir = trim(ibasedir)//'/'//trim(isubdir)
 
-    ! Modify output path and create output folder
+    ! Modify output path. The directory itself is created by the caller
+    ! (cmor4cmip7.F90), so that under MPI only rank 0 creates it.
     obasedir = trim(obasedir)//'/'//trim(osubdir)
-    call execute_command_line('mkdir -p '//trim(obasedir))
 
   end subroutine read_namelists
 

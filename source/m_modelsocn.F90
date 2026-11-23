@@ -75,7 +75,8 @@ contains
 
     logical :: badrec
     integer :: k, m, n
-    character(len=slenmax), dimension(5) :: itags
+    ! one entry per tag scanned below; keep size and constructor in step
+    character(len=slenmax), dimension(6) :: itags
 
     ! rmax: maximum number of records;
     ! initial value 120, corresponds to 10-year of monthly data, and 
@@ -104,7 +105,8 @@ contains
     call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
 #endif
 
-    itags = [tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday]
+    ! annual, monthly and daily files, for the physical and the bgc ocean:
+    itags = [tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc]
 
     do n = 1, size(itags)
       itag = itags(n)

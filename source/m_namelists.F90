@@ -203,8 +203,14 @@ contains
     !end if
     !end if
 
+    ! NB: remove restrictions on line length in the open statements below. 
+    ! no RECL= on these opens. For a formatted sequential file RECL is the
+    ! maximum record (line) length in characters, so a value of 200 silently
+    ! limits every namelist to short lines; a long compound_names/branded
+    ! names list is then read truncated (or rejected) without a clear error.
     funit = get_free_unit()
-    open (funit, file=trim(nmlfpsys), status='old', action='read', recl=200)
+   !open (funit, file=trim(nmlfpsys), status='old', action='read', recl=200)
+    open (funit, file=trim(nmlfpsys), status='old', action='read')
     read (funit, nml=sys, iostat=istatus)
     close (funit)
     if (istatus /= 0) then
@@ -214,7 +220,7 @@ contains
     griddata = trim(griddata)//'/'
     tabledir = trim(tabledir)//'/'
 
-    open (funit, file=trim(nmlfpmod), status='old', action='read', recl=200)
+    open (funit, file=trim(nmlfpmod), status='old', action='read')
     read (funit, nml=model, iostat=istatus)
     close (funit)
     if (istatus /= 0) then
@@ -222,7 +228,7 @@ contains
       stop
     end if
 
-    open (funit, file=trim(nmlfpexp), status='old', action='read', recl=200)
+    open (funit, file=trim(nmlfpexp), status='old', action='read')
     read (funit, nml=experiment, iostat=istatus)
     close (funit)
     if (istatus /= 0) then
@@ -230,7 +236,7 @@ contains
       stop
     end if
 
-    open (funit, file=trim(nmlfpvar), status='old', action='read', recl=200)
+    open (funit, file=trim(nmlfpvar), status='old', action='read')
     read (funit, nml=variables, iostat=istatus)
     !rewind(funit)
     if (istatus /= 0) write (*, *) &

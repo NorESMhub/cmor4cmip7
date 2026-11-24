@@ -166,8 +166,11 @@ contains
         call jsonc%info(child_ptr, name=key_name)
         keys(i) = key_name
       end do
-!   else
-!     if (verbose) write(*,*) "Warning: '"//trim(path)//"' not found in JSON."
+    else
+      ! The path is missing. Return an empty (but allocated) array, so that a
+      ! caller which forgets to test lfound sees size(keys) == 0 instead of
+      ! reading an unallocated array.
+      allocate (keys(0))
     end if
 
     call jsonf%destroy()
@@ -204,6 +207,9 @@ contains
     call json%destroy()
     !if (.not. found) write(*,*) "Warning: value of "//trim(path)//" in "//trim(fnm)//" not found"
 
+    ! str is INTENT(OUT), so it is undefined on entry when the key is missing;
+    ! return a blank string instead of leaving the caller's value undefined.
+    str = ''
     if (found) then
       str = cval
       deallocate (cval)
@@ -260,6 +266,9 @@ contains
     end if
     call json%load_file(filename=trim(fnm))
     if (json%failed()) stop "Error: Could not load JSON file: "//fnm
+    ! deterministic result when the key is missing (e.g. a source listed in
+    ! "sources" without a numeric factor)
+    scalar = 1.0d0
     call json%get(path, scalar, found)
     call json%destroy()
 
@@ -307,6 +316,10 @@ contains
     character(len=slenmax), dimension(:), allocatable :: cval
     logical :: found
 
+    ! str is INTENT(OUT): make sure it is defined even when the table has no
+    ! matching coordinate (or no dimensions at all)
+    str = ''
+
     if (present(separator)) then
       call json%initialize(path_separator=trim(separator))
     else
@@ -351,6 +364,10 @@ contains
     integer :: k, pdm
     character(len=slenmax), dimension(:), allocatable :: cval
     logical         :: found
+
+    ! str is INTENT(OUT): make sure it is defined even when the table has no
+    ! matching coordinate (or no dimensions at all)
+    str = ''
 
     if (present(separator)) then
       call json%initialize(path_separator=trim(separator))

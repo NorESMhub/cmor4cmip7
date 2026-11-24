@@ -74,8 +74,7 @@ contains
     implicit none
 
     logical :: badrec
-    integer :: k, m, n
-    ! one entry per tag scanned below; keep size and constructor in step
+    integer :: k, m, n, ntag
     character(len=slenmax), dimension(6) :: itags
 
     ! rmax: maximum number of records;
@@ -105,20 +104,38 @@ contains
     call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
 #endif
 
-    ! annual, monthly and daily files, for the physical and the bgc ocean:
-    itags = [tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc]
+    ! Check the needed file tags
+    itags = ''
+    itags(1) = tagomon    ! impulsory as the gridinfo is read from it
+    ntag = 1
+    do m = 1, n_datasets
+      if (realms(m) /= 'ocean' .and. realms(m) /= 'ocnBgchem') cycle
+      itag = ''
+      call set_ocn_tag(trim(realms(m)), trim(frequencies(m)), itag)
+      if (len_trim(itag) == 0) cycle      ! 'fx': read from griddata, no tag
+      if (any(itags(1:ntag) == itag)) cycle
+      ntag = ntag + 1
+      itags(ntag) = itag
+    end do
 
-    do n = 1, size(itags)
+    do n = 1, ntag
       itag = itags(n)
       call scan_files(reset=.true.)
 
-      if (verbose) write(*,*) 'found fnm: ', trim(fnm)
       if (len_trim(fnm) == 0) then
         if (verbose) write (*, *) &
-          'WARNING: no file found for case dir|tag|year1|month1|yearn|monthn: ', &
-          trim(ibasedir)//'/'//trim(casename), '|', trim(itag), '|', &
-          year1, '|', month1, '|', yearn, '|', monthn
+#ifdef MPI
+          if (mpirank .eq. 0) then
+#endif
+            'WARNING: no file found for case dir|tag|year1|month1|yearn|monthn: ', &
+            trim(ibasedir)//'/'//trim(casename), '|', trim(itag), '|', &
+            year1, '|', month1, '|', yearn, '|', monthn
         !cycle
+#ifdef MPI
+          end if
+#endif
+      else
+        if (verbose) write (*, *) 'input file for tag ', trim(itag), ':', trim(fnm)
       end if
     end do
 
@@ -220,6 +237,11 @@ contains
         allocate(factors(size(sources)))
         do k = 1, size(sources)
           call json_get_factor(trim(mapfile), trim(cvnm), sources(k), factors(k), lfound=found)
+          if (.not. found) then
+            write(*,*) 'ERROR: no factor for source ', trim(sources(k)), &
+                       ' of ', trim(cvnm), ' in mapfile'
+            cycle main_loop
+          end if
         end do
       else
         allocate(sources(1))
@@ -238,6 +260,10 @@ contains
       ! read dimensions
       call json_get_array_string(trim(tabledir)//trim(table), 'variable_entry.'//trim(bvnm)// &
                                  '.dimensions', dimensions, lfound=found)
+      if (.not. found) then
+        write(*,*) 'ERROR: no dimensions in CMOR table for ', trim(bvnm)
+        cycle main_loop
+      end if
       dims = dimensions(1)
       do k = 2, size(dimensions)
         dims = trim(dims)//","//trim(dimensions(k))
@@ -2437,6 +2463,8 @@ contains
     character(len=*), intent(in) :: realm, frequency
     character(len=*), intent(out) :: itag
 
+    itag = ''
+
     select case (frequency)
     case ('mon')
       if (realm == 'ocean') itag = tagomon
@@ -2448,9 +2476,11 @@ contains
       if (realm == 'ocean') itag = tagoyr
       if (realm == 'ocnBgchem') itag = tagoyrbgc
     case ('fx')
+      itag = ''
     case default
       write(*,*) 'Error: Unknown realm and frequency: '
       write(*,*) trim(realm), ': ', trim(frequency)
+      stop 1
     end select
 
   end subroutine set_ocn_tag

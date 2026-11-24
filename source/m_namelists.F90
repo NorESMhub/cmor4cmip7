@@ -169,44 +169,39 @@ contains
     pomon = ''
 
     ! Read namelists
-    if (iargc() /= 4) then
-      write (*, *) 'Usage: cmor4cmip7 <system nml-file> <model nml-file>'// &
+    if (command_argument_count() /= 4) then
+      write (*, *) 'Usage: cmor4cmip7 <system nml-file> <model nml-file> '// &
         '<exp nml-file> <variable nml-file>'
       stop
     end if
-    !else if (iargc() == 4 .or. iargc() == 5) then
     nmlfpsys = ' '
-    call getarg(1, nmlfpsys)
+    call get_command_argument(1, nmlfpsys)
     inquire (file=trim(nmlfpsys), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpsys)
       stop
     end if
     nmlfpmod = ' '
-    call getarg(2, nmlfpmod)
+    call get_command_argument(2, nmlfpmod)
     inquire (file=trim(nmlfpmod), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpmod)
       stop
     end if
     nmlfpexp = ' '
-    call getarg(3, nmlfpexp)
+    call get_command_argument(3, nmlfpexp)
     inquire (file=trim(nmlfpexp), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpexp)
       stop
     end if
     nmlfpvar = ' '
-    call getarg(4, nmlfpvar)
+    call get_command_argument(4, nmlfpvar)
     inquire (file=trim(nmlfpvar), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpvar)
       stop
     end if
-    !if (iargc() == 5) then
-    !call getarg(5, vsingle)
-    !end if
-    !end if
 
     ! NB: remove restrictions on line length in the open statements below. 
     ! no RECL= on these opens. For a formatted sequential file RECL is the

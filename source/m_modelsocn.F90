@@ -123,17 +123,17 @@ contains
       call scan_files(reset=.true.)
 
       if (len_trim(fnm) == 0) then
+#ifdef MPI
+        if (mpirank .eq. 0) then
+#endif
         if (verbose) write (*, *) &
+          'WARNING: no file found for case dir|tag|year1|month1|yearn|monthn: ', &
+          trim(ibasedir)//'/'//trim(casename), '|', trim(itag), '|', &
+          year1, '|', month1, '|', yearn, '|', monthn
 #ifdef MPI
-          if (mpirank .eq. 0) then
+        end if
 #endif
-            'WARNING: no file found for case dir|tag|year1|month1|yearn|monthn: ', &
-            trim(ibasedir)//'/'//trim(casename), '|', trim(itag), '|', &
-            year1, '|', month1, '|', yearn, '|', monthn
         !cycle
-#ifdef MPI
-          end if
-#endif
       else
         if (verbose) write (*, *) 'input file for tag ', trim(itag), ':', trim(fnm)
       end if

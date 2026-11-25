@@ -21,7 +21,8 @@ contains
 #endif
 
     character(len=*), intent(in) :: grid_label, grid_resolution, varname
-    character :: yyyymm1*6, yyyymm2*6, c2*2, r3*3
+    character :: yyyymm1*6, yyyymm2*6, r3*3
+    character(len=8) :: crank
     type(json_core) :: json
     type(json_value), pointer :: p
 
@@ -111,14 +112,20 @@ contains
     write (yyyymm2, '(I4.4,I2.2)') yearn, monthn
 #ifdef MPI
     call mpi_comm_rank(mpi_comm_world, mpirank, mpierror)
-    write (c2, '(I2.2)') mpirank
+    ! two-digit names as before for ranks < 100; I2.2 cannot represent larger
+    ! ranks and used to write '**', so all of those ranks shared one file
+    if (mpirank < 100) then
+      write (crank, '(I2.2)') mpirank
+    else
+      write (crank, '(I0)') mpirank
+    end if
 #else
-    c2 = '00'
+    crank = '00'
 #endif
 
     json_file_attributes = 'attributes_'//trim(casename)//'_'// &
                            trim(varname)//'_'//yyyymm1//'-'//yyyymm2//'_'// &
-                           trim(variant_label)//'_'//c2//'.json'
+                           trim(variant_label)//'_'//trim(crank)//'.json'
     call json%print(p, json_file_attributes)
     call json%destroy(p)            ! cleanup
     !write(*, *) 'json-namelist file: ', trim(json_file_attributes)

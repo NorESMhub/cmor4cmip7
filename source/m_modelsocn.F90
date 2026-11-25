@@ -1663,7 +1663,7 @@ contains
               table_entry='op20bar', &
               units='bar', &
               length=1, &
-              coord_vals=(/20./))
+              coord_vals=(/20.2/))
              !coord_vals=(/20./), &     ! omit bounds;
              !cell_bounds=(/20., 20./)) ! value close to 200m at hybrid coordinate.
     else if (vtype == 'ols') then

@@ -515,7 +515,7 @@
         "ocnBgchem.dissi13c.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "dissic13lvl"
         },
-        "ocnBgchem.dissic.tavg-ols-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.dissic.tavg-ols-hxy-sea.mon.glb": {
             "original_name": "srfdissic"
         },
         "ocnBgchem.dissic.tavg-ol-hxy-sea.mon.glb": {
@@ -675,7 +675,7 @@
         "ocnBgchem.froc.tavg-u-hxy-sea.mon.glb": {
             "original_name": "carflx_bot"
         },
-        "ocnBgchem.intdic.tavg-u-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.intdic.tavg-u-hxy-sea.mon.glb": {
             "original_name": "dissiclvl)",
             "sources": {
                 "dissiclvl": 0.012
@@ -686,7 +686,7 @@
             "history": "intdic = int(dissiclvl*12/1000)_z",
             "comment": "Vertical sum of dissiclvl*12/1000"
         },
-        "ocnBgchem.intdoc.tavg-u-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.intdoc.tavg-u-hxy-sea.mon.glb": {
             "original_name": "dissoclvl",
             "sources": {
                 "dissoclvl": 1.464
@@ -697,7 +697,7 @@
             "history": "intdoc [kg C m-2] = sum_z(dissoclvl[mol P m-2]*122*12/1000)",
             "comment": "conversion of [mol P m-2] to [kg C m-2], where 122 converts from P->C using the model redfield-ratio, 12 converts from mol-g, and division by 1000 converts from g->kg"
         },
-        "ocnBgchem.intpn2.tavg-u-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.intpn2.tavg-u-hxy-sea.mon.glb": {
             "original_name": "nfixint"
         },
         "ocnBgchem.intpoc.tavg-u-hxy-sea.day.glb": {
@@ -708,7 +708,7 @@
             "history": "intpoc[kg C m-2] = intpoc[mol P m-2]*122*12/1000",
             "comment": "conversion of [mol P m-2] to [kg C m-2], where 122 converts from P->C using the model redfield-ratio, 12 converts from mol-g, and division by 1000 converts from g->kg"
         },
-        "ocnBgchem.intpoc.tavg-u-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.intpoc.tavg-u-hxy-sea.mon.glb": {
             "original_name": "intpoc",
             "sources": {
                 "intpoc": 1.464
@@ -752,7 +752,7 @@
         "ocnBgchem.ph.tavg-ols-hxy-sea.day.glb": {
             "original_name": "srfph"
         },
-        "ocnBgchem.ph.tavg-ols-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.ph.tavg-ols-hxy-sea.mon.glb": {
             "original_name": "srfph"
         },
         "ocnBgchem.ph.tavg-ol-hxy-sea.mon.glb": {
@@ -815,7 +815,7 @@
         "ocnBgchem.talk.tavg-ol-hxy-sea.mon.glb": {
             "original_name": "talklvl"
         },
-        "ocnBgchem.zooc.tavg-ols-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.zooc.tavg-ols-hxy-sea.mon.glb": {
             "original_name": "zooclvl",
             "sources": {
                 "zooclvl": 122.0

@@ -96,8 +96,19 @@ contains
       call json%add(p, 'parent_activity_id', trim(parent_activity_id))
       call json%add(p, 'parent_experiment_id', trim(parent_experiment_id))
       call json%add(p, 'parent_mip_era', trim(parent_mip_era))
-      if (len_trim(parent_source_id) < 3) parent_source_id = source_id
-      call json%add(p, 'parent_source_id', trim(parent_source_id))
+      ! parent_source_id defaults to source_id (parent and child are normally
+      ! the same model). The namelist variable itself is left untouched — it
+      ! used to be overwritten here, which also changed what print_namelists
+      ! reported; and a non-empty but implausibly short value is reported
+      ! instead of silently replaced.
+      if (len_trim(parent_source_id) >= 3) then
+        call json%add(p, 'parent_source_id', trim(parent_source_id))
+      else
+        if (len_trim(parent_source_id) > 0) write (*, *) &
+          'WARNING: parent_source_id "'//trim(parent_source_id)// &
+          '" is too short, using '//trim(source_id)
+        call json%add(p, 'parent_source_id', trim(source_id))
+      end if
       call json%add(p, 'parent_time_units', trim(parent_time_units))
       call json%add(p, 'parent_variant_label', trim(parent_variant_label))
     end if

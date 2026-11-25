@@ -236,6 +236,17 @@ contains
       stop
     end if
 
+    ! sanity check on the experiment period.
+    if (year1 < 1 .or. yearn < year1 .or. &
+        month1 < 1 .or. month1 > 12 .or. monthn < 1 .or. monthn > 12 .or. &
+        (year1 == yearn .and. monthn < month1)) then
+      write (*, *) 'ERROR: invalid period in the experiment namelist '// &
+        trim(nmlfpexp)
+      write (*, *) '       year1, month1, yearn, monthn = ', &
+        year1, month1, yearn, monthn
+      stop 1
+    end if
+
     open (funit, file=trim(nmlfpvar), status='old', action='read')
     read (funit, nml=variables, iostat=istatus)
     !rewind(funit)

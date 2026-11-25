@@ -233,7 +233,10 @@ contains
         cycle main_loop
       end if
       call json_get_sources(trim(mapfile), trim(cvnm), sources, lfound=found)
-      if (found) then
+      ! json_get_keys always returns an allocated array — size 0 when the key
+      ! is missing or the object is empty — so the fallback below must
+      ! deallocate it first (it used to be left unallocated when missing).
+      if (found .and. size(sources) > 0) then
         allocate(factors(size(sources)))
         do k = 1, size(sources)
           call json_get_factor(trim(mapfile), trim(cvnm), sources(k), factors(k), lfound=found)
@@ -244,6 +247,8 @@ contains
           end if
         end do
       else
+        ! no sources listed: the original name with factor 1
+        deallocate(sources)
         allocate(sources(1))
         allocate(factors(1))
         sources(1) = trim(original_name)

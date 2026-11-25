@@ -52,8 +52,9 @@ module m_namelists
   logical, save                 :: scanallfiles
   ! CMIP7 DRS elements
   character(len=slenmax), save  :: activity_id, &
-                                   mip_era, tracking_prefix, &
-                                   variant_label
+                                   mip_era, tracking_prefix
+  ! derived from the four index strings in read_namelists, not a namelist entry
+  character(len=slenmax), save  :: variant_label
   character(len=slenmax), save  :: forcing_index, physics_index, realization_index, &
                                    initialization_index
   ! conditionally required global attributes
@@ -74,7 +75,7 @@ module m_namelists
     scanallfiles, &
     activity_id, parent_variant_label, parent_mip_era, mip_era, &
     parent_activity_id, &
-    parent_time_units, tracking_prefix, variant_label, &
+    parent_time_units, tracking_prefix, &
     branch_time_in_child, branch_time_in_parent, &
     forcing_index, physics_index, realization_index, initialization_index
 
@@ -177,6 +178,20 @@ contains
     membertag = ' '
     parent_source_id = ' '
     exprefyear = 1
+
+    ! CMIP7 DRS elements and conditionally required attributes.
+    activity_id = ' '
+    mip_era = ' '
+    realization_index = ' '
+    initialization_index = ' '
+    physics_index = ' '
+    forcing_index = ' '
+    parent_activity_id = ' '
+    parent_mip_era = ' '
+    parent_time_units = ' '
+    parent_variant_label = ' '
+    branch_time_in_child = 0.0
+    branch_time_in_parent = 0.0
 
     ! Initialise arrays. 
     compound_names = ''
@@ -321,7 +336,10 @@ contains
       end if
     end do
 
-!   variant_label=realization_index//initialization_index//physics_index//forcing_index
+    ! variant_label is the r<i>i<i>p<i>f<i> string built from the four index strings
+    variant_label = trim(realization_index)//trim(initialization_index)// &
+                    trim(physics_index)//trim(forcing_index)
+
     ! Extend input path if necessary
     if (len_trim(isubdir) > 0) &
       ibasedir = with_slash(ibasedir)//trim(isubdir)

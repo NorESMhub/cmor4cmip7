@@ -187,7 +187,13 @@ contains
 
       write(*,*) ''
       write(*, *) '--- ', trim(cvnm), ' ---'
-      if (verbose) write(*,*) 'CMOR table: ',trim(table)
+      if (verbose) then
+        write(*,*) 'CMOR table: ',trim(table)
+        write(*,*) 'frequency: ',trim(frequency)
+        write(*,*) 'reigion_label: ',trim(region_label)
+        write(*,*) 'horizontal_label: ',trim(horizontal_label)
+        write(*,*) 'table: ',trim(table)
+      end if
 
       ! Initialize variable attributes
       vpositive = ''
@@ -256,6 +262,22 @@ contains
         sources(1) = trim(original_name)
         factors(1) = 1.0
       end if
+
+      ! Arakawa horizontal grid of the model variable: 'p', 'u' or 'v'. It is
+      ! taken from the mapfile when given (authoritative); open_ofile falls
+      ! back to the file's 'coordinates' attribute, then to the name's first
+      ! letter (which is wrong for e.g. volgs, a 'p' variable starting with v).
+      call json_get_hcoord(trim(mapfile), trim(cvnm), hcoord, lfound=found)
+      if (found) then
+        if (hcoord(1:1) /= 'p' .and. hcoord(1:1) /= 'u' .and. &
+            hcoord(1:1) /= 'v' .and. hcoord(1:1) /= 'q') then
+          write (*, *) 'ERROR: invalid hcoord "', trim(hcoord), &
+            '" in mapfile for ', trim(cvnm), ' (expected p, u or v)'
+          cycle main_loop
+        end if
+        if (verbose) write (*, *) 'horizontal grid from mapfile: ', trim(hcoord(1:1))
+      end if
+
       ivnm = sources(1)
 
       if (verbose) then
@@ -1429,11 +1451,15 @@ contains
               fldtmp(ii, jj, kk), stat=status)
     if (status /= 0) stop 'cannot ALLOCATE enough memory (4)'
 
-    status = nf90_get_att(ncid, rhid, 'coordinates', hcoord)
-    if (status /= nf90_noerr) hcoord(1:1) = ivnm(1:1)
-    if (hcoord(1:1) .ne. 'p' .and. hcoord(1:1) .ne. 'u' .and. &
-        hcoord(1:1) .ne. 'v' .and. hcoord(1:1) .ne. 'q') then
-      hcoord(1:1) = 'p'
+    if (len_trim(hcoord) == 0) then
+      ! not given in the mapfile: take it from the file's 'coordinates'
+      ! attribute (e.g. "ulon ulat"), else from the name's first letter
+      status = nf90_get_att(ncid, rhid, 'coordinates', hcoord)
+      if (status /= nf90_noerr) hcoord(1:1) = ivnm(1:1)
+      if (hcoord(1:1) .ne. 'p' .and. hcoord(1:1) .ne. 'u' .and. &
+          hcoord(1:1) .ne. 'v' .and. hcoord(1:1) .ne. 'q') then
+        hcoord(1:1) = 'p'
+      end if
     end if
     if (verbose) write(*,*) 'C-grid point: ',hcoord(1:1)
 

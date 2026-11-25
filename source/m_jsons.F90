@@ -439,7 +439,6 @@ contains
 
   ! -----------------------------------------------------------------
   subroutine json_get_units(tnm, vnm, str, lfound)
-
     character(len=*), intent(in)  :: tnm, vnm
     character(len=*), intent(out) :: str
     logical, intent(out), optional :: lfound
@@ -449,6 +448,22 @@ contains
                           '.units', str, separator='.', lfound=lfound)
 
   end subroutine json_get_units
+
+  ! -----------------------------------------------------------------
+  subroutine json_get_hcoord(tnm, vnm, str, lfound)
+
+    ! Arakawa horizontal grid of the model variable: 'p', 'u' or 'v'.
+    ! Optional per-variable mapfile key 'arakawa_grid_point'; the caller falls
+    ! back to the file's 'coordinates' attribute when it is absent.
+
+    character(len=*), intent(in)  :: tnm, vnm
+    character(len=*), intent(out) :: str
+    logical, intent(out), optional :: lfound
+
+    call json_get_val_str(trim(tnm), 'variable_entry:'//trim(vnm)// &
+                          ':arakawa_grid_point', str, separator=':', lfound=lfound)
+
+  end subroutine json_get_hcoord
 
   ! -----------------------------------------------------------------
   subroutine json_get_sources(fnm, vnm, keys, lfound)

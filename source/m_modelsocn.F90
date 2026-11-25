@@ -181,6 +181,7 @@ contains
       cvnm = trim(compound_names(idx(n)))
       frequency = trim(frequencies(idx(n)))
       region_label = trim(regions(idx(n)))
+      horizontal_label = trim(horizontal_labels(idx(n)))
       ovnm = bvnm
       table = 'CMIP7_'//trim(realm)//'.json'
 
@@ -1480,7 +1481,19 @@ contains
     ! Define output dataset
     grid_label = ocngrid_label
     if (hcoord(1:1) == 'p') then
-      grid_label = 'g202'
+      if (horizontal_label == 'hm') then
+        grid_label = 'g010'
+      else if (horizontal_label == 'ht') then
+        if (dims == 'oline,time') then
+          grid_label = 'g014'
+        else
+          grid_label = 'g262'   ! e.g.,  dims = 'gridlatitude,olevel,basin,time'
+        end if
+      else if (horizontal_label == 'hyb') then
+        grid_label = 'g262'
+      else
+        grid_label = 'g202'
+      end if
     else if (hcoord(1:1) == 'u') then
       grid_label = 'g241'
     else if (hcoord(1:1) == 'v') then

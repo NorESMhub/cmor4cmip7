@@ -1,7 +1,7 @@
 program main
    
   use m_namelists, only: verbose, read_namelists, print_namelists, &
-    ibasedir, casename, forcefilescan, membertag
+    ibasedir, obasedir, casename, forcefilescan, membertag
   !use m_modelsatm, only: atm2cmor
   !use m_modelslnd, only: lnd2cmor
   !use m_modelsice, only: ice2cmor
@@ -16,6 +16,10 @@ program main
    
   ! --- Initialise mpi
   call MPI_INIT(mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_INIT failed (ierror=', mpierror, ')'
+    stop 1
+  end if
 #endif
    
   ! --- Read namelists
@@ -24,9 +28,16 @@ program main
   ! --- Create file list if it does not exist
 #ifdef MPI
   call MPI_COMM_RANK(MPI_COMM_WORLD, mpirank, mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_COMM_RANK failed (ierror=', mpierror, ')'
+    stop 1
+  end if
   if (mpirank .eq. 0) then
 #endif
     if (verbose) call print_namelists
+    ! Create the output directory once, on rank 0 only
+    ! makes the directory visible to all ranks before CMOR starts.
+    call execute_command_line('mkdir -p '//trim(obasedir))
     inquire(file='filelist_'//trim(casename)//trim(membertag), &
       exist=fileexists)
     if (.not. fileexists .or. forcefilescan) then
@@ -70,6 +81,10 @@ program main
 #ifdef MPI
   end if
   call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_BARRIER failed (ierror=', mpierror, ')'
+    stop 1
+  end if
 #endif
    
   ! --- Run cmor processing for individual components
@@ -81,7 +96,15 @@ program main
    
 #ifdef MPI
   call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_BARRIER failed (ierror=', mpierror, ')'
+    stop 1
+  end if
   call MPI_COMM_RANK(MPI_COMM_WORLD, mpirank, mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_COMM_RANK failed (ierror=', mpierror, ')'
+    stop 1
+  end if
   if (mpirank .eq. 0) then
 #endif
   call system('rm '//trim('filelist_'//casename)//trim(membertag))
@@ -94,6 +117,10 @@ program main
   end if
   ! --- Finalise mpi
   call MPI_FINALIZE(mpierror)
+  if (mpierror /= MPI_SUCCESS) then
+    write (*, *) 'ERROR: MPI_FINALIZE failed (ierror=', mpierror, ')'
+    stop 1
+  end if
 #endif
 
 end program main

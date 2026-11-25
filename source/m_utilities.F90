@@ -3,7 +3,8 @@ module m_utilities
   use netcdf
   use m_namelists, only: itag, verbose, ibasedir, slenmax, r4, r8, eps, missing, &
     casename, fnm, year1, month1, yearn, monthn, exprefyear, rec, tval, &
-    tbnd, mbnd, year, month, forcefilescan, funit, scanallfiles, membertag
+    tbnd, mbnd, year, month, forcefilescan, funit, scanallfiles, membertag, &
+    ltimebnds
 
   implicit none
 
@@ -136,8 +137,27 @@ contains
     character(len=1024)         :: units, calendar
     integer, save       :: n, nrec, unlimdimid, ncid, rhid, rhid2, &
                            status, sstartend(2, 10), nskip, irecold, toff, ndays
-    real(r8), save  :: dnumlo, dnumhi, tbndold(2) = (/-999999., -999999./)
-    logical, save       :: ltimebnds, ldone
+    integer             :: ndims_bnds, dimids_bnds(2), ndim1, ndim2
+    real(r8), save      :: dnumlo, dnumhi, tbndold(2) = (/-999999., -999999./)
+    logical, save       :: ldone
+    ! lbnds_in_file: the current file provides a 2-D time_bnds/time_bounds
+    ! lusebnds     : those bounds are to be used (namelist switch AND file)
+    logical             :: lbnds_in_file, lusebnds
+    ! ltrans = "logical, transposed": set when the time-bounds variable of the
+    ! current file is stored as (time,bnds) instead of the usual (bnds,time),
+    ! so that the bounds are read with start=(/n,1/) count=(/1,2/)
+    ! rather than start=(/1,n/) count=(/2,1/)
+    logical             :: ltrans
+
+    ! never return undefined INTENT(OUT) values: if no file/record is found
+    ! below, the caller must see "no data" instead of leftovers/garbage
+    fnam = ' '
+    irec = 0
+    tval = 0._r8
+    tbnd = 0._r8
+    mbnd = 0._r8
+    year = yr
+    month = 1
 
     ! check whether to start file list read from beginning or to resume
     idx = index(ftag, '.')
@@ -171,12 +191,26 @@ contains
     end if
 
     ! loop over files
-    open (funit, file=trim('filelist_'//cnam)//trim(membertag), form='formatted')
+    ! DS: the list file is created by the caller; open it read-only and fail
+    ! loudly if it is missing (the default status='unknown' would silently
+    ! create an empty list, i.e. pretend that there is no data at all)
+    open (funit, file=trim('filelist_'//cnam)//trim(membertag), form='formatted', &
+          status='old', action='read', iostat=status)
+    if (status /= 0) then
+      write (*, *) 'ERROR: cannot open file list '// &
+        trim('filelist_'//cnam)//trim(membertag)
+      stop 1
+    end if
 
     ! skip all files that have already been scanned
     do n = 1, nskip
       read (funit, '(a1024)', iostat=status) fnam
-      if (status /= 0) stop 'unexpected end of list file'
+      if (status /= 0) then
+        write (*, *) 'ERROR: unexpected end of file list '// &
+          trim('filelist_'//cnam)//trim(membertag)
+        close (funit)
+        stop 1
+      end if
     end do
 
     ! continue with files that have not yet been scanned
@@ -197,12 +231,27 @@ contains
       end if
 
       ! skip files beyond year1 - yearn (with one-year halo)
+      ! the year is the 4-digit field in front of the file suffix
+      ! (<case>.<tag>.<yyyy>.nc); if it cannot be parsed the file is skipped
       if (.not. scanallfiles) then
+        yyyy = -1
         idx = scan(fnam, ".", back=.true.)
-        str1 = fnam(1:idx - 1)
-        idx = scan(str1, ".", back=.true.)
-        str2 = str1(idx + 1:idx + 4)
-        read (str2, "(i4)") yyyy
+        if (idx > 1) then
+          str1 = trim(fnam(1:idx - 1))
+          idx = scan(str1, ".", back=.true.)
+          if (idx > 0 .and. len_trim(str1) >= idx + 4) then
+            str2 = str1(idx + 1:idx + 4)
+            read (str2, "(i4)", iostat=status) yyyy
+            if (status /= 0) yyyy = -1
+          end if
+        end if
+        if (yyyy < 0) then
+          if (verbose) write (*, *) &
+            'WARNING: no year in file name, skipped: '//trim(fnam)
+          nskip = nskip + 1
+          irecold = 0
+          cycle
+        end if
         if (yyyy < y1 - 1 .or. yyyy > y2 + 1) then
           nskip = nskip + 1
           irecold = 0
@@ -220,10 +269,31 @@ contains
       call handle_ncerror(nf90_inq_varid(ncid, 'time', rhid))
       units = ' '
       call handle_ncerror(nf90_get_att(ncid, rhid, 'units', units))
-      call ncsevl(units, n, sstartend)
-      read (units(sstartend(1, 3):sstartend(1, 3) + 3), *) yref
-      read (units(sstartend(1, 4):sstartend(1, 4) + 1), *) mref
-      read (units(sstartend(1, 5):sstartend(1, 5) + 1), *) dref
+      call ncsevl(units, n, sstartend, size(sstartend))
+      ! DS: the units attribute has to read '<unit> since <yyyy>-<mm>-<dd> ...';
+      ! ncsevl splits at ' ', '-' and ':', so the reference date is given by
+      ! sub-strings 3, 4 and 5. If it cannot be determined, the file cannot be
+      ! placed on the time axis and is skipped (before, the stale, saved
+      ! sstartend values of the previously scanned file were used instead)
+      yref = -1
+      mref = -1
+      dref = -1
+      if (n >= 5) then
+        read (units(sstartend(1, 3):sstartend(2, 3)), *, iostat=status) yref
+        if (status /= 0) yref = -1
+        read (units(sstartend(1, 4):sstartend(2, 4)), *, iostat=status) mref
+        if (status /= 0) mref = -1
+        read (units(sstartend(1, 5):sstartend(2, 5)), *, iostat=status) dref
+        if (status /= 0) dref = -1
+      end if
+      if (yref < 0 .or. mref < 0 .or. dref < 0) then
+        write (*, *) 'WARNING: no reference date in time units "'// &
+          trim(units)//'" of '//trim(fnam)//', file skipped'
+        nskip = nskip + 1
+        irecold = 0
+        call handle_ncerror(nf90_close(ncid))
+        cycle
+      end if
       calendar = ' '
       call handle_ncerror(nf90_get_att(ncid, rhid, 'calendar', calendar))
 
@@ -237,23 +307,63 @@ contains
       end if
       dnumhi = ndays
       call nccaln(trim(calendar), y1, m1, 1, yr, 1, 1, ndays)
-      toff = dnumlo - ndays
-     !set as default to avoid issue as reported in BLOM #781 before get fixed
-      ltimebnds = .false.
+      ! DS: dnumlo is exact, but the real->integer conversion must be explicit
+      toff = nint(dnumlo) - ndays
+      ! Look for time bounds; accept both (bnds,time) and (time,bnds) order.
+      lbnds_in_file = .false.
+      ltrans = .false.
       status = nf90_inq_varid(ncid, 'time_bnds', rhid2)
       if (status /= nf90_noerr) then
         status = nf90_inq_varid(ncid, 'time_bounds', rhid2)
-        if (status /= nf90_noerr) ltimebnds = .false.
+      end if
+      if (status == nf90_noerr) then
+        status = nf90_inquire_variable(ncid, rhid2, ndims=ndims_bnds)
+        if (status == nf90_noerr .and. ndims_bnds == 2) then
+          status = nf90_inquire_variable(ncid, rhid2, dimids=dimids_bnds)
+        end if
+        if (status == nf90_noerr) then
+          status = nf90_inquire_dimension(ncid, dimids_bnds(1), len=ndim1)
+        end if
+        if (status == nf90_noerr) then
+          status = nf90_inquire_dimension(ncid, dimids_bnds(2), len=ndim2)
+        end if
+        if (status == nf90_noerr) then
+          if (ndim1 == 2) then
+            lbnds_in_file = .true.
+          else if (ndim2 == 2) then
+            lbnds_in_file = .true.
+            ltrans = .true.
+          end if
+        end if
       end if
 
+      ! Use the bounds only when the experiment namelist did not switch them
+      ! off (ltimebnds = .false.) and the file actually provides them. Files
+      ! with broken bounds are handled below by falling back to tval
+      ! (cf. issue reported in BLOM #781).
+      lusebnds = ltimebnds .and. lbnds_in_file
       do n = irecold + 1, nrec
         irecold = n
         call handle_ncerror(nf90_get_var(ncid, rhid, tval, start=(/n/)))
-        if (ltimebnds) then
-          call handle_ncerror(nf90_get_var(ncid, rhid2, tbnd, &
-                                           start=(/1, n/), count=(/2, 1/)))
-        else
-          tbnd = tval
+        tbnd = tval
+        if (lusebnds) then
+          if (ltrans) then
+            status = nf90_get_var(ncid, rhid2, tbnd, &
+                                  start=(/n, 1/), count=(/1, 2/))
+          else
+            status = nf90_get_var(ncid, rhid2, tbnd, &
+                                  start=(/1, n/), count=(/2, 1/))
+          end if
+          ! discard unusable bounds and fall back to the instantaneous value
+          if (status /= nf90_noerr) then
+            tbnd = tval
+          else if (tbnd(1) > tbnd(2) .or. &
+                   tval < tbnd(1) - 1.e-6_r8 .or. tval > tbnd(2) + 1.e-6_r8) then
+            if (verbose) write (*, *) &
+              'WARNING: inconsistent time bounds in '//trim(fnam)// &
+              ', using the time value instead'
+            tbnd = tval
+          end if
         end if
 
         ! check if time value lies within limits
@@ -270,7 +380,7 @@ contains
           irec = n
           tval = tval + toff
           tbnd = tbnd + toff
-          tbndold = tbnd + toff
+          tbndold = tbnd
           ldone = .true.
           exit
         elseif (tbnd(1) >= dnumhi) then
@@ -315,6 +425,12 @@ contains
     y1 = 1
     m1 = 1
 
+    ! always assign the INTENT(OUT) arguments, also on the early return
+    tbnd(1) = 0._r8
+    tbnd(2) = 0._r8
+    year = yref
+    month = 1
+
     if (tval < 0.) return
 
     ndayslast = 0
@@ -344,7 +460,7 @@ contains
 
   ! -----------------------------------------------------------------
 
-  subroutine ncsevl(strg, strgn, strgind)
+  subroutine ncsevl(strg, strgn, strgind, nmax)
 
     ! Description:
     !   Finds the number and the locations of sub-strings.
@@ -355,18 +471,24 @@ contains
     !   int strgn      (out) - number of sub-strings
     !   int strgind(*) (out) - start/end locations of sub-strings (the
     !                         dimension must at least equal to strgn*2)
+    !   int nmax       (in,opt) - size of strgind; the scan stops here instead
+    !                         of writing beyond the end of the array
 
     implicit none
 
     character(len=*), intent(in) :: strg
     integer, intent(out) :: strgn, strgind(*)
+    integer, intent(in), optional :: nmax
 
     character :: charold, charnew
-    integer :: i
+    integer :: i, nlim
 
+    nlim = huge(1)
+    if (present(nmax)) nlim = nmax
     charold = ' '
     strgn = 0
     do i = 1, len(strg)
+      if (strgn >= nlim) exit
       charnew = strg(i:i)
       if ((charold == ' ' .or. charold == '-' .or. charold == ':') .and. &
           (charnew /= ' ' .and. charnew /= '-' .and. charnew /= ':')) then
@@ -380,8 +502,13 @@ contains
       charold = charnew
     end do
     if (mod(strgn, 2) == 1) then
-      strgn = strgn + 1
-      strgind(strgn) = len(strg)
+      if (strgn < nlim) then
+        strgn = strgn + 1
+        strgind(strgn) = len(strg)
+      else
+        ! no room left to terminate the last sub-string: drop it
+        strgn = strgn - 1
+      end if
     end if
     strgn = strgn/2
 
@@ -404,15 +531,23 @@ contains
     integer, intent(in) :: year, month, day
     integer, intent(out) :: ndays
 
-    integer :: y
+    integer :: y, ical
+    character(len=16) :: cal
     integer, parameter :: yoffset = 1000000, yr1 = 365, yr4 = 1461, &
                           yr100 = 36524, yr400 = 146097
     integer :: acc_leap(12), acc_noleap(12)
     data acc_leap/0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335/
     data acc_noleap/0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334/
 
+    ! evaluate a blank padded copy, so that cal(1:3) cannot run past the
+    ! end of a short calendar string
+    cal = ' '
+    ical = min(len_trim(calendar), len(cal))
+    if (ical > 0) cal(1:ical) = calendar(1:ical)
+
+    ndays = -1
     y = year + yoffset
-    if (calendar(1:3) == 'pro') then
+    if (cal(1:3) == 'pro') then
       ndays = int((y - 1)/400)*yr400 &
               + int(mod((y - 1), 400)/100)*yr100 &
               + int(mod(mod((y - 1), 400), 100)/4)*yr4 &
@@ -422,19 +557,25 @@ contains
       else
         ndays = ndays + acc_noleap(month) + day
       end if
-    elseif (calendar(1:3) == 'jul') then
+    elseif (cal(1:3) == 'jul') then
       ndays = int((y - 1)/4)*yr4 + mod(y, 4)*yr1
       if (month > 2 .and. mod(y, 4) == 0) then
         ndays = ndays + acc_leap(month) + day
       else
         ndays = ndays + acc_noleap(month) + day
       end if
-    elseif (calendar(1:3) == '360') then
+    elseif (cal(1:3) == '360') then
       ndays = (y - 1)*360 + 30*(month - 1) + day
-    elseif (calendar(1:2) == 'no' .or. calendar(1:3) == '365') then
+    elseif (cal(1:2) == 'no' .or. cal(1:3) == '365') then
       ndays = (y - 1)*365 + acc_noleap(month) + day
-    elseif (calendar(1:3) == 'all' .or. calendar(1:3) == '366') then
+    elseif (cal(1:3) == 'all' .or. cal(1:3) == '366') then
       ndays = (y - 1)*366 + acc_leap(month) + day
+    else
+      ! an unrecognised calendar used to leave ndays undefined, and the
+      ! undefined value then propagated into the time axis of the output
+      ! files; fail loudly instead
+      write (*, *) 'ERROR: unknown calendar "'//trim(calendar)//'"'
+      stop
     end if
 
   end subroutine ncdnum
@@ -465,10 +606,20 @@ contains
     integer, intent(in) :: y1, m1, d1, y2, m2, d2
     integer, intent(out) :: ndays
 
-    integer :: n1, n2, nd1, nd2, nd3
+    integer :: n1, n2, nd1, nd2, nd3, ical
+    character(len=16) :: cal
 
-    if (calendar(1:3) == 'sta' .or. calendar(1:3) == 'mix' .or. &
-        calendar(1:3) == 'gre') then
+    ! in CF a missing calendar attribute means "standard"; evaluate a blank
+    ! padded copy, so that cal(1:3) cannot run past the end of a short string
+    cal = 'standard'
+    ical = min(len_trim(calendar), len(cal))
+    if (ical > 0) then
+      cal = ' '
+      cal(1:ical) = calendar(1:ical)
+    end if
+
+    if (cal(1:3) == 'sta' .or. cal(1:3) == 'mix' .or. &
+        cal(1:3) == 'gre') then
       if (y1 < 1582 .or. (y1 == 1582 .and. m1 < 10) .or. &
           (y1 == 1582 .and. m1 == 10 .and. d1 <= 15)) then
         call ncdnum('julian', y1, m1, d1, n1)
@@ -488,8 +639,8 @@ contains
         n2 = nd1 - nd2 + nd3 - 10
       end if
     else
-      call ncdnum(calendar, y1, m1, d1, n1)
-      call ncdnum(calendar, y2, m2, d2, n2)
+      call ncdnum(cal, y1, m1, d1, n1)
+      call ncdnum(cal, y2, m2, d2, n2)
     end if
     ndays = n2 - n1
 
@@ -677,7 +828,11 @@ contains
         end do
       end do
     end do
-    rhoglb = rhoglb/pacc
+    if (pacc > 0.) then
+      rhoglb = rhoglb/pacc
+    else
+      rhoglb = missing
+    end if
 
   end subroutine calc_rho_glb
 

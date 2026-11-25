@@ -74,8 +74,8 @@ contains
     implicit none
 
     logical :: badrec
-    integer :: k, m, n
-    character(len=slenmax), dimension(5) :: itags
+    integer :: k, m, n, ntag
+    character(len=slenmax), dimension(6) :: itags
 
     ! rmax: maximum number of records;
     ! initial value 120, corresponds to 10-year of monthly data, and 
@@ -104,19 +104,38 @@ contains
     call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
 #endif
 
-    itags = [tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday]
+    ! Check the needed file tags
+    itags = ''
+    itags(1) = tagomon    ! impulsory as the gridinfo is read from it
+    ntag = 1
+    do m = 1, n_datasets
+      if (realms(m) /= 'ocean' .and. realms(m) /= 'ocnBgchem') cycle
+      itag = ''
+      call set_ocn_tag(trim(realms(m)), trim(frequencies(m)), itag)
+      if (len_trim(itag) == 0) cycle      ! 'fx': read from griddata, no tag
+      if (any(itags(1:ntag) == itag)) cycle
+      ntag = ntag + 1
+      itags(ntag) = itag
+    end do
 
-    do n = 1, size(itags)
+    do n = 1, ntag
       itag = itags(n)
       call scan_files(reset=.true.)
 
-      if (verbose) write(*,*) 'found fnm: ', trim(fnm)
       if (len_trim(fnm) == 0) then
+#ifdef MPI
+        if (mpirank .eq. 0) then
+#endif
         if (verbose) write (*, *) &
           'WARNING: no file found for case dir|tag|year1|month1|yearn|monthn: ', &
           trim(ibasedir)//'/'//trim(casename), '|', trim(itag), '|', &
           year1, '|', month1, '|', yearn, '|', monthn
+#ifdef MPI
+        end if
+#endif
         !cycle
+      else
+        if (verbose) write (*, *) 'input file for tag ', trim(itag), ':', trim(fnm)
       end if
     end do
 
@@ -135,7 +154,9 @@ contains
     fnm = pomon
 
     ! filter only ocean variables, facilitate parallisation
-    n = count(realms == 'ocean' .or. realms == 'ocnBgchem')
+    ! only the first n_datasets entries of realms() are defined
+    n = count(realms(1:n_datasets) == 'ocean' .or. &
+              realms(1:n_datasets) == 'ocnBgchem')
     allocate (idx(n))
     k = 1
     do n = 1, n_datasets
@@ -147,7 +168,11 @@ contains
 
     main_loop: do n = 1, size(idx)
 
-      if (skip_dataset(n, n_datasets)) cycle
+      ! distribute datasets over the MPI ranks by their index in the namelist
+      ! (not by their position in the filtered list), so that a dataset always
+      ! maps to the same rank and the bounds check in skip_dataset is meaningful
+!     if (skip_dataset(n, n_datasets)) cycle
+      if (skip_dataset(idx(n), n_datasets)) cycle
 
       realm = trim(realms(idx(n)))
 
@@ -171,6 +196,9 @@ contains
       tcoord = ''
       zcoord = ''
       hcoord = ''
+      vunits = ''
+      original_name = ''
+      vtype = ''
 
       ! Select file tag according to realm and frequency
       call set_ocn_tag(realm, frequency, itag)
@@ -189,20 +217,38 @@ contains
 
 
       ! Get variable attributes from table and mapfile
-      call json_get_units(trim(tabledir)//trim(table), trim(ovnm), vunits)
+      call json_get_units(trim(tabledir)//trim(table), trim(ovnm), vunits, lfound=found)
+      if (.not. found) then
+        write(*,*) 'ERROR: no units in CMOR table for ', trim(bvnm)
+        cycle main_loop
+      end if
       call json_get_zcoord(trim(tabledir)//trim(table), trim(bvnm), zcoord, lfound=found)
 
       ! Get sources and factors from mapfile
       if (allocated(sources)) deallocate(sources)
       if (allocated(factors)) deallocate(factors)
-      call json_get_original_name(trim(mapfile), trim(cvnm), original_name)
+      call json_get_original_name(trim(mapfile), trim(cvnm), original_name, lfound=found)
+      if (.not. found) then
+        write(*,*) 'ERROR: no original_name in mapfile for ', trim(cvnm)
+        cycle main_loop
+      end if
       call json_get_sources(trim(mapfile), trim(cvnm), sources, lfound=found)
-      if (found) then
+      ! json_get_keys always returns an allocated array — size 0 when the key
+      ! is missing or the object is empty — so the fallback below must
+      ! deallocate it first (it used to be left unallocated when missing).
+      if (found .and. size(sources) > 0) then
         allocate(factors(size(sources)))
         do k = 1, size(sources)
           call json_get_factor(trim(mapfile), trim(cvnm), sources(k), factors(k), lfound=found)
+          if (.not. found) then
+            write(*,*) 'ERROR: no factor for source ', trim(sources(k)), &
+                       ' of ', trim(cvnm), ' in mapfile'
+            cycle main_loop
+          end if
         end do
       else
+        ! no sources listed: the original name with factor 1
+        deallocate(sources)
         allocate(sources(1))
         allocate(factors(1))
         sources(1) = trim(original_name)
@@ -219,6 +265,10 @@ contains
       ! read dimensions
       call json_get_array_string(trim(tabledir)//trim(table), 'variable_entry.'//trim(bvnm)// &
                                  '.dimensions', dimensions, lfound=found)
+      if (.not. found) then
+        write(*,*) 'ERROR: no dimensions in CMOR table for ', trim(bvnm)
+        cycle main_loop
+      end if
       dims = dimensions(1)
       do k = 2, size(dimensions)
         dims = trim(dims)//","//trim(dimensions(k))
@@ -293,6 +343,11 @@ contains
           if (verbose) write(*,*) 'read_tslice: ', &
             trim(fnm(index(fnm, '/', back=.true.)+1:))
           call read_tslice(rec, badrec, fnm)
+          if (badrec) then
+            if (verbose) write (*, *) 'WARNING: skipping bad record ', rec, &
+              ' of ', trim(fnm(index(fnm, '/', back=.true.)+1:))
+            cycle
+          end if
 
           !! calcluate tval and tbnds
           select case (frequency)
@@ -359,6 +414,13 @@ contains
                 sealv, xvec, yvec, kvec, pbot, &
                 dpini, sini, tini, &
                 kvechalf, basin, stat=status)
+    if (status /= 0) &
+      write (*, *) 'WARNING: deallocation of the grid variables failed'
+
+    ! release the field buffers and the per-dataset helpers as well
+    if (allocated(fldtmp)) deallocate (fld, fld2, fldacc, fldtmp)
+    if (allocated(dp)) deallocate (dp)
+    if (allocated(dimensions)) deallocate (dimensions)
 
     if (allocated(idx)) deallocate (idx)
 
@@ -498,12 +560,13 @@ contains
         end do
         fld = fldacc
 
-        ! Set ice free points to missing value
+        ! Set zero (land) points to missing value
       case ('zero2missing')
         do k = 1, kk
           do j = 1, jj
             do i = 1, ii
-              if (abs(fld(i, j, k)) < 1e-6) fld(i, j, k) = missing
+              if (pmask(i, j) == 0 .or. abs(fld(i, j, k)) < 1e-6) &
+                fld(i, j, k) = missing
             end do
           end do
         end do
@@ -573,8 +636,17 @@ contains
             end do
           end do
         end do
-        rhoavg = rhoavg/volsum
-        fld(1, 1, 1) = volsum0/areaogs*(1-rhoavg/rhoavg0)
+        if (volsum > 0._r8) then
+          rhoavg = rhoavg/volsum
+        else
+          rhoavg = rhoavg0
+        end if
+        if (rhoavg0 > 0._r8 .and. areaogs > 0._r8) then
+          fld(1, 1, 1) = volsum0/areaogs*(1-rhoavg/rhoavg0)
+        else
+          write (*, *) 'ERROR: cannot compute zostoga, zero area/rhoavg0'
+          fld(1, 1, 1) = missing
+        end if
         if (verbose) then
           write(*,*) 'rhoavg:',rhoavg
           write(*,'(A, E23.15)') ' volsum:',volsum
@@ -663,8 +735,14 @@ contains
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
             end do
-            if (abs(fld(i, j, 1) - missing) > eps ) &
-              fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+            if (abs(fld(i, j, 1) - missing) > eps ) then
+              ! the layer thickness can be zero (cell shallower than 300 m)
+              if (fldtmp(i, j, 1) > 0.) then
+                fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+              else
+                fld(i, j, 1) = missing
+              end if
+            end if
           end do
         end do
 
@@ -686,8 +764,14 @@ contains
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
             end do
-            if (abs(fld(i, j, 1) - missing) > eps) &
-              fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+            if (abs(fld(i, j, 1) - missing) > eps) then
+              ! the layer thickness can be zero (cell shallower than 700 m)
+              if (fldtmp(i, j, 1) > 0.) then
+                fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+              else
+                fld(i, j, 1) = missing
+              end if
+            end if
           end do
         end do
 
@@ -709,8 +793,14 @@ contains
                 fldtmp(i, j, 1) = fldtmp(i, j, 1) + fldtmp(i, j, k)
               end if
             end do
-            if (abs(fld(i, j, 1) - missing) > eps) &
-              fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+            if (abs(fld(i, j, 1) - missing) > eps) then
+              ! the layer thickness can be zero (cell shallower than 2000 m)
+              if (fldtmp(i, j, 1) > 0.) then
+                fld(i, j, 1) = fld(i, j, 1)/fldtmp(i, j, 1)
+              else
+                fld(i, j, 1) = missing
+              end if
+            end if
           end do
         end do
 
@@ -859,6 +949,7 @@ contains
       status = nf90_inquire_dimension(ncid, dimid, len=rdm)
       call handle_ncerror(status)
       status = nf90_inq_dimid(ncid, 'slenmax', dimid)
+      call handle_ncerror(status)
       status = nf90_inquire_dimension(ncid, dimid, len=slenmax2)
       call handle_ncerror(status)
       allocate (region(slenmax2, rdm), region1(rdm), stat=status)
@@ -869,8 +960,15 @@ contains
       status = nf90_get_var(ncid, rhid, region, (/1, 1/), (/slenmax2, rdm/))
       call handle_ncerror(status)
       region1 = ' '
+      ! region1 is declared with len=slenmax (m_namelists), which is unrelated
+      ! to the 'slenmax' dimension of the input file; copying the full file
+      ! width would write past the end of the strings
+      if (slenmax2 > len(region1)) then
+        write (*, *) 'WARNING: region names truncated to ', len(region1), &
+          ' characters (file uses ', slenmax2, ')'
+      end if
       do i = 1, rdm
-        do j = 1, slenmax2
+        do j = 1, min(slenmax2, len(region1))
           region1(i) (j:j) = region(j, i)
         end do
       end do
@@ -884,6 +982,7 @@ contains
       status = nf90_inquire_dimension(ncid, dimid, len=sdm)
       call handle_ncerror(status)
       status = nf90_inq_dimid(ncid, 'slenmax', dimid)
+      call handle_ncerror(status)
       status = nf90_inquire_dimension(ncid, dimid, len=slenmax2)
       call handle_ncerror(status)
       allocate (section(slenmax2, sdm), section1(sdm), stat=status)
@@ -895,9 +994,14 @@ contains
       call handle_ncerror(status)
       !write(*, *) 'section:', section
       section1 = ' '
+      ! same for the section names: s1 is a slenmax-long scratch buffer
+      if (slenmax2 > len(s1)) then
+        write (*, *) 'WARNING: section names truncated to ', len(s1), &
+          ' characters (file uses ', slenmax2, ')'
+      end if
       do i = 1, sdm
         s1 = ' '
-        do j = 1, slenmax2
+        do j = 1, min(slenmax2, len(s1))
           s1(j:j) = section(j, i)
         end do
         if (trim(s1) == 'taiwan_and_luzon_straits') then
@@ -1110,12 +1214,22 @@ contains
         end do
       end do
     end do
-    rhoavg0 = rhoavg0/volsum0
+    if (volsum0 > 0._r8) then
+      rhoavg0 = rhoavg0/volsum0
+    else
+      write (*, *) 'ERROR: initial global ocean volume is zero, check ', &
+        trim(griddata)//trim(ocninitfile)
+      stop
+    end if
     if (verbose) then
       write(*,*) 'rhoavg0:',rhoavg0
       write(*,*) 'volgs:',volgs
       write(*,'(A,E23.15)') 'volsum0:',volsum0
-      write(*,*) 'volsum0/areaogs:',volsum0/areaogs
+      if (areaogs > 0._r8) then
+        write(*,*) 'volsum0/areaogs:',volsum0/areaogs
+      else
+        write(*,*) 'WARNING: global ocean area is zero'
+      end if
     end if
 
   end subroutine read_gridinfo_ifile
@@ -1133,6 +1247,8 @@ contains
 
     integer, parameter              :: ndimmax = 10
     integer                 :: n, ndims, dimids(ndimmax), dimlens(ndimmax)
+    integer                 :: dimid_time
+    logical                 :: lvert3
 !   character(len=slenmax)  :: coord
 
     character(len=slenmax)          :: cell_measures
@@ -1142,6 +1258,18 @@ contains
 
     ! initalise
     cell_measures = '' 
+
+    ! reset the CMOR handles so that a stale id from the previous dataset
+    ! cannot mask a failure of the calls below
+    iaxid = -1
+    jaxid = -1
+    kaxid = -1
+    laxid = -1
+    raxid = -1
+    saxid = -1
+    taxid = -1
+    grdid = -1
+    varid = -1
 
     ! Check if output variable should have time coordinate
     fxflag = .false.
@@ -1167,6 +1295,17 @@ contains
       status = nf90_inquire_dimension(ncid, dimids(n), len=dimlens(n))
       call handle_ncerror(status)
     end do
+    ! Is the third dimension of the input variable a vertical (level/depth)
+    ! dimension rather than time?
+    lvert3 = .false.
+    if (ndims >= 3) then
+      status = nf90_inq_dimid(ncid, 'time', dimid_time)
+      if (status /= nf90_noerr) then
+        lvert3 = .true.                        ! no time dimension in this file
+      else
+        lvert3 = dimids(3) /= dimid_time
+      end if
+    end if
     if (.not. allocated(dp)) allocate (dp(idm, jdm, kdm))
     if (allocated(fld)) deallocate (fld, fld2, fldacc, fldtmp)
     ii = idm
@@ -1176,6 +1315,10 @@ contains
       write (*, '(1X, A, 4I5)') 'Horizontal dimension of  model input:', dimlens(1:4)
       write(*, '(1X, A, I5)') 'Vertical dimension of model input:', kdm
     end if
+    ! The third dimension is only a vertical one if it is not time; if it is
+    ! time (e.g. a 2-D field whose record count happens to equal kdm or ddm)
+    ! it must not be used to select kk in the branches below.
+    if (.not. lvert3) dimlens(3) = 1
     if (dims(1:25) == 'longitude,latitude,olevel') then
       vtype = 'level'
       kk = ddm
@@ -1208,12 +1351,38 @@ contains
       else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
         kk = ddm
       end if
+    else if (dims == 'longitude,latitude,time1') then
+      vtype = '2d'
+      kk = 1
+      if (dimlens(3) .eq. kdm .and. kdm>0) THEN
+        kk = kdm
+      else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
+        kk = ddm
+      end if
+    else if (dims(1:27) == 'longitude,latitude,oplayer4') then
+      vtype = 'olayer'
+      kk = 1
+      if (dimlens(3) .eq. kdm .and. kdm>0) THEN
+        kk = kdm
+      else if (dimlens(3) .eq. ddm .and. ddm>0) THEN
+        kk = ddm
+      end if
     else if (dims == 'latitude,rho,basin,time') then
       vtype = 'merk'
       ii = ldm
       jj = kdm
       kk = rdm
+    else if (dims == 'gridlatitude,rho,basin,time') then
+      vtype = 'merk'
+      ii = ldm
+      jj = kdm
+      kk = rdm
     else if (dims == 'latitude,olevel,basin,time') then
+      vtype = 'merd'
+      ii = ldm
+      jj = ddm
+      kk = rdm
+    else if (dims == 'gridlatitude,olevel,basin,time') then
       vtype = 'merd'
       ii = ldm
       jj = ddm
@@ -1241,7 +1410,10 @@ contains
         kk = ddm
       end if
     else
-      write (*, *) 'Undefined variable type, please check!'
+      write (*, *) 'ERROR: unsupported CMOR dimensions: ', trim(dims)
+      write (*, *) '       for variable: ', trim(bvnm)
+      write (*, *) '       cannot determine the grid type, aborting'
+      stop
     end if
     if (verbose) then
       write (*, *) 'CMOR output variable type:', trim(vtype)
@@ -1273,6 +1445,8 @@ contains
     if (.not. fxflag) call json_get_tcoord(trim(tablepath), ovnm, tcoord)
 
     ! Call CMOR setup
+    ! DS: verbose must only change the verbosity, not the failure semantics:
+    ! exit_control is the same in both branches
     if (verbose) then
       if (createsubdirs) then
         error_flag = cmor_setup(inpath=trim(ibasedir), &
@@ -1289,10 +1463,12 @@ contains
       if (createsubdirs) then
         error_flag = cmor_setup(inpath=trim(ibasedir), &
                                 netcdf_file_action=CMOR_REPLACE_4, set_verbosity=CMOR_QUIET, &
+                                exit_control=CMOR_EXIT_ON_WARNING, &
                                 create_subdirectories=1)
       else
         error_flag = cmor_setup(inpath=trim(ibasedir), &
                                 netcdf_file_action=CMOR_REPLACE_4, set_verbosity=CMOR_QUIET, &
+                                exit_control=CMOR_EXIT_ON_WARNING, &
                                 create_subdirectories=0)
       end if
     end if
@@ -1314,7 +1490,13 @@ contains
     end if
     call json_write_attributes(grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)
-    call system('rm '//trim(json_file_attributes))
+    if (error_flag /= 0) then
+      write (*, *) 'ERROR: cmor_dataset_json failed for ', trim(ovnm)
+      stop
+    end if
+    if (deletejson) then
+      call system('rm '//trim(json_file_attributes))
+    end if
 
     ! Define horizontal axes
     !write(*, *) 'Define horizontal axes'
@@ -1341,7 +1523,7 @@ contains
                 coord_vals=yvec)
       end if
 
-      !write(*, *) 'Define horizontal grid '//hcoord(1:1)
+      if (verbose) write(*, *) 'Define horizontal grid '//trim(hcoord)
       if (hcoord(1:1) == 'p') then
         if (lshiftgrid) then
           grdid = cmor_grid( &
@@ -1519,7 +1701,7 @@ contains
 
     ! Define time axis
     if (.not. fxflag) then
-      if(verbose) then
+      if (verbose) then
         write(*, *) 'Define time axis '
         if (verbose) then
           write (*, *) 'Time coord:', trim(tcoord)
@@ -1658,6 +1840,32 @@ contains
         status = cmor_set_variable_attribute(varid, "cell_measures", 'area: areacello volume: volcello')
       end if
     end if
+    if (status /= 0) then
+      write (*, *) 'ERROR: cmor_set_variable_attribute failed for ', trim(ovnm)
+      stop
+    end if
+
+    ! A failed cmor_axis/cmor_grid/cmor_variable returns a negative handle
+    ! (CMOR itself only warns, depending on exit_control), which would
+    ! otherwise surface much later as an empty or broken output file.
+    if (varid < 0) then
+      write (*, *) 'ERROR: cmor_variable failed for ', trim(ovnm)
+      stop
+    end if
+    if (vtype(1:3) /= 'mer' .and. vtype(1:3) /= 'sec') then
+      if (iaxid < 0 .or. jaxid < 0) then
+        write (*, *) 'ERROR: cmor_axis (horizontal) failed for ', trim(ovnm)
+        stop
+      end if
+      if (grdid > 0) then
+        write (*, *) 'ERROR: cmor_grid failed for ', trim(ovnm)
+        stop
+      end if
+      if (.not. fxflag .and. taxid < 0) then
+        write (*, *) 'ERROR: cmor_axis (time) failed for ', trim(ovnm)
+        stop
+      end if
+    end if
 
 #ifdef DEFLATE
     error_flag = cmor_set_deflate(varid, 1, 1, 5)
@@ -1715,6 +1923,8 @@ contains
 
   subroutine read_tslice(rec, badrec, fname)
 
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+
     implicit none
 
     integer, intent(in)             :: rec
@@ -1722,6 +1932,10 @@ contains
     character(len=*), intent(in), optional  :: fname
     integer, save                   :: fid
     integer                         :: i, j, k, rec1
+    real(r8)                        :: tvalfile
+
+    ! badrec is INTENT(OUT): always define it, whatever path is taken below
+    badrec = .false.
 
     ! Exception for fill day
     rec1 = max(rec, 1)
@@ -1735,20 +1949,30 @@ contains
       call handle_ncerror(status)
     end if
 
-    if (.false.) then
-      ! Read time information
-      status = nf90_inq_varid(fid, 'time', rhid)
+    ! Validate the requested record: its time value must be readable and
+    ! finite.  This is a consistency check only - the time axis written to
+    ! the output is taken from get_file_info (tval already shifted by toff)
+    ! and from mbnd, so tval/tbnds must not be overwritten here.
+    status = nf90_inq_varid(fid, 'time', rhid)
+    if (status /= nf90_noerr) then
+      badrec = .true.
+    else
+      status = nf90_get_var(fid, rhid, tvalfile, start=(/rec1/))
       if (status /= nf90_noerr) then
-        write (*, *) 'cannot find time variable'
-        stop
+        badrec = .true.
+      else if (.not. ieee_is_finite(tvalfile)) then
+        badrec = .true.
       end if
-      status = nf90_get_var(fid, rhid, tval, (/rec1/), (/1/))
-      if (status /= nf90_noerr) badrec = .true.
+    end if
+    if (badrec) then
+      if (present(fname)) then
+        write (*, *) 'WARNING: unusable time record ', rec1, ' in ', trim(fname)
+      else
+        write (*, *) 'WARNING: unusable time record ', rec1, ' in ', trim(fnm)
+      end if
+      status = nf90_close(fid)
       call handle_ncerror(status)
-      if (rec == 0) tval = tval - 1
-
-      tbnds(1, 1) = max(0., tbnds(1, 1))
-      tval = 0.5*(tbnds(1, 1) + tbnds(2, 1))
+      return
     end if
 
     ! Read data
@@ -1770,6 +1994,13 @@ contains
     end if
 
     if (index(special, 'dp.avg') > 0) then
+      ! sources(2) holds the dp weight; a mapfile entry with a single
+      ! source would index past the array bound here
+      if (size(sources) < 2) then
+        write (*, *) 'ERROR: special dp.avg needs two sources: ', trim(cvnm)
+        write (*, *) '       only found: ', trim(sources(1))
+        stop
+      end if
       fld = 0.
       call add_tslice(sources(2), factors(2), rec1, fid)
       fld2 = fld
@@ -1798,15 +2029,25 @@ contains
       status = nf90_get_att(fid, rhid, 'add_offset', offs)
       if (status /= nf90_noerr) offs = 0.
       status = nf90_get_att(fid, rhid, '_FillValue', fill)
-      do j = 1, jj
-        do i = 1, ii
-          if (abs(sealv(i, j) - fill) < eps) then
-            sealv(i, j) = missing
-          else
-            sealv(i, j) = sealv(i, j)*sfac + offs
-          end if
+      if (status == nf90_noerr) then
+        do j = 1, jj
+          do i = 1, ii
+            if (abs(sealv(i, j) - fill) < eps) then
+              sealv(i, j) = missing
+            else
+              sealv(i, j) = sealv(i, j)*sfac + offs
+            end if
+          end do
         end do
-      end do
+      else
+        ! no _FillValue: do not mask against a value left over from another
+        ! variable, just apply scale/offset
+        do j = 1, jj
+          do i = 1, ii
+            sealv(i, j) = sealv(i, j)*sfac + offs
+          end do
+        end do
+      end if
     end if
 
     ! Read bottom pressure if necessary
@@ -1823,15 +2064,25 @@ contains
       status = nf90_get_att(fid, rhid, 'add_offset', offs)
       if (status /= nf90_noerr) offs = 0.
       status = nf90_get_att(fid, rhid, '_FillValue', fill)
-      do j = 1, jj
-        do i = 1, ii
-          if (abs(pbot(i, j) - fill) < eps) then
-            pbot(i, j) = missing
-          else
-            pbot(i, j) = pbot(i, j)*sfac + offs
-          end if
+      if (status == nf90_noerr) then
+        do j = 1, jj
+          do i = 1, ii
+            if (abs(pbot(i, j) - fill) < eps) then
+              pbot(i, j) = missing
+            else
+              pbot(i, j) = pbot(i, j)*sfac + offs
+            end if
+          end do
         end do
-      end do
+      else
+        ! no _FillValue: do not mask against a value left over from another
+        ! variable, just apply scale/offset
+        do j = 1, jj
+          do i = 1, ii
+            pbot(i, j) = pbot(i, j)*sfac + offs
+          end do
+        end do
+      end if
     end if
 
     status = nf90_close(fid)
@@ -1976,17 +2227,7 @@ contains
 
     implicit none
 
-    integer :: i, j, k
     real(r4), allocatable, dimension(:, :, :)   :: fldtmp2
-
-    ! Set zero on ocean grid cells
-    do k = 1, kk
-      do j = 1, jj
-        do i = 1, ii
-          if (abs(fld(i, j, k)) > 2e20) fld(i, j, k) = 0.
-        end do
-      end do
-    end do
 
     ! Store variable
     if (vtype == '2d') then
@@ -2017,9 +2258,15 @@ contains
     else
       if (lshiftgrid) then
         if (hcoord(1:1) == 'p') then
+          ! cmor_write expects contiguous data; fld(:,1:jj-1,:) is strided
+          ! when kk>1 (level stride jj, section stride jj-1), which shifts
+          ! every level by one j-row. Copy to a contiguous buffer first.
+          allocate(fldtmp2(ii,jj-1,kk))
+          fldtmp2 = fld(:,1:jj-1,:)
           error_flag = cmor_write( &
                        var_id=varid, &
-                       data=fld(:,1:jj-1,:))
+                       data=fldtmp2(:,:,:))
+          deallocate(fldtmp2)
         else if (hcoord(1:1) == 'u') then
           allocate(fldtmp2(ii,jj-1,kk))
           fldtmp2 = cshift(fld(:,1:jj-1,:), 1, 1)
@@ -2028,9 +2275,12 @@ contains
                        data=fldtmp2(:,:,:))
           deallocate(fldtmp2)
         else if (hcoord(1:1) == 'v') then
-           error_flag = cmor_write( &
-                        var_id=varid, &
-                        data=fld(:, 2:jj, :))
+          allocate(fldtmp2(ii,jj-1,kk))
+          fldtmp2 = fld(:,2:jj,:)
+          error_flag = cmor_write( &
+                       var_id=varid, &
+                       data=fldtmp2(:,:,:))
+          deallocate(fldtmp2)
         else
           write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
         end if
@@ -2039,6 +2289,10 @@ contains
                      var_id=varid, &
                      data=fld(:,:,:))
       end if
+    end if
+    if (error_flag /= 0) then
+      write (*, *) 'ERROR: cmor_write failed for ', trim(ovnm)
+      stop
     end if
 
   end subroutine write_field
@@ -2156,12 +2410,17 @@ contains
       else
         if (lshiftgrid) then
           if (hcoord(1:1) == 'p') then
+            ! cmor_write expects contiguous data; fld(:,1:jj-1,:) is strided
+            ! when kk>1, which shifts every level by one j-row.
+            allocate(fldtmp2(ii,jj-1,kk))
+            fldtmp2 = fld(:,1:jj-1,:)
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=fld(:,1:jj-1,:), &
+                         data=fldtmp2(:,:,:), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
+            deallocate(fldtmp2)
           else if (hcoord(1:1) == 'u') then
             allocate(fldtmp2(ii,jj-1,kk))
             fldtmp2 = cshift(fld(:,1:jj-1,:), 1, 1)
@@ -2173,12 +2432,15 @@ contains
                          time_bnds=tbnds)
             deallocate(fldtmp2)
           else if (hcoord(1:1) == 'v') then
+            allocate(fldtmp2(ii,jj-1,kk))
+            fldtmp2 = fld(:,2:jj,:)
             error_flag = cmor_write( &
                          var_id=varid, &
-                         data=fld(:,2:jj,:), &
+                         data=fldtmp2(:,:,:), &
                          ntimes_passed=1, &
                          time_vals=tval, &
                          time_bnds=tbnds)
+            deallocate(fldtmp2)
           else
             write(*,*) "ERROR: unknow grid type: ",trim(hcoord(1:1))
           end if
@@ -2192,6 +2454,10 @@ contains
         end if
       end if
     end if
+    if (error_flag /= 0) then
+      write (*, *) 'ERROR: cmor_write failed for ', trim(ovnm)
+      stop
+    end if
 
   end subroutine write_tslice
 
@@ -2201,6 +2467,8 @@ contains
 
     character(len=*), intent(in) :: realm, frequency
     character(len=*), intent(out) :: itag
+
+    itag = ''
 
     select case (frequency)
     case ('mon')
@@ -2213,9 +2481,11 @@ contains
       if (realm == 'ocean') itag = tagoyr
       if (realm == 'ocnBgchem') itag = tagoyrbgc
     case ('fx')
+      itag = ''
     case default
       write(*,*) 'Error: Unknown realm and frequency: '
       write(*,*) trim(realm), ': ', trim(frequency)
+      stop 1
     end select
 
   end subroutine set_ocn_tag

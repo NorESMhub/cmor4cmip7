@@ -21,10 +21,10 @@ contains
 #endif
 
     character(len=*), intent(in) :: grid_label, grid_resolution, varname
-    character :: yyyymm1*6, yyyymm2*6, c2*2, r3*3
+    character :: yyyymm1*6, yyyymm2*6
+    character(len=8) :: crank
     type(json_core) :: json
     type(json_value), pointer :: p
-    integer   :: itmp
 
     !write(*,*) 'varname:',trim(varname)
     call json%initialize()
@@ -96,8 +96,19 @@ contains
       call json%add(p, 'parent_activity_id', trim(parent_activity_id))
       call json%add(p, 'parent_experiment_id', trim(parent_experiment_id))
       call json%add(p, 'parent_mip_era', trim(parent_mip_era))
-      if (len_trim(parent_source_id) < 3) parent_source_id = source_id
-      call json%add(p, 'parent_source_id', trim(parent_source_id))
+      ! parent_source_id defaults to source_id (parent and child are normally
+      ! the same model). The namelist variable itself is left untouched — it
+      ! used to be overwritten here, which also changed what print_namelists
+      ! reported; and a non-empty but implausibly short value is reported
+      ! instead of silently replaced.
+      if (len_trim(parent_source_id) >= 3) then
+        call json%add(p, 'parent_source_id', trim(parent_source_id))
+      else
+        if (len_trim(parent_source_id) > 0) write (*, *) &
+          'WARNING: parent_source_id "'//trim(parent_source_id)// &
+          '" is too short, using '//trim(source_id)
+        call json%add(p, 'parent_source_id', trim(source_id))
+      end if
       call json%add(p, 'parent_time_units', trim(parent_time_units))
       call json%add(p, 'parent_variant_label', trim(parent_variant_label))
     end if
@@ -110,17 +121,22 @@ contains
 
     write (yyyymm1, '(I4.4,I2.2)') year1, month1
     write (yyyymm2, '(I4.4,I2.2)') yearn, monthn
-    read(realization_index(2:), *) itmp
-    write (r3, '(I3.3)') itmp
 #ifdef MPI
     call mpi_comm_rank(mpi_comm_world, mpirank, mpierror)
-    write (c2, '(I2.2)') mpirank
+    ! two-digit names as before for ranks < 100; I2.2 cannot represent larger
+    ! ranks and used to write '**', so all of those ranks shared one file
+    if (mpirank < 100) then
+      write (crank, '(I2.2)') mpirank
+    else
+      write (crank, '(I0)') mpirank
+    end if
 #else
-    c2 = '00'
+    crank = '00'
 #endif
 
     json_file_attributes = 'attributes_'//trim(casename)//'_'// &
-                           trim(varname)//'_'//yyyymm1//'-'//yyyymm2//'_'//r3//'_'//c2//'.json'
+                           trim(varname)//'_'//yyyymm1//'-'//yyyymm2//'_'// &
+                           trim(variant_label)//'_'//trim(crank)//'.json'
     call json%print(p, json_file_attributes)
     call json%destroy(p)            ! cleanup
     !write(*, *) 'json-namelist file: ', trim(json_file_attributes)
@@ -163,8 +179,11 @@ contains
         call jsonc%info(child_ptr, name=key_name)
         keys(i) = key_name
       end do
-!   else
-!     if (verbose) write(*,*) "Warning: '"//trim(path)//"' not found in JSON."
+    else
+      ! The path is missing. Return an empty (but allocated) array, so that a
+      ! caller which forgets to test lfound sees size(keys) == 0 instead of
+      ! reading an unallocated array.
+      allocate (keys(0))
     end if
 
     call jsonf%destroy()
@@ -201,6 +220,9 @@ contains
     call json%destroy()
     !if (.not. found) write(*,*) "Warning: value of "//trim(path)//" in "//trim(fnm)//" not found"
 
+    ! str is INTENT(OUT), so it is undefined on entry when the key is missing;
+    ! return a blank string instead of leaving the caller's value undefined.
+    str = ''
     if (found) then
       str = cval
       deallocate (cval)
@@ -257,6 +279,9 @@ contains
     end if
     call json%load_file(filename=trim(fnm))
     if (json%failed()) stop "Error: Could not load JSON file: "//fnm
+    ! deterministic result when the key is missing (e.g. a source listed in
+    ! "sources" without a numeric factor)
+    scalar = 1.0d0
     call json%get(path, scalar, found)
     call json%destroy()
 
@@ -304,6 +329,10 @@ contains
     character(len=slenmax), dimension(:), allocatable :: cval
     logical :: found
 
+    ! str is INTENT(OUT): make sure it is defined even when the table has no
+    ! matching coordinate (or no dimensions at all)
+    str = ''
+
     if (present(separator)) then
       call json%initialize(path_separator=trim(separator))
     else
@@ -348,6 +377,10 @@ contains
     integer :: k, pdm
     character(len=slenmax), dimension(:), allocatable :: cval
     logical         :: found
+
+    ! str is INTENT(OUT): make sure it is defined even when the table has no
+    ! matching coordinate (or no dimensions at all)
+    str = ''
 
     if (present(separator)) then
       call json%initialize(path_separator=trim(separator))

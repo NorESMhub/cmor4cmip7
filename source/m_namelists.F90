@@ -17,9 +17,9 @@ module m_namelists
 
   ! System namelist
   character(len=slenmax), save  :: ibasedir, obasedir, tabledir, griddata
-  logical, save                 :: createsubdirs, forcefilescan, verbose
+  logical, save                 :: createsubdirs, forcefilescan, verbose, deletejson
   namelist /sys/ ibasedir, obasedir, tabledir, griddata, createsubdirs, &
-    forcefilescan, verbose
+    forcefilescan, verbose, deletejson
 
   ! Model namelist
   character(len=slenmax), save  :: source_id, institute_id
@@ -49,12 +49,15 @@ module m_namelists
   character(len=slenmax), save  :: history, comment
   integer, save                 :: exprefyear, year1, yearn, month1, monthn
   real(r8), save                :: branch_time
-  logical, save :: dry_run, plevdummy, readdummy, add_fill_day, scanallfiles
-  integer, save :: physics_version = 1, initialization_method = 1
+  logical, save                 :: scanallfiles
+  ! use the time_bnds/time_bounds variable of an input file when it has one;
+  ! experiment namelist switch, default .true. (see get_file_info in m_utilities)
+  logical, save                 :: ltimebnds
   ! CMIP7 DRS elements
   character(len=slenmax), save  :: activity_id, &
-                                   mip_era, tracking_prefix, &
-                                   variant_label
+                                   mip_era, tracking_prefix
+  ! derived from the four index strings in read_namelists, not a namelist entry
+  character(len=slenmax), save  :: variant_label
   character(len=slenmax), save  :: forcing_index, physics_index, realization_index, &
                                    initialization_index
   ! conditionally required global attributes
@@ -72,10 +75,11 @@ module m_namelists
     history, comment, &
     exprefyear, year1, yearn, month1, monthn, &
     branch_time, &
-    dry_run, plevdummy, readdummy, add_fill_day, scanallfiles, &
+    scanallfiles, &
+    ltimebnds, &
     activity_id, parent_variant_label, parent_mip_era, mip_era, &
     parent_activity_id, &
-    parent_time_units, tracking_prefix, variant_label, &
+    parent_time_units, tracking_prefix, &
     branch_time_in_child, branch_time_in_parent, &
     forcing_index, physics_index, realization_index, initialization_index
 
@@ -101,6 +105,25 @@ module m_namelists
                                   calunits = 'days since 1850-01-01 00:00:00'
 
 contains
+
+  ! -----------------------------------------------------------------
+
+  pure function with_slash(path) result(res)
+
+    ! Trailing separator for directory names used as '<dir>'//'<file>'.
+    ! Appends '/' only when it is missing, so a namelist value that already
+    ! ends in '/' does not turn every later path into '...//file'.
+    ! An empty value stays empty (it must not become the root directory).
+
+    character(len=*), intent(in)  :: path
+    character(len=:), allocatable :: res
+
+    res = trim(path)
+    if (len(res) > 0) then
+      if (res(len(res):len(res)) /= '/') res = res//'/'
+    end if
+
+  end function with_slash
 
   ! -----------------------------------------------------------------
 
@@ -137,12 +160,9 @@ contains
     createsubdirs = .true.
     forcefilescan = .true.
     verbose = .true.
-    dry_run = .false.
-    plevdummy = .false.
-    readdummy = .false.
-    add_fill_day = .false.
-    !newcolumnorder= .true.
+    deletejson = .true.
     scanallfiles = .true.
+    ltimebnds = .true.
     tracking_prefix = 'hdl:21.14107'
 
     casename = ' '
@@ -164,115 +184,195 @@ contains
     parent_source_id = ' '
     exprefyear = 1
 
+    ! CMIP7 DRS elements and conditionally required attributes.
+    activity_id = ' '
+    mip_era = ' '
+    realization_index = ' '
+    initialization_index = ' '
+    physics_index = ' '
+    forcing_index = ' '
+    parent_activity_id = ' '
+    parent_mip_era = ' '
+    parent_time_units = ' '
+    parent_variant_label = ' '
+    branch_time_in_child = 0.0
+    branch_time_in_parent = 0.0
+
+    ! Initialise arrays. 
     compound_names = ''
+    branded_names = ''
+    realms = ''
+    frequencies = ''
+    regions = ''
 
     pomon = ''
 
     ! Read namelists
-    if (iargc() /= 4) then
-      write (*, *) 'Usage: cmor4cmip7 <system nml-file> <model nml-file>'// &
+    if (command_argument_count() /= 4) then
+      write (*, *) 'Usage: cmor4cmip7 <system nml-file> <model nml-file> '// &
         '<exp nml-file> <variable nml-file>'
-      stop
+      stop 1
     end if
-    !else if (iargc() == 4 .or. iargc() == 5) then
     nmlfpsys = ' '
-    call getarg(1, nmlfpsys)
+    call get_command_argument(1, nmlfpsys)
     inquire (file=trim(nmlfpsys), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpsys)
-      stop
+      stop 1
     end if
     nmlfpmod = ' '
-    call getarg(2, nmlfpmod)
+    call get_command_argument(2, nmlfpmod)
     inquire (file=trim(nmlfpmod), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpmod)
-      stop
+      stop 1
     end if
     nmlfpexp = ' '
-    call getarg(3, nmlfpexp)
+    call get_command_argument(3, nmlfpexp)
     inquire (file=trim(nmlfpexp), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpexp)
-      stop
+      stop 1
     end if
     nmlfpvar = ' '
-    call getarg(4, nmlfpvar)
+    call get_command_argument(4, nmlfpvar)
     inquire (file=trim(nmlfpvar), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpvar)
-      stop
+      stop 1
     end if
-    !if (iargc() == 5) then
-    !call getarg(5, vsingle)
-    !end if
-    !end if
 
+    ! NB: remove restrictions on line length in the open statements below. 
+    ! no RECL= on these opens. For a formatted sequential file RECL is the
+    ! maximum record (line) length in characters, so a value of 200 silently
+    ! limits every namelist to short lines; a long compound_names/branded
+    ! names list is then read truncated (or rejected) without a clear error.
     funit = get_free_unit()
-    open (funit, file=trim(nmlfpsys), status='old', action='read', recl=200)
+   !open (funit, file=trim(nmlfpsys), status='old', action='read', recl=200)
+    open (funit, file=trim(nmlfpsys), status='old', action='read')
     read (funit, nml=sys, iostat=istatus)
     close (funit)
     if (istatus /= 0) then
       write (*, *) 'Problem reading namelist system in file '//trim(nmlfpsys)
-      stop
+      stop 1
     end if
-    griddata = trim(griddata)//'/'
-    tabledir = trim(tabledir)//'/'
 
-    open (funit, file=trim(nmlfpmod), status='old', action='read', recl=200)
+    ! The input, output and table directories are used as '<dir>'//'<name>'
+    ! everywhere. An empty value would silently turn into a relative path
+    ! (or, before with_slash(), into '/' itself), so require all three.
+    if (len_trim(ibasedir) == 0 .or. len_trim(obasedir) == 0 .or. &
+        len_trim(tabledir) == 0) then
+      write (*, *) 'ERROR: ibasedir, obasedir and tabledir must be set in '// &
+        'the system namelist '//trim(nmlfpsys)
+      write (*, *) '       ibasedir = "'//trim(ibasedir)//'"'
+      write (*, *) '       obasedir = "'//trim(obasedir)//'"'
+      write (*, *) '       tabledir = "'//trim(tabledir)//'"'
+      stop 1
+    end if
+
+    griddata = with_slash(griddata)
+    tabledir = with_slash(tabledir)
+
+    open (funit, file=trim(nmlfpmod), status='old', action='read')
     read (funit, nml=model, iostat=istatus)
     close (funit)
     if (istatus /= 0) then
       write (*, *) 'Problem reading namelist model in file '//trim(nmlfpmod)
-      stop
+      stop 1
     end if
 
-    open (funit, file=trim(nmlfpexp), status='old', action='read', recl=200)
+    open (funit, file=trim(nmlfpexp), status='old', action='read')
     read (funit, nml=experiment, iostat=istatus)
     close (funit)
     if (istatus /= 0) then
       write (*, *) 'Problem reading namelist experiment in file '//trim(nmlfpexp)
-      stop
+      stop 1
     end if
 
-    open (funit, file=trim(nmlfpvar), status='old', action='read', recl=200)
+    ! sanity check on the experiment period.
+    if (year1 < 1 .or. yearn < year1 .or. &
+        month1 < 1 .or. month1 > 12 .or. monthn < 1 .or. monthn > 12 .or. &
+        (year1 == yearn .and. monthn < month1)) then
+      write (*, *) 'ERROR: invalid period in the experiment namelist '// &
+        trim(nmlfpexp)
+      write (*, *) '       year1, month1, yearn, monthn = ', &
+        year1, month1, yearn, monthn
+      stop 1
+    end if
+
+    open (funit, file=trim(nmlfpvar), status='old', action='read')
     read (funit, nml=variables, iostat=istatus)
     !rewind(funit)
     if (istatus /= 0) write (*, *) &
       'WARNING: compound_names not in namelist file.'
     close (funit)
 
+    ! compound_names entries have the form
+    !   <realm>.<branded_base>.<branded_suffix>.<frequency>.<region>
+    ! e.g. 'ocean.agessc.tavg-ol-hxy-sea.mon.glb'. The fields are split off
+    ! with index(); when a separator is missing index() returns 0 and the old
+    ! code then took substring (1:-1) (a legal empty string) and shifted every
+    ! following field, so a typo silently produced a dataset with an empty
+    ! realm or a wrong region instead of an error.
     n_datasets = 0
     do n = 1, rowmax
       nstr = len_trim(compound_names(n))
       if (nstr /= 0) then
         substr = compound_names(n)
         pos = index(substr, '.')
+        if (pos <= 1) call bad_compound(n)
         realms(n) = substr(1:pos - 1)
         substr = substr(pos + 1:nstr)
         pos = index(substr, '.')
+        if (pos <= 1) call bad_compound(n)
         tmpstr = substr(1:pos - 1)
         substr = substr(pos + 1:nstr)
         pos = index(substr, '.')
+        if (pos <= 1) call bad_compound(n)
         branded_names(n) = trim(tmpstr)//'_'//substr(1:pos - 1)
         substr = substr(pos + 1:nstr)
         pos = index(substr, '.')
+        if (pos <= 1 .or. pos >= len_trim(substr)) call bad_compound(n)
         frequencies(n) = substr(1:pos - 1)
-        regions(n) = substr(pos + 1:nstr)
+        regions(n) = substr(pos + 1:)
         n_datasets = n_datasets + 1
       else
         exit
       end if
     end do
 
-!   variant_label=realization_index//initialization_index//physics_index//forcing_index
+    ! variant_label is the r<i>i<i>p<i>f<i> string built from the four index strings
+    variant_label = trim(realization_index)//trim(initialization_index)// &
+                    trim(physics_index)//trim(forcing_index)
+
     ! Extend input path if necessary
     if (len_trim(isubdir) > 0) &
-      ibasedir = trim(ibasedir)//'/'//trim(isubdir)
+      ibasedir = with_slash(ibasedir)//trim(isubdir)
 
-    ! Modify output path and create output folder
-    obasedir = trim(obasedir)//'/'//trim(osubdir)
-    call execute_command_line('mkdir -p '//trim(obasedir))
+    ! Modify output path. The directory itself is created by the caller
+    ! (cmor4cmip7.F90), so that under MPI only rank 0 creates it.
+    obasedir = with_slash(obasedir)//trim(osubdir)
+
+  contains
+
+    ! -----------------------------------------------------------------
+
+    subroutine bad_compound(idx)
+
+      ! A malformed compound_names entry cannot be interpreted, and guessing
+      ! would CMORize the wrong quantities into the wrong realm, so stop with
+      ! a message that names the entry.
+
+      implicit none
+
+      integer, intent(in) :: idx
+
+      write (*, *) 'ERROR: malformed compound_names entry, expected'
+      write (*, *) '       <realm>.<branded_base>.<branded_suffix>.<frequency>.<region>'
+      write (*, *) '       entry ', idx, ': '//trim(compound_names(idx))
+      stop 1
+
+    end subroutine bad_compound
 
   end subroutine read_namelists
 
@@ -292,6 +392,7 @@ contains
     write (*, *) ' grid data dir.   = ', trim(griddata)
     write (*, *) ' create sub-dirs  = ', createsubdirs
     write (*, *) ' verbose          = ', verbose
+    write (*, *) ' deletejson       = ', deletejson
     write (*, *)
     write (*, *) 'Model namelist:'
 !   write (*, *) ' institution      = ', trim(institution)
@@ -324,8 +425,7 @@ contains
     write (*, *) ' end year         = ', yearn
     write (*, *) ' start month      = ', month1
     write (*, *) ' end month        = ', monthn
-!   write (*, *) ' add dummy day    = ', add_fill_day
-!   write (*, *) ' dry run          = ', dry_run
+    write (*, *) ' use file time bounds  = ', ltimebnds
 
     write (*, *)
     print *, 'List of datasets to be CMORized:'
@@ -390,8 +490,13 @@ contains
 
     do free_unit = 10, 99
       inquire (free_unit, opened=in_use)
-      if (.not. in_use) exit
+      if (.not. in_use) return
     end do
+
+    ! The loop variable is 100 here; returning it would open a unit that was
+    ! never checked (and may hold a real connection), so fail explicitly.
+    write (*, *) 'ERROR: no free Fortran unit in 10-99'
+    stop 1
 
   end function get_free_unit
 

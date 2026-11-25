@@ -3,7 +3,8 @@ module m_utilities
   use netcdf
   use m_namelists, only: itag, verbose, ibasedir, slenmax, r4, r8, eps, missing, &
     casename, fnm, year1, month1, yearn, monthn, exprefyear, rec, tval, &
-    tbnd, mbnd, year, month, forcefilescan, funit, scanallfiles, membertag
+    tbnd, mbnd, year, month, forcefilescan, funit, scanallfiles, membertag, &
+    ltimebnds
 
   implicit none
 
@@ -138,7 +139,10 @@ contains
                            status, sstartend(2, 10), nskip, irecold, toff, ndays
     integer             :: ndims_bnds, dimids_bnds(2), ndim1, ndim2
     real(r8), save      :: dnumlo, dnumhi, tbndold(2) = (/-999999., -999999./)
-    logical, save       :: ltimebnds, ldone
+    logical, save       :: ldone
+    ! lbnds_in_file: the current file provides a 2-D time_bnds/time_bounds
+    ! lusebnds     : those bounds are to be used (namelist switch AND file)
+    logical             :: lbnds_in_file, lusebnds
     ! ltrans = "logical, transposed": set when the time-bounds variable of the
     ! current file is stored as (time,bnds) instead of the usual (bnds,time),
     ! so that the bounds are read with start=(/n,1/) count=(/1,2/)
@@ -306,7 +310,7 @@ contains
       ! DS: dnumlo is exact, but the real->integer conversion must be explicit
       toff = nint(dnumlo) - ndays
       ! Look for time bounds; accept both (bnds,time) and (time,bnds) order.
-      ltimebnds = .false.
+      lbnds_in_file = .false.
       ltrans = .false.
       status = nf90_inq_varid(ncid, 'time_bnds', rhid2)
       if (status /= nf90_noerr) then
@@ -325,24 +329,24 @@ contains
         end if
         if (status == nf90_noerr) then
           if (ndim1 == 2) then
-            ltimebnds = .true.
+            lbnds_in_file = .true.
           else if (ndim2 == 2) then
-            ltimebnds = .true.
+            lbnds_in_file = .true.
             ltrans = .true.
           end if
         end if
       end if
 
-      ! Files with broken bounds are handled below by falling back to tval
+      ! Use the bounds only when the experiment namelist did not switch them
+      ! off (ltimebnds = .false.) and the file actually provides them. Files
+      ! with broken bounds are handled below by falling back to tval
       ! (cf. issue reported in BLOM #781).
-      ! force set ltimebnds = .false. for now 
-
-      ltimebnds = .false.
+      lusebnds = ltimebnds .and. lbnds_in_file
       do n = irecold + 1, nrec
         irecold = n
         call handle_ncerror(nf90_get_var(ncid, rhid, tval, start=(/n/)))
         tbnd = tval
-        if (ltimebnds) then
+        if (lusebnds) then
           if (ltrans) then
             status = nf90_get_var(ncid, rhid2, tbnd, &
                                   start=(/n, 1/), count=(/1, 2/))

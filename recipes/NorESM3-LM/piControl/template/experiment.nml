@@ -20,5 +20,6 @@
  mip_era                = 'CMIP7',
  branch_time_in_child   = 0.0D0,
  branch_time_in_parent  = 620500.0D0,
+ ltimebnds              = .false.,
  scanallfiles           = .false.
 /

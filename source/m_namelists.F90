@@ -50,6 +50,9 @@ module m_namelists
   integer, save                 :: exprefyear, year1, yearn, month1, monthn
   real(r8), save                :: branch_time
   logical, save                 :: scanallfiles
+  ! use the time_bnds/time_bounds variable of an input file when it has one;
+  ! experiment namelist switch, default .true. (see get_file_info in m_utilities)
+  logical, save                 :: ltimebnds
   ! CMIP7 DRS elements
   character(len=slenmax), save  :: activity_id, &
                                    mip_era, tracking_prefix
@@ -73,6 +76,7 @@ module m_namelists
     exprefyear, year1, yearn, month1, monthn, &
     branch_time, &
     scanallfiles, &
+    ltimebnds, &
     activity_id, parent_variant_label, parent_mip_era, mip_era, &
     parent_activity_id, &
     parent_time_units, tracking_prefix, &
@@ -158,6 +162,7 @@ contains
     verbose = .true.
     deletejson = .true.
     scanallfiles = .true.
+    ltimebnds = .true.
     tracking_prefix = 'hdl:21.14107'
 
     casename = ' '
@@ -420,6 +425,7 @@ contains
     write (*, *) ' end year         = ', yearn
     write (*, *) ' start month      = ', month1
     write (*, *) ' end month        = ', monthn
+    write (*, *) ' use file time bounds  = ', ltimebnds
 
     write (*, *)
     print *, 'List of datasets to be CMORized:'

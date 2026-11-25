@@ -230,6 +230,7 @@ contains
       if (allocated(factors)) deallocate(factors)
       call json_get_original_name(trim(mapfile), trim(cvnm), original_name, lfound=found)
       if (.not. found) then
+        write(*,*) 'mapfile: ', trim(mapfile)
         write(*,*) 'ERROR: no original_name in mapfile for ', trim(cvnm)
         cycle main_loop
       end if

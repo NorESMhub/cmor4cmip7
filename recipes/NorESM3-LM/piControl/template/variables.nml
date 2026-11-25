@@ -6,7 +6,7 @@
 ! --- --- --- --- --- ---
 !
 &variables
-mapfile         = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/recipes/template/mapping.json',
+mapfile         = '../recipes/template/mapping.json',
 compound_names  = 
     'ocean.agessc.tavg-ol-hxy-sea.mon.glb'
     'ocean.areacello.ti-u-hxy-u.fx.glb'

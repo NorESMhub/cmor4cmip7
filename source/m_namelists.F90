@@ -206,35 +206,35 @@ contains
     if (command_argument_count() /= 4) then
       write (*, *) 'Usage: cmor4cmip7 <system nml-file> <model nml-file> '// &
         '<exp nml-file> <variable nml-file>'
-      stop
+      stop 1
     end if
     nmlfpsys = ' '
     call get_command_argument(1, nmlfpsys)
     inquire (file=trim(nmlfpsys), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpsys)
-      stop
+      stop 1
     end if
     nmlfpmod = ' '
     call get_command_argument(2, nmlfpmod)
     inquire (file=trim(nmlfpmod), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpmod)
-      stop
+      stop 1
     end if
     nmlfpexp = ' '
     call get_command_argument(3, nmlfpexp)
     inquire (file=trim(nmlfpexp), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpexp)
-      stop
+      stop 1
     end if
     nmlfpvar = ' '
     call get_command_argument(4, nmlfpvar)
     inquire (file=trim(nmlfpvar), exist=fexist)
     if (.not. fexist) then
       write (*, *) 'cannot find namelist file: '//trim(nmlfpvar)
-      stop
+      stop 1
     end if
 
     ! NB: remove restrictions on line length in the open statements below. 
@@ -249,7 +249,7 @@ contains
     close (funit)
     if (istatus /= 0) then
       write (*, *) 'Problem reading namelist system in file '//trim(nmlfpsys)
-      stop
+      stop 1
     end if
 
     ! The input, output and table directories are used as '<dir>'//'<name>'
@@ -273,7 +273,7 @@ contains
     close (funit)
     if (istatus /= 0) then
       write (*, *) 'Problem reading namelist model in file '//trim(nmlfpmod)
-      stop
+      stop 1
     end if
 
     open (funit, file=trim(nmlfpexp), status='old', action='read')
@@ -281,7 +281,7 @@ contains
     close (funit)
     if (istatus /= 0) then
       write (*, *) 'Problem reading namelist experiment in file '//trim(nmlfpexp)
-      stop
+      stop 1
     end if
 
     ! sanity check on the experiment period.

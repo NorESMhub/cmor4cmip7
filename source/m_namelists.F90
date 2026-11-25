@@ -484,8 +484,13 @@ contains
 
     do free_unit = 10, 99
       inquire (free_unit, opened=in_use)
-      if (.not. in_use) exit
+      if (.not. in_use) return
     end do
+
+    ! The loop variable is 100 here; returning it would open a unit that was
+    ! never checked (and may hold a real connection), so fail explicitly.
+    write (*, *) 'ERROR: no free Fortran unit in 10-99'
+    stop 1
 
   end function get_free_unit
 

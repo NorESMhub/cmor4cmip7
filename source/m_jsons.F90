@@ -21,7 +21,7 @@ contains
 #endif
 
     character(len=*), intent(in) :: grid_label, grid_resolution, varname
-    character :: yyyymm1*6, yyyymm2*6, r3*3
+    character :: yyyymm1*6, yyyymm2*6
     character(len=8) :: crank
     type(json_core) :: json
     type(json_value), pointer :: p

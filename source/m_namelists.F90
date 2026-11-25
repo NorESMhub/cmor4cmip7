@@ -103,6 +103,25 @@ contains
 
   ! -----------------------------------------------------------------
 
+  pure function with_slash(path) result(res)
+
+    ! Trailing separator for directory names used as '<dir>'//'<file>'.
+    ! Appends '/' only when it is missing, so a namelist value that already
+    ! ends in '/' does not turn every later path into '...//file'.
+    ! An empty value stays empty (it must not become the root directory).
+
+    character(len=*), intent(in)  :: path
+    character(len=:), allocatable :: res
+
+    res = trim(path)
+    if (len(res) > 0) then
+      if (res(len(res):len(res)) /= '/') res = res//'/'
+    end if
+
+  end function with_slash
+
+  ! -----------------------------------------------------------------
+
   subroutine read_namelists
 
     implicit none
@@ -217,8 +236,22 @@ contains
       write (*, *) 'Problem reading namelist system in file '//trim(nmlfpsys)
       stop
     end if
-    griddata = trim(griddata)//'/'
-    tabledir = trim(tabledir)//'/'
+
+    ! The input, output and table directories are used as '<dir>'//'<name>'
+    ! everywhere. An empty value would silently turn into a relative path
+    ! (or, before with_slash(), into '/' itself), so require all three.
+    if (len_trim(ibasedir) == 0 .or. len_trim(obasedir) == 0 .or. &
+        len_trim(tabledir) == 0) then
+      write (*, *) 'ERROR: ibasedir, obasedir and tabledir must be set in '// &
+        'the system namelist '//trim(nmlfpsys)
+      write (*, *) '       ibasedir = "'//trim(ibasedir)//'"'
+      write (*, *) '       obasedir = "'//trim(obasedir)//'"'
+      write (*, *) '       tabledir = "'//trim(tabledir)//'"'
+      stop 1
+    end if
+
+    griddata = with_slash(griddata)
+    tabledir = with_slash(tabledir)
 
     open (funit, file=trim(nmlfpmod), status='old', action='read')
     read (funit, nml=model, iostat=istatus)
@@ -291,11 +324,11 @@ contains
 !   variant_label=realization_index//initialization_index//physics_index//forcing_index
     ! Extend input path if necessary
     if (len_trim(isubdir) > 0) &
-      ibasedir = trim(ibasedir)//'/'//trim(isubdir)
+      ibasedir = with_slash(ibasedir)//trim(isubdir)
 
     ! Modify output path. The directory itself is created by the caller
     ! (cmor4cmip7.F90), so that under MPI only rank 0 creates it.
-    obasedir = trim(obasedir)//'/'//trim(osubdir)
+    obasedir = with_slash(obasedir)//trim(osubdir)
 
   contains
 

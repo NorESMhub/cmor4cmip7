@@ -25,6 +25,15 @@ The `system` namelist defines the local filesystem locations and processing cont
 | `createsubdirs` | Logical flag indicating whether CMOR should create the CMIP7 directory tree following the CMIP7 Data Reference Syntax (DRS). |
 | `forcefilescan` | Logical flag forcing a full scan of the model output files and regeneration of the file list, even when cached metadata already exists. |
 | `verbose` | Logical flag controlling the amount of diagnostic output written to the terminal and log stream during processing. |
+| `deletejson` | Logical flag, default `.true.`: remove the temporary CMIP7 attribute JSON (`attributes_*.json`) written for each variable after CMOR has read it. |
+
+:::{note}
+`ibasedir`, `obasedir` and `tabledir` must not be empty; the program stops at
+start-up with `ERROR: ibasedir, obasedir and tabledir must be set in the system
+namelist` if one of them is missing. A trailing `/` is added automatically
+when it is missing, so paths may be written either way without producing
+`dir//file` mistakes.
+:::
 
 :::{note}
 These values are local configurations for the `cmor4cmip7` rather than CMIP7 global attributes, but they directly influence the consistency and correctness of the generated CMIP7 archive. In particular, `tabledir`, and `griddata` determine whether the workflow is using the correct CMIP7-controlled vocabularies, and grid metadata for the target output.

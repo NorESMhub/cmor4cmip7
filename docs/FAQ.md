@@ -76,3 +76,31 @@ A good workflow is:
 - check the mapping in `mapping.json`.
 - hack the CMIP7 CV json file (`CMIP7_*.json`), if necessary.
 - rerun the program with `verbose = .true.` to inspect the generated CMIP7 metadata and output structure.
+
+## Why is a variable skipped with "no original_name in mapfile"?
+
+The lookup uses the **complete** compound name, including the region field. If
+`variables.nml` asks for e.g.
+`ocnBgchem.intpoc.tavg-u-hxy-sea.mon.glb` while `mapping.json` only defines
+`ocnBgchem.intpoc.tavg-u-hxy-sea.mon.30S-90S`, the entry is not found and the
+variable is skipped with that message.
+
+Either request the region that the mapping defines, or add the requested region
+to `mapping.json`. Note that in a parallel run each rank checks the variables it
+owns, so the messages from different ranks appear interleaved; the number of
+skipped variables is the same as in a serial run, and the cause is not the
+parallel execution.
+
+## How do I control whether `time_bnds` is read?
+
+By default (`ltimebnds = .true.`) the program uses the `time_bnds` /
+`time_bounds` variable of an input file when the file provides one, and falls
+back to the instantaneous time value otherwise. To ignore the bounds for all
+files — for example when they are known to be broken (BLOM issue #781) — set
+
+```fortran
+ ltimebnds = .false.
+```
+
+in `experiment.nml`. `print_namelists` reports the effective setting as
+`use time bounds = T/F`.

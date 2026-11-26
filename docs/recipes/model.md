@@ -8,7 +8,6 @@ The `model` namelist defines the source and configuration metadata needed for CM
  institute_id  = 'NCC',
  contact       = 'Please send any requests or bug reports to noresm-ncc@met.no.',
  ocngrid       = 'tripolar grid with 1deg nominal resolution',
- ocngrid_label = 'g143',
  ocngrid_resolution = '100 km',
  tagoyr        = 'blom.hy',
  tagoyrbgc     = 'blom.hbgcy',
@@ -32,7 +31,6 @@ The `model` namelist defines the source and configuration metadata needed for CM
 | `institute_id` | Institution acronym for the group responsible for the model, as recorded in CMIP7 metadata. |
 | `contact` | Contact information for questions, bug reports, or requests related to the model output or data provenance. |
 | `ocngrid` | Human-readable description of the ocean grid geometry and resolution used by the model. |
-| `ocngrid_label` | CMIP7 grid identifier associated with the ocean grid, such as `g143`, following the registered grid label convention. |
 | `ocngrid_resolution` | Approximate nominal horizontal resolution of the ocean grid, such as `100 km`. |
 | `tagoyr` | File name tag or pattern used for yearly ocean model output files. |
 | `tagoyrbgc` | File name tag or pattern used for yearly ocean biogeochemistry output files. |
@@ -49,3 +47,20 @@ The `model` namelist defines the source and configuration metadata needed for CM
 :::{note}
 This namelist is not itself a CMIP7 global-attribute table, but it supplies the model-specific metadata that is needed to generate CMIP7-compliant output. The values here must be consistent with the registered `source_id`, the grid label, and the model-configuration information used when creating the final file metadata and directory structure.
 :::
+
+## Grid labels
+
+For each variable the program derives the CMIP7 `grid_label` from the Arakawa
+grid point in `mapping.json` and the horizontal label of the compound name:
+
+| Arakawa point | horizontal label | `grid_label` |
+| --- | --- | --- |
+| `p` | `hm` (global mean) | `g010` |
+| `p` | `ht` (line transport) | `g014` (`oline,time`), else `g262` |
+| `p` | `hyb` (basin / meridional) | `g262` |
+| `p` | anything else (`hxy`, …) | `g202` |
+| `u` | – | `g241` |
+| `v` | – | `g240` |
+
+`ocngrid_label` is used as the starting value and therefore as the label for
+any case the table above does not cover.

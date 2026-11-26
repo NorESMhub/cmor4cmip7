@@ -35,6 +35,9 @@ cmor4cmip7
 │   ├── grid_tnx1v4.nc          # Native ocean grid
 │   ├── inicon_tnx1v4.nc        # Ocean initial conditions
 │   └── ocean_regions_tnx1v4.nc # Ocean region masks
+├── helper/                     # Stand-alone utilities
+│   ├── cmorCheck.sh            # quick check of CMORized output
+│   └── checkmissing.sh         # report missing variables in the output
 ├── json-fortran/               # JSON I/O library used by the workflow (submodule)
 ├── recipes/                    # Experiment-specific recipes and templates
 │   ├── NorESM3-LM/
@@ -78,7 +81,10 @@ This is the user-facing configuration area. Each experiment has a recipe directo
 - `mapping.json`: mapping between native output fields and CMIP7 variable definitions
 
 :::{note}
-The `mapping.json` file is currently hard-coded to point to one under the `receipe/template/mapping.json`.
+The mapping file is not hard-coded: `variables.nml` points to it with the
+`mapfile` entry. The path may be absolute (as in the shipped
+`recipes/template/variables.nml`) or relative to the directory the program is
+started from.
 :::
 
 ### `source/`

@@ -34,12 +34,12 @@ compound_names  =
     'ocnBgchem.chl.tavg-ols-hxy-sea.day.glb'
     'ocnBgchem.chl.tavg-ols-hxy-sea.mon.glb'
 !...
-    'ocnBgchem.zooc.tavg-ols-hxy-sea.mon.30S-90S'
+    'ocnBgchem.zooc.tavg-ols-hxy-sea.mon.glb'
     'ocnBgchem.zooc.tavg-ol-hxy-sea.mon.glb'
 /
 ```
 
-`mapfile` specify path to the variable mapping file that links model-specific output fields to the CMIP7 data request and target metadata definitions.
+`mapfile` specify path to the variable mapping file that links model-specific output fields to the CMIP7 data request and target metadata definitions. The path may be absolute or relative to the directory the program is started from.
 
 The list of compound names denotes the datasets to be CMORized:
 
@@ -51,8 +51,26 @@ The list of compound names denotes the datasets to be CMORized:
 | `ocean.zos.tavg-u-hxy-sea.mon.glb` | Same field but monthly mean output, following the CMIP7 branded-variable naming scheme. |
 | `ocean.zostoga.tavg-u-hm-sea.mon.glb` | Global ocean steric sea-level anomaly or equivalent monthly mean diagnostic. |
 | `ocnBgchem.chl.tavg-ols-hxy-sea.mon.glb` | Ocean biogeochemistry chlorophyll concentration, monthly mean, global ocean domain. |
-| `ocnBgchem.zooc.tavg-ols-hxy-sea.mon.30S-90S` | Zooplankton concentration for a specified latitude band, monthly mean, Southern Ocean subset. |
+| `ocnBgchem.zooc.tavg-ols-hxy-sea.mon.glb` | Zooplankton concentration, monthly mean over the global ocean. |
 
 :::{tip}
 The entries can be commented out with `!` to disable individual variables without removing them from the file, which makes it easy to re-run only selected CMIP7 diagnostics.
 :::
+
+## Parsing and validation
+
+The program splits every entry into five dot-separated fields and the branded
+suffix into four dash-separated fields:
+
+```text
+<realm>.<branded_base>.<temporal>-<vertical>-<horizontal>-<area>.<frequency>.<region>
+```
+
+- the **horizontal** label (third dash field, e.g. `hxy`, `hm`, `ht`, `hyb`) is
+extracted and used, together with the Arakawa grid point from `mapping.json`,
+to choose the CMIP7 `grid_label` of the output;
+- entries with a missing dot, or a suffix without the four dash-separated
+fields, stop the program with an error that names the offending entry instead
+of silently shifting the fields;
+- the region field must match a `mapping.json` entry exactly — requesting
+`...mon.glb` does not pick up a mapping written for `...mon.30S-90S`.

@@ -11,8 +11,7 @@ cd ~/                                             # Install under home as defaul
 tag=v20261126                                     # Chose [the latest release](https://github.com/NorESMhub/cmor4cmip7/tags)
 git clone git@github.com:NorESMhub/cmor4cmip7.git # Clone the source code
 cd cmor4cmip7
-git checkout -b $tag tags/$tag                    # Checout the tag
-git switch -c $tag                                # Make it as a branch
+git checkout -b $tag tags/$tag                    # Checout the tag, and make it as a branch
 git submodule update --init --recursive           # Get the submodules
 ```
 

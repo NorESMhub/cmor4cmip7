@@ -8,7 +8,6 @@ The `model` namelist defines the source and configuration metadata needed for CM
  institute_id  = 'NCC',
  contact       = 'Please send any requests or bug reports to noresm-ncc@met.no.',
  ocngrid       = 'tripolar grid with 1deg nominal resolution',
- ocngrid_label = 'g143',
  ocngrid_resolution = '100 km',
  tagoyr        = 'blom.hy',
  tagoyrbgc     = 'blom.hbgcy',
@@ -32,7 +31,6 @@ The `model` namelist defines the source and configuration metadata needed for CM
 | `institute_id` | Institution acronym for the group responsible for the model, as recorded in CMIP7 metadata. |
 | `contact` | Contact information for questions, bug reports, or requests related to the model output or data provenance. |
 | `ocngrid` | Human-readable description of the ocean grid geometry and resolution used by the model. |
-| `ocngrid_label` | Default CMIP7 grid label for the ocean grid, such as `g143`. The label actually written for a variable is chosen from the Arakawa grid point and the horizontal label of the CMIP7 name; see the table below. |
 | `ocngrid_resolution` | Approximate nominal horizontal resolution of the ocean grid, such as `100 km`. |
 | `tagoyr` | File name tag or pattern used for yearly ocean model output files. |
 | `tagoyrbgc` | File name tag or pattern used for yearly ocean biogeochemistry output files. |

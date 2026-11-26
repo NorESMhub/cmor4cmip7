@@ -96,7 +96,6 @@ Key entries:
 
 - `source_id`: the CMIP7 model/source identifier, for example `NorESM3-LM`
 - `institute_id`: institution acronym
-- `ocngrid_label`: grid label such as `g143`
 - `ocngrid_resolution`: nominal model resolution
 - auxiliary file names for the native ocean grid and masks
 

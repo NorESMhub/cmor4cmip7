@@ -1505,8 +1505,9 @@ contains
     ! Derive path to CMOR table
     tablepath = trim(tabledir)//trim(table)
 
-    ! Define output dataset
-    grid_label = ocngrid_label
+    ! Define output dataset. The grid label follows the Arakawa grid point and
+    ! the horizontal label of the compound name; it is not a namelist choice.
+    grid_label = ''
     if (hcoord(1:1) == 'p') then
       if (horizontal_label == 'hm') then
         grid_label = 'g010'
@@ -1526,7 +1527,8 @@ contains
     else if (hcoord(1:1) == 'v') then
       grid_label = 'g240'
     else
-      write(*, *) 'ERROR: unknow horizontal grid: '//hcoord(1:1)
+      write (*, *) 'ERROR: unknown horizontal grid point: '//hcoord(1:1)
+      stop 1
     end if
     call json_write_attributes(grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)

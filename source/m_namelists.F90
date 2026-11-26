@@ -29,7 +29,7 @@ module m_namelists
   character(len=slenmax), save  :: secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
                                    ocnregnfile
   character(len=slenmax), save  :: coordtable, json_file_attributes, &
-                                   ocngrid, ocngrid_label, ocngrid_resolution
+                                   ocngrid, ocngrid_resolution
   ! conditionally required global attributes
 ! character(len=slenmax), save  :: external_variables
 
@@ -40,7 +40,7 @@ module m_namelists
     tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc, &
     secindexfile, ocngridfile, ocninitfile, ocnmertfile, ocnregnfile, &
     coordtable, json_file_attributes, &
-    ocngrid, ocngrid_label, ocngrid_resolution, &
+    ocngrid, ocngrid_resolution, &
     lshiftgrid
 
   ! Experiment namelist

@@ -141,6 +141,7 @@ Example:
  mip_era                = 'CMIP7',
  branch_time_in_child   = 0.0D0,
  branch_time_in_parent  = 620500.0D0,
+ ltimebnds              = .false.,
  scanallfiles           = .false.
 /
 ```
@@ -168,6 +169,9 @@ mapfile = '/nird/datalake/NS16000B/CMOR/cmor4cmip7/recipes/template/mapping.json
 ```
 
 Use `!` to skip any variable you do not want to process in the current run.
+
+The optional `arakawa_grid_point` key of each `mapping.json` entry tells the
+program whether the native variable lives on the `p`, `u` or `v` grid; When it is absent, the `coordinates` attribute of the input file is used.
 
 :::{note}
 These are Fortran namelist files, so standard Fortran rules apply. Keep the syntax valid, avoid missing commas, and check that each entry is quoted properly.

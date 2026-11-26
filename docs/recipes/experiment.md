@@ -28,6 +28,7 @@ The CMIP7 guidance defines these as part of the required and conditionally requi
  mip_era                = 'CMIP7',
  branch_time_in_child   = 0.0D0,
  branch_time_in_parent  = 620500.0D0,
+ ltimebnds              = .false.,
  scanallfiles           = .false.
 /
 ```
@@ -70,6 +71,21 @@ The most important fields in this namelist are:
 | `branch_time_in_child` | Time in the child simulation when the branch occurred, expressed in the child simulation's time units and calendar. |
 | `branch_time_in_parent` | Time in the parent simulation when the branch occurred, expressed in the parent simulation's time units and calendar. |
 | `scanallfiles` | Logical switch controlling whether all files in the target output set are scanned when determining file coverage. |
+| `ltimebnds` | Logical switch, default `.true.`: use the `time_bnds`/`time_bounds` variable of the input file when it has one. Set `.false.` to always use the instantaneous time value (the usual choice for files with broken bounds). |
+
+:::{note}
+`variant_label` is **not** a namelist entry. It is always derived from the
+four index strings as
+`realization_index // initialization_index // physics_index // forcing_index`
+(e.g. `r1i1p1f1`); a `variant_label` key in the file is no longer accepted.
+
+The period is validated when the namelist is read: `year1` must be at least 1,
+`yearn` at least `year1`, `month1`/`monthn` must be between 1 and 12 and, for a
+single-year period, `monthn` must not be smaller than `month1`. Otherwise the
+program stops with `ERROR: invalid period in the experiment namelist`, which
+prevents runs that would silently produce files with a bogus
+`000001-000012` timestamp.
+:::
 
 :::{note}
 For CMIP7, these values should be internally consistent with the registered experiment definition, the `source_id`, and the variant information used in the file metadata. When a simulation is a branch of an earlier experiment, the parent metadata must clearly record the parent experiment identity, the parent variant label, and the parent branch time so that users can trace the lineage of the simulation.

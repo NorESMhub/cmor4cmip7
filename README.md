@@ -21,6 +21,12 @@ The full documentaion is at [https://cmor4cmip7.readthedocs.io](https://cmor4cmi
 * [Developer’s Guide](https://cmor4cmip7.readthedocs.io/en/stable/develop/intro.html)
 * [FAQ](https://cmor4cmip7.readthedocs.io/en/stable/FAQ.html)
 
+## Utilities
+
+Additional helper scripts live in `helper/`:
+
+- `cmorCheck.sh`, `checkmissing.sh` — quick checks of CMORized output.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).

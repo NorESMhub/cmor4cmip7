@@ -3,6 +3,7 @@
         "description": "mapping of NorESM3 model output to CMIP7 data request v1.2.2.3",
         "entry": "a list of variables as CMIP7 compound names",
         "original_name": "the orginal name of the model output or a simple derivation for the requested variable",
+        "arakawa_grid_point": "Arakawa grid of the model variable: p, u or v (optional; taken from the model file coordinates attribute when absent)",
         "sources": {
             "description": [
                 "a list of variable:scale_factor variables and factors are given",
@@ -21,66 +22,86 @@
             "original_name": "TREFHT"
         },
         "ocean.agessc.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "idlagelvl"
         },
         "ocean.areacello.ti-u-hxy-u.fx.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "parea"
         },
         "ocean.basin.ti-u-hxy-u.fx.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "region"
         },
         "ocean.deptho.ti-u-hxy-sea.fx.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pdepth",
             "postprocs": {
                 "zero2missing": true
             }
         },
         "ocean.diftrblo.tavg-ol-hxy-sea.yr.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "difintlvl"
         },
         "ocean.diftrelo.tavg-ol-hxy-sea.yr.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "difisolvl"
         },
         "ocean.difvho.tavg-ol-hxy-sea.yr.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "difvholvl"
         },
         "ocean.difvso.tavg-ol-hxy-sea.yr.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "difvholvl"
         },
         "ocean.dxto.ti-u-hxy-u.fx.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pdx"
         },
         "ocean.dxuo.ti-u-hxy-u.fx.glb": {
+            "arakawa_grid_point": "u",
             "original_name": "udx"
         },
         "ocean.dxvo.ti-u-hxy-u.fx.glb": {
+            "arakawa_grid_point": "v",
             "original_name": "vdx"
         },
         "ocean.dyto.ti-u-hxy-u.fx.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pdy"
         },
         "ocean.dyuo.ti-u-hxy-u.fx.glb": {
+            "arakawa_grid_point": "u",
             "original_name": "udy"
         },
         "ocean.dyvo.ti-u-hxy-u.fx.glb": {
+            "arakawa_grid_point": "v",
             "original_name": "vdy"
         },
         "ocean.evspsbl.tavg-u-hxy-ifs.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "eva"
         },
         "ocean.ficeberg.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "rfi"
         },
         "ocean.friver.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "rnf"
         },
         "ocean.hfacrossline.tavg-u-ht-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "heattr"
         },
         "ocean.hfbasin.tavg-u-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mhflx"
         },
         "ocean.hfbasinpadv.tavg-u-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mhftd, mhfsm",
             "sources": {
                 "mhftd": 1.0,
@@ -89,24 +110,30 @@
             "history": "hfbasinpadv = mhftd + mhfsm"
         },
         "ocean.hfbasinpmadv.tavg-u-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mhftd"
         },
         "ocean.hfbasinpmdiff.tavg-u-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mhfld"
         },
         "ocean.hfbasinpsmadv.tavg-u-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mhfsm"
         },
         "ocean.hfds.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "hflx",
             "preprocs": {
                 "positive": "down"
             }
         },
         "ocean.hfx.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "u",
             "original_name": "uhflxlvl"
         },
         "ocean.hfx.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "u",
             "original_name": "uhflx, dp",
             "sources": {
                 "uhflx": 1.0,
@@ -118,9 +145,11 @@
             "history": "hfx = vertical average by dp, sum(uhflx*dp)/sum(dp)"
         },
         "ocean.hfy.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "v",
             "original_name": "vhflxlvl"
         },
         "ocean.hfy.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "v",
             "original_name": "vhflx, dp",
             "sources": {
                 "vhflx": 1.0,
@@ -132,6 +161,7 @@
             "history": "hfy = vertical average by dp, sum(vhflx*dp)/sum(dp)"
         },
         "ocean.masscello.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pbot, depth_bnds, pdepth",
             "sources": {
                 "dzlvl": 1.0
@@ -143,72 +173,94 @@
             "history": "masscello = pbot(i,j)*(min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth_bnds(k,1)))/pdepth(i,j)/g"
         },
         "ocean.masso.tavg-u-hm-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "massgs"
         },
         "ocean.mfo.tavg-u-ht-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "masstr"
         },
         "ocean.mlotst.tavg-u-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mldb04"
         },
         "ocean.mlotst.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mldb04"
         },
         "ocean.mlotst.tmax-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mldb04mx"
         },
         "ocean.mlotst.tmin-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mldb04mn"
         },
         "ocean.mlotstsq.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mldb04sq"
         },
         "ocean.msftbarot.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "btmstr"
         },
         "ocean.msftm.tavg-ol-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mmflxd"
         },
         "ocean.msftm.tavg-rho-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mmflxl"
         },
         "ocean.msftmmpa.tavg-ol-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mmftdd"
         },
         "ocean.msftmmpa.tavg-rho-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mmftdl"
         },
         "ocean.msftmsmpa.tavg-ol-hyb-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "mmfsmd"
         },
         "ocean.obvfsq.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "bfsqlvl"
         },
         "ocean.pbo.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pbot"
         },
         "ocean.pso.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "psrf"
         },
         "ocean.sf6.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sf6lvl"
         },
         "ocean.sfacrossline.tavg-u-ht-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "salttr"
         },
         "ocean.sfdsi.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sfl",
             "preprocs": {
                 "positive": "down"
             }
         },
         "ocean.sftof.ti-u-hxy-u.fx.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pmask"
         },
         "ocean.sfx.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "u",
             "original_name": "usflxlvl"
         },
         "ocean.sfx.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "u",
             "original_name": "usflx, dp",
             "sources": {
                 "usflx": 1.0,
@@ -220,9 +272,11 @@
             "history": "sfx = vertical average by dp, sum(usflx*dp)/sum(dp)"
         },
         "ocean.sfy.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "v",
             "original_name": "vsflxlvl"
         },
         "ocean.sfy.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "v",
             "original_name": "vsflx, dp",
             "sources": {
                 "vsflx": 1.0,
@@ -234,51 +288,65 @@
             "history": "sfy = vertical average by dp, sum(vsflx*dp)/sum(dp)"
         },
         "ocean.siflfwbot.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "fmltfz"
         },
         "ocean.so.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "salnlvl"
         },
         "ocean.so.tavg-u-hm-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "salnga"
         },
         "ocean.sob.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sbot"
         },
         "ocean.sos.tavg-u-hm-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sssga"
         },
         "ocean.sos.tavg-u-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sss"
         },
         "ocean.sos.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sss"
         },
         "ocean.sossq.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "ssssq"
         },
         "ocean.t17d.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "t17d"
         },
         "ocean.t20d.tavg-u-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "t20d"
         },
         "ocean.t20d.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "t20d"
         },
         "ocean.tauuo.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "u",
             "original_name": "taux",
             "preprocs": {
                 "positive": "down"
             }
         },
         "ocean.tauvo.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "v",
             "original_name": "tauy",
             "preprocs": {
                 "positive": "down"
             }
         },
         "ocean.thetao.tavg-d2000m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "templvl, depth_bnds, pdepth",
             "sources": {
                 "templvl": 1.0
@@ -289,6 +357,7 @@
             "history": "thetao = sum(templvl(i,j,k)*(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))/sum(min(2000,pdepth(i,j),depth_bnds(2,k))-min(2000,pdepth(i,j),depth_bnds(1,k)))"
         },
         "ocean.thetao.tavg-d300m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "templvl;depth_bnds;pdepth",
             "sources": {
                 "templvl": 1.0
@@ -299,6 +368,7 @@
             "history": "thetao = sum(templvl(i,j,k)*(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))/sum(min(300,pdepth(i,j),depth_bnds(2,k))-min(300,pdepth(i,j),depth_bnds(1,k)))"
         },
         "ocean.thetao.tavg-d700m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "templvl;depth_bnds;pdepth;pbot",
             "sources": {
                 "templvl": 1.0
@@ -309,12 +379,15 @@
             "history": "thetao = sum(templvl(i,j,k)*(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))/sum(min(700,pdepth(i,j),depth_bnds(2,k))-min(700,pdepth(i,j),depth_bnds(1,k)))"
         },
         "ocean.thetao.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "templvl"
         },
         "ocean.thetao.tavg-u-hm-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "tempga"
         },
         "ocean.thetaot.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "temp, dp",
             "sources": {
                 "temp": 1.0,
@@ -326,9 +399,11 @@
             "history": "thetaot = sum(temp*dp)/sum(dp)"
         },
         "ocean.thkcello.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "depth_bnds"
         },
         "ocean.thkcello.ti-ol-hxy-sea.fx.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pdepth, depth_bnds",
             "sources": {
                 "pdepth": 1.0
@@ -339,42 +414,55 @@
             "history": "thkcello = min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j), depth(k,1))"
         },
         "ocean.tob.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "tbot"
         },
         "ocean.tos.tavg-u-hm-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sstga"
         },
         "ocean.tos.tavg-u-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sst"
         },
         "ocean.tos.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sst"
         },
         "ocean.tossq.tavg-u-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sstsq"
         },
         "ocean.tossq.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sstsq"
         },
         "ocean.umo.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "u",
             "original_name": "uflxlvl"
         },
         "ocean.uo.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "u",
             "original_name": "uvellvl"
         },
         "ocean.vmo.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "v",
             "original_name": "vflxlvl"
         },
         "ocean.vo.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "v",
             "original_name": "vvellvl"
         },
         "ocean.volcello.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "depth_bnds, parea"
         },
         "ocean.volcello.tavg-ol-hxy-sea.yr.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "depth_bnds, parea"
         },
         "ocean.volcello.ti-ol-hxy-sea.fx.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "depth_bnds, pdepth, parea",
             "sources": {
                 "pdepth": 1.0
@@ -385,12 +473,15 @@
             "history": "volcello = (min(pdepth(i,j),depth_bnds(k,2))-min(pdepth(i,j),depth(k,1)))*parea(i,j)"
         },
         "ocean.volo.tavg-u-hm-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "volgs"
         },
         "ocean.vsf.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sflx"
         },
         "ocean.wfo.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "lip, sop, eva, rnf, rfi, fmltfz",
             "sources": {
                 "lip": 1.0,
@@ -403,9 +494,11 @@
             "history": "wfo = lip+sop+eva+rnf+rfi+fmltfz"
         },
         "ocean.wmo.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "wflxlvl"
         },
         "ocean.wo.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "wflxlvl/(1035.*parea)",
             "sources": {
                 "wflxlvl": 1.0
@@ -415,18 +508,23 @@
             }
         },
         "ocean.zfullo.tavg-ol-hxy-sea.yr.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dz, sealv"
         },
         "ocean.zos.tavg-u-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sealv"
         },
         "ocean.zos.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "sealv"
         },
         "ocean.zossq.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "slvsq"
         },
         "ocean.zostoga.tavg-u-hm-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "temp, dp, parea",
             "sources": {
                 "temp": 1.0
@@ -437,6 +535,7 @@
             "history": "zostoga = thermo-steric sea level change due to ocean temperature change with reference salinity as 35.0 following Griffies et al., 2016, GMD"
         },
         "ocnBgchem.calc.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "calclvl",
             "postprocs": {
                 "lvl2srf": true
@@ -445,9 +544,11 @@
             "comment": "Surface value of calclvl"
         },
         "ocnBgchem.calc.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "calclvl"
         },
         "ocnBgchem.chl.tavg-ols-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfphyc",
             "sources": {
                 "srfphyc": 0.024399999999999998
@@ -456,6 +557,7 @@
             "comment": "Conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
         },
         "ocnBgchem.chl.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfphyc",
             "sources": {
                 "srfphyc": 0.024399999999999998
@@ -464,6 +566,7 @@
             "comment": "Conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
         },
         "ocnBgchem.chl.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "phyclvl",
             "sources": {
                 "phyclvl": 0.024399999999999998
@@ -472,6 +575,7 @@
             "comment": "Conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
         },
         "ocnBgchem.chl.tavg-op20bar-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "phyc_200",
             "sources": {
                 "phyc_200": 0.024399999999999998
@@ -480,18 +584,23 @@
             "comment": "Conversion from [mol P/m3] to [kg Chl/m3] using [60 gC/gChl]"
         },
         "ocnBgchem.co3.tavg-ols-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfco3"
         },
         "ocnBgchem.co3.tavg-op20bar-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "co3_200"
         },
         "ocnBgchem.co3satarag.tavg-ols-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfco3satarag"
         },
         "ocnBgchem.co3satarag.tavg-op20bar-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "co3satarag_200"
         },
         "ocnBgchem.detoc.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "detoclvl",
             "sources": {
                 "detoclvl": 122.0
@@ -499,12 +608,15 @@
             "history": "detoc = detoclvl*122"
         },
         "ocnBgchem.dfe.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfdfe"
         },
         "ocnBgchem.dfe.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dfelvl"
         },
         "ocnBgchem.dissi13c.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dissic13lvl",
             "postprocs": {
                 "lvl2srf": true
@@ -513,15 +625,19 @@
             "comment": "Surface value of dissic13lvl"
         },
         "ocnBgchem.dissi13c.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dissic13lvl"
         },
-        "ocnBgchem.dissic.tavg-ols-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.dissic.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfdissic"
         },
         "ocnBgchem.dissic.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dissiclvl"
         },
         "ocnBgchem.dissoc.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dissoclvl",
             "sources": {
                 "dissoclvl": 122.0
@@ -529,9 +645,11 @@
             "history": "dissco = dissoclvl*122"
         },
         "ocnBgchem.dmso.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dms"
         },
         "ocnBgchem.dpco2.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pco2, pco2_gex",
             "sources": {
                 "pco2": 1.0,
@@ -544,6 +662,7 @@
             "comment": "Convert from micro-atm to Pascal"
         },
         "ocnBgchem.epn.tavg-d100m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx0100",
             "sources": {
                 "carflx0100": 0.13114754098360656
@@ -552,6 +671,7 @@
             "comment": ""
         },
         "ocnBgchem.epp.tavg-d100m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx0100",
             "sources": {
                 "carflx0100": 0.00819672131147541
@@ -559,33 +679,41 @@
             "history": "epp = carflx0100/122"
         },
         "ocnBgchem.epsi.tavg-d100m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "bsiflx0100"
         },
         "ocnBgchem.expc.tavg-d1000m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx1000"
         },
         "ocnBgchem.expc.tavg-d100m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx0100"
         },
         "ocnBgchem.expcalc.tavg-d1000m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "calflx1000"
         },
         "ocnBgchem.expcalc.tavg-d100m-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "calflx0100"
         },
         "ocnBgchem.expcalcob.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "calflx_bot",
             "preprocs": {
               "positive": "down"
             }
         },
         "ocnBgchem.expcob.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx_bot",
             "preprocs": {
               "positive": "down"
             }
         },
         "ocnBgchem.expfeob.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx_bot",
             "sources": {
                 "carflx_bot": 0.000005
@@ -596,6 +724,7 @@
             "history": "expfeob = carflx_bot*5.*1.e-6"
         },
         "ocnBgchem.expnob.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx_bot",
             "sources": {
                 "carflx_bot": 0.13114754098360656
@@ -606,6 +735,7 @@
             "history": "expnob = carflx_bot/122*16"
         },
         "ocnBgchem.exppob.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx_bot",
             "sources": {
                 "carflx_bot": 0.00819672131147541
@@ -616,12 +746,14 @@
             "history": "exppob = carflx_bot/122"
         },
         "ocnBgchem.expsiob.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "bsiflx_bot",
             "preprocs": {
               "positive": "down"
             }
         },
         "ocnBgchem.fg13co2.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "co213fxd, co213fxu",
             "sources": {
                 "co213fxd": 1.0,
@@ -630,6 +762,7 @@
             "history": "fg13co2 = co213fxd-co213fxu"
         },
         "ocnBgchem.fgco2.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "co2fxd, co2fxu",
             "sources": {
                 "co2fxd": 1.0,
@@ -641,12 +774,14 @@
             "history": "fgco2 = co2fxd-co2fxu"
         },
         "ocnBgchem.fgdms.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dmsflux",
             "preprocs": {
               "positive": "up"
             }
         },
         "ocnBgchem.frfe.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx_bot",
             "sources": {
                 "carflx_bot": 0.000005
@@ -654,6 +789,7 @@
             "history": "frfe = carflx_bot*5.*1.e-6"
         },
         "ocnBgchem.fric.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "calflx_bot, sedfdic",
             "sources": {
                 "calflx_bot": 1.0,
@@ -662,6 +798,7 @@
             "history": "fric = calflx_bot+sedfdic"
         },
         "ocnBgchem.frn.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "ndepnoy, ndepnhx, 2*fgn2, 2*n2oflux, nh3flux",
             "sources": {
                 "ndepnoy": 1.0,
@@ -673,9 +810,11 @@
             "history": "frn = ndepnoy+ndepnhx-2*fgn2-2*n2oflux-nh3flux"
         },
         "ocnBgchem.froc.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "carflx_bot"
         },
-        "ocnBgchem.intdic.tavg-u-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.intdic.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dissiclvl)",
             "sources": {
                 "dissiclvl": 0.012
@@ -686,7 +825,8 @@
             "history": "intdic = int(dissiclvl*12/1000)_z",
             "comment": "Vertical sum of dissiclvl*12/1000"
         },
-        "ocnBgchem.intdoc.tavg-u-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.intdoc.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "dissoclvl",
             "sources": {
                 "dissoclvl": 1.464
@@ -697,10 +837,12 @@
             "history": "intdoc [kg C m-2] = sum_z(dissoclvl[mol P m-2]*122*12/1000)",
             "comment": "conversion of [mol P m-2] to [kg C m-2], where 122 converts from P->C using the model redfield-ratio, 12 converts from mol-g, and division by 1000 converts from g->kg"
         },
-        "ocnBgchem.intpn2.tavg-u-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.intpn2.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "nfixint"
         },
         "ocnBgchem.intpoc.tavg-u-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "intpoc",
             "sources": {
                 "intpoc": 1.464
@@ -708,7 +850,8 @@
             "history": "intpoc[kg C m-2] = intpoc[mol P m-2]*122*12/1000",
             "comment": "conversion of [mol P m-2] to [kg C m-2], where 122 converts from P->C using the model redfield-ratio, 12 converts from mol-g, and division by 1000 converts from g->kg"
         },
-        "ocnBgchem.intpoc.tavg-u-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.intpoc.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "intpoc",
             "sources": {
                 "intpoc": 1.464
@@ -717,54 +860,71 @@
             "comment": "conversion of [mol P m-2] to [kg C m-2], where 122 converts from P->C using the model redfield-ratio, 12 converts from mol-g, and division by 1000 converts from g->kg"
         },
         "ocnBgchem.intpp.tavg-u-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "ppint"
         },
         "ocnBgchem.intpp.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "ppint"
         },
         "ocnBgchem.nh4.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "nh4lvl"
         },
         "ocnBgchem.no3.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfno3"
         },
         "ocnBgchem.no3.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "no3lvl"
         },
         "ocnBgchem.o2.tavg-ols-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfo2"
         },
         "ocnBgchem.o2.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfo2"
         },
         "ocnBgchem.o2.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "o2lvl"
         },
         "ocnBgchem.o2.tavg-op20bar-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "o2_200"
         },
         "ocnBgchem.o2min.tavg-u-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "o2min"
         },
         "ocnBgchem.o2sat.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "satoxylvl"
         },
         "ocnBgchem.ph.tavg-ols-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfph"
         },
-        "ocnBgchem.ph.tavg-ols-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.ph.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfph"
         },
         "ocnBgchem.ph.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "phlvl"
         },
         "ocnBgchem.ph.tavg-op20bar-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "ph_200"
         },
         "ocnBgchem.phyc.tavg-ols-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfphyc"
         },
         "ocnBgchem.phyc.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfphyc",
             "sources": {
                 "srfphyc": 122.0
@@ -772,6 +932,7 @@
             "history": "phyc = srfphyc*122"
         },
         "ocnBgchem.phyc.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "phyclvl*122",
             "sources": {
                 "phyclvl": 122.0
@@ -779,12 +940,15 @@
             "history": "phyc = phyclvl*122"
         },
         "ocnBgchem.phyc.tavg-op20bar-hxy-sea.day.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "phyc_200"
         },
         "ocnBgchem.po4.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "po4lvl"
         },
         "ocnBgchem.pp.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pplvl",
             "sources": {
                 "pplvl": 1.0
@@ -796,15 +960,19 @@
             "comment": "Surface value of pplvl"
         },
         "ocnBgchem.pp.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pplvl"
         },
         "ocnBgchem.si.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "srfsi"
         },
         "ocnBgchem.si.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "silvl"
         },
         "ocnBgchem.spco2.tavg-u-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "pco2",
             "postprocs": {
                 "muatm2pa": true
@@ -813,9 +981,11 @@
             "comment": "Convert from micro-atm to Pascal"
         },
         "ocnBgchem.talk.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "talklvl"
         },
-        "ocnBgchem.zooc.tavg-ols-hxy-sea.mon.30S-90S": {
+        "ocnBgchem.zooc.tavg-ols-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "zooclvl",
             "sources": {
                 "zooclvl": 122.0
@@ -826,6 +996,7 @@
             "history": "zooc = zooclvl[:,:,1]*122"
         },
         "ocnBgchem.zooc.tavg-ol-hxy-sea.mon.glb": {
+            "arakawa_grid_point": "p",
             "original_name": "zooclvl",
             "sources": {
                 "zooclvl": 122.0

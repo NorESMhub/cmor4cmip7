@@ -1,9 +1,9 @@
 [submodule "json-fortran"]
 	path = json-fortran
 	url = git@github.com:jacobwilliams/json-fortran.git
-[submodule "cmor"]
-	path = cmor
-	url = git@github.com:PCMDI/cmor.git
 [submodule "GSW-Fortran"]
 	path = GSW-Fortran
 	url = git@github.com:TEOS-10/GSW-Fortran.git
+[submodule "cmip7-cmor-tables"]
+	path = cmip7-cmor-tables
+	url = https://github.com/WCRP-CMIP/cmip7-cmor-tables

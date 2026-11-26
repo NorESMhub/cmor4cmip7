@@ -3,7 +3,6 @@
  institute_id  = 'NCC',
  contact       = 'Please send any requests or bug reports to noresm-ncc@met.no.',
  ocngrid       = 'tripolar grid with 1deg nominal resolution',
- ocngrid_label = 'g143', 
  ocngrid_resolution = '100 km',
  tagoyr        = 'blom.hy',
  tagoyrbgc     = 'blom.hbgcy',

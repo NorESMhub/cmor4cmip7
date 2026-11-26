@@ -29,7 +29,7 @@ module m_namelists
   character(len=slenmax), save  :: secindexfile, ocngridfile, ocninitfile, ocnmertfile, &
                                    ocnregnfile
   character(len=slenmax), save  :: coordtable, json_file_attributes, &
-                                   ocngrid, ocngrid_label, ocngrid_resolution
+                                   ocngrid, ocngrid_resolution
   ! conditionally required global attributes
 ! character(len=slenmax), save  :: external_variables
 
@@ -40,7 +40,7 @@ module m_namelists
     tagoyr, tagoyrbgc, tagomon, tagomonbgc, tagoday, tagodaybgc, &
     secindexfile, ocngridfile, ocninitfile, ocnmertfile, ocnregnfile, &
     coordtable, json_file_attributes, &
-    ocngrid, ocngrid_label, ocngrid_resolution, &
+    ocngrid, ocngrid_resolution, &
     lshiftgrid
 
   ! Experiment namelist
@@ -87,8 +87,9 @@ module m_namelists
   character(len=slenmax), save  :: pomon, mapfile
   integer, save                 :: n_datasets
   character(len=slenmax), dimension(rowmax), save :: compound_names, branded_names, &
-                                                     realms, frequencies, regions
-  character(len=slenmax) :: realm, frequency, region_label
+                                                     realms, frequencies, regions, &
+                                                     horizontal_labels
+  character(len=slenmax) :: realm, frequency, region_label, horizontal_label
 
   namelist /variables/ mapfile, compound_names
 
@@ -131,7 +132,7 @@ contains
 
     implicit none
 
-    integer :: n, pos, nstr
+    integer :: n, pos, nstr, p1, p2, p3
     logical :: fexist
     character(len=slenmax)  :: substr, tmpstr
 
@@ -204,6 +205,7 @@ contains
     realms = ''
     frequencies = ''
     regions = ''
+    horizontal_labels = ''
 
     pomon = ''
 
@@ -330,6 +332,19 @@ contains
         pos = index(substr, '.')
         if (pos <= 1) call bad_compound(n)
         branded_names(n) = trim(tmpstr)//'_'//substr(1:pos - 1)
+        ! branded_suffix = <temporal>-<vertical>-<horizontal>-<area>, e.g.
+        ! tavg-ol-hxy-sea or tavg-u-hm-sea; the horizontal label is the third
+        ! dash-separated field (hxy, hm, ht, hyb ...)
+        p1 = index(substr, '-')
+        if (p1 <= 1) call bad_suffix(n)
+        p2 = index(substr(p1 + 1:), '-')
+        if (p2 <= 0) call bad_suffix(n)
+        p2 = p2 + p1
+        p3 = index(substr(p2 + 1:), '-')
+        if (p3 <= 1) call bad_suffix(n)
+        p3 = p3 + p2
+        if (p3 + 1 > pos - 1) call bad_suffix(n)   ! empty <area> field
+        horizontal_labels(n) = substr(p2 + 1:p3 - 1)
         substr = substr(pos + 1:nstr)
         pos = index(substr, '.')
         if (pos <= 1 .or. pos >= len_trim(substr)) call bad_compound(n)
@@ -373,6 +388,26 @@ contains
       stop 1
 
     end subroutine bad_compound
+
+    ! -----------------------------------------------------------------
+
+    subroutine bad_suffix(idx)
+
+      ! The branded suffix must be <temporal>-<vertical>-<horizontal>-<area>;
+      ! without the third dash-separated field the horizontal label cannot be
+      ! derived.
+
+      implicit none
+
+      integer, intent(in) :: idx
+
+      write (*, *) 'ERROR: malformed branded suffix in compound_names, expected'
+      write (*, *) '       <realm>.<branded_base>.<temporal>-<vertical>-<horizontal>-<area>'&
+        //'.<frequency>.<region>'
+      write (*, *) '       entry ', idx, ': '//trim(compound_names(idx))
+      stop 1
+
+    end subroutine bad_suffix
 
   end subroutine read_namelists
 

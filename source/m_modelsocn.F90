@@ -181,12 +181,19 @@ contains
       cvnm = trim(compound_names(idx(n)))
       frequency = trim(frequencies(idx(n)))
       region_label = trim(regions(idx(n)))
+      horizontal_label = trim(horizontal_labels(idx(n)))
       ovnm = bvnm
       table = 'CMIP7_'//trim(realm)//'.json'
 
       write(*,*) ''
       write(*, *) '--- ', trim(cvnm), ' ---'
-      if (verbose) write(*,*) 'CMOR table: ',trim(table)
+      if (verbose) then
+        write(*,*) 'CMOR table: ',trim(table)
+        write(*,*) 'frequency: ',trim(frequency)
+        write(*,*) 'reigion_label: ',trim(region_label)
+        write(*,*) 'horizontal_label: ',trim(horizontal_label)
+        write(*,*) 'table: ',trim(table)
+      end if
 
       ! Initialize variable attributes
       vpositive = ''
@@ -229,6 +236,7 @@ contains
       if (allocated(factors)) deallocate(factors)
       call json_get_original_name(trim(mapfile), trim(cvnm), original_name, lfound=found)
       if (.not. found) then
+        write(*,*) 'mapfile: ', trim(mapfile)
         write(*,*) 'ERROR: no original_name in mapfile for ', trim(cvnm)
         cycle main_loop
       end if
@@ -254,6 +262,22 @@ contains
         sources(1) = trim(original_name)
         factors(1) = 1.0
       end if
+
+      ! Arakawa horizontal grid of the model variable: 'p', 'u' or 'v'. It is
+      ! taken from the mapfile when given (authoritative); open_ofile falls
+      ! back to the file's 'coordinates' attribute, then to the name's first
+      ! letter (which is wrong for e.g. volgs, a 'p' variable starting with v).
+      call json_get_hcoord(trim(mapfile), trim(cvnm), hcoord, lfound=found)
+      if (found) then
+        if (hcoord(1:1) /= 'p' .and. hcoord(1:1) /= 'u' .and. &
+            hcoord(1:1) /= 'v' .and. hcoord(1:1) /= 'q') then
+          write (*, *) 'ERROR: invalid hcoord "', trim(hcoord), &
+            '" in mapfile for ', trim(cvnm), ' (expected p, u or v)'
+          cycle main_loop
+        end if
+        if (verbose) write (*, *) 'horizontal grid from mapfile: ', trim(hcoord(1:1))
+      end if
+
       ivnm = sources(1)
 
       if (verbose) then
@@ -615,14 +639,14 @@ contains
 
         ! Compute thermo-steric sea level following Griffies et al., GMD 2016, H27
       case ('t2zostoga')
-        rhoavg = 0d0; volsum = 0d0
+        rhoavg = 0_r8; volsum = 0_r8
         jtmp = jdm
         if  (lshiftgrid) jtmp = jdm -1
         do j = 1, jtmp
           do i = 1, idm
             if (pmask(i,j) == 0) cycle
-            pmid = 0d0
-            pcum = 0d0
+            pmid = 0_r8
+            pcum = 0_r8
             do k = 1, kdm
               dpk = dp(i,j,k)*1d-4  ! pa->dbar
               if (fld(i,j,k) < missing) then
@@ -1192,8 +1216,8 @@ contains
     call handle_ncerror(status)
 
     ! Compute nitial global mean density
-    rhoavg0 = 0d0
-    volsum0 = 0d0
+    rhoavg0 = 0_r8
+    volsum0 = 0_r8
     jtmp = jdm
     if (lshiftgrid) jtmp = jdm -1
     do j = 1, jtmp
@@ -1427,11 +1451,15 @@ contains
               fldtmp(ii, jj, kk), stat=status)
     if (status /= 0) stop 'cannot ALLOCATE enough memory (4)'
 
-    status = nf90_get_att(ncid, rhid, 'coordinates', hcoord)
-    if (status /= nf90_noerr) hcoord(1:1) = ivnm(1:1)
-    if (hcoord(1:1) .ne. 'p' .and. hcoord(1:1) .ne. 'u' .and. &
-        hcoord(1:1) .ne. 'v' .and. hcoord(1:1) .ne. 'q') then
-      hcoord(1:1) = 'p'
+    if (len_trim(hcoord) == 0) then
+      ! not given in the mapfile: take it from the file's 'coordinates'
+      ! attribute (e.g. "ulon ulat"), else from the name's first letter
+      status = nf90_get_att(ncid, rhid, 'coordinates', hcoord)
+      if (status /= nf90_noerr) hcoord(1:1) = ivnm(1:1)
+      if (hcoord(1:1) .ne. 'p' .and. hcoord(1:1) .ne. 'u' .and. &
+          hcoord(1:1) .ne. 'v' .and. hcoord(1:1) .ne. 'q') then
+        hcoord(1:1) = 'p'
+      end if
     end if
     if (verbose) write(*,*) 'C-grid point: ',hcoord(1:1)
 
@@ -1477,16 +1505,30 @@ contains
     ! Derive path to CMOR table
     tablepath = trim(tabledir)//trim(table)
 
-    ! Define output dataset
-    grid_label = ocngrid_label
+    ! Define output dataset. The grid label follows the Arakawa grid point and
+    ! the horizontal label of the compound name; it is not a namelist choice.
+    grid_label = ''
     if (hcoord(1:1) == 'p') then
-      grid_label = 'g202'
+      if (horizontal_label == 'hm') then
+        grid_label = 'g010'
+      else if (horizontal_label == 'ht') then
+        if (dims == 'oline,time') then
+          grid_label = 'g014'
+        else
+          grid_label = 'g262'   ! e.g.,  dims = 'gridlatitude,olevel,basin,time'
+        end if
+      else if (horizontal_label == 'hyb') then
+        grid_label = 'g262'
+      else
+        grid_label = 'g202'
+      end if
     else if (hcoord(1:1) == 'u') then
       grid_label = 'g241'
     else if (hcoord(1:1) == 'v') then
       grid_label = 'g240'
     else
-      write(*, *) 'ERROR: unknow horizontal grid: '//hcoord(1:1)
+      write (*, *) 'ERROR: unknown horizontal grid point: '//hcoord(1:1)
+      stop 1
     end if
     call json_write_attributes(grid_label, ocngrid_resolution, ovnm)
     error_flag = cmor_dataset_json(json_file_attributes)
@@ -1635,24 +1677,24 @@ contains
                 table_entry='olayer300m', &
                 units='m', &
                 length=1, &
-                coord_vals=(/150./), &
-                cell_bounds=(/0., 300./))
+                coord_vals=(/150._r8/), &
+                cell_bounds=(/0._r8, 300._r8/))
       else if (index(special, 'dzavg700m') > 0) then
         kaxid = cmor_axis( &
                 table=trim(tablepath), &
                 table_entry='olayer700m', &
                 units='m', &
                 length=1, &
-                coord_vals=(/350./), &
-                cell_bounds=(/0., 700./))
+                coord_vals=(/350._r8/), &
+                cell_bounds=(/0._r8, 700._r8/))
       else if (index(special, 'dzavg2000m') > 0) then
         kaxid = cmor_axis( &
                 table=trim(tablepath), &
                 table_entry='olayer2000m', &
                 units='m', &
                 length=1, &
-                coord_vals=(/1000./), &
-                cell_bounds=(/0., 2000./))
+                coord_vals=(/1000._r8/), &
+                cell_bounds=(/0._r8, 2000._r8/))
       else
         write(*,*) 'Error: olayer depth not supported'
         write(*,*) 'special: ', trim(special)
@@ -1663,18 +1705,18 @@ contains
               table_entry='op20bar', &
               units='bar', &
               length=1, &
-              coord_vals=(/20./))
-             !coord_vals=(/20./), &     ! omit bounds;
-             !cell_bounds=(/20., 20./)) ! value close to 200m at hybrid coordinate.
+              coord_vals=(/20.2_r8/))
+             !coord_vals=(/20._r8/), &     ! omit bounds;
+             !cell_bounds=(/20._r8, 20._r8/)) ! value close to 200m at hybrid coordinate.
     else if (vtype == 'ols') then
       kaxid = cmor_axis( &
               table=trim(tablepath), &
               table_entry='osurf', &
               units='', &
               length=1, &
-              coord_vals=(/0./))
-              !coord_vals=(/0./), &
-              !cell_bounds=(/0., 0./))
+              coord_vals=(/0._r8/))
+              !coord_vals=(/0._r8/), &
+              !cell_bounds=(/0._r8, 0._r8/))
     else if (trim(vtype) == 'merd') then
       kaxid = cmor_axis( &
               table=trim(tablepath), &
@@ -1689,8 +1731,8 @@ contains
               table_entry='rho', &
               units='kg m-3', &
               length=kdm, &
-              coord_vals=sigma + 1000., &
-              cell_bounds=sigma_bnds + 1000.)
+              coord_vals=sigma + 1000._r8, &
+              cell_bounds=sigma_bnds + 1000._r8)
     else if (vtype(1:4) == 'sect') then
       saxid = cmor_axis( &
               table=trim(tablepath), &
@@ -1833,12 +1875,10 @@ contains
 
     call json_get_val_str(trim(tabledir)//"CMIP7_cell_measures.json", &
          "cell_measures:"//trim(cvnm), cell_measures, separator=':', lfound=found)
-    if (cell_measures == 'area: areacello') then
-      status = cmor_set_variable_attribute(varid, "cell_measures", 'area: areacello')
+    if (found .and. len_trim(cell_measures) >= 15) then ! "area: areacello" or 'area: areacello volume: volcello'
+      status = cmor_set_variable_attribute(varid, "cell_measures", cell_measures)
     else
-      if (cell_measures == 'area: areacello volume: volcello') then
-        status = cmor_set_variable_attribute(varid, "cell_measures", 'area: areacello volume: volcello')
-      end if
+      status = cmor_set_variable_attribute(varid, "cell_measures", 'area: areacello')
     end if
     if (status /= 0) then
       write (*, *) 'ERROR: cmor_set_variable_attribute failed for ', trim(ovnm)

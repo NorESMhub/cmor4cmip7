@@ -45,7 +45,7 @@ cmor4cmip7
 │   │       ├── checkcmorout.sh
 │   │       ├── cmor.sh
 │   │       ├── template/
-│   │       └── v20260306/
+│   │       └── v20261126/
 │   ├── NorESM3-MM/
 │   │   └── piControl/
 │   └── template/

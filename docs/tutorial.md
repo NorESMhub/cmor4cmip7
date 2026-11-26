@@ -8,7 +8,7 @@ The example below assumes a `piControl` experiment for the `NorESM3-LM` model, b
 
 ```bash
 cd ~/                                             # Install under home as default
-tag=v20261028                                     # Chose [the latest release](https://github.com/NorESMhub/cmor4cmip7/tags)
+tag=v20261126                                     # Chose [the latest release](https://github.com/NorESMhub/cmor4cmip7/tags)
 git clone git@github.com:NorESMhub/cmor4cmip7.git # Clone the source code
 cd cmor4cmip7
 git checkout -b $tag tags/$tag                    # Checout the tag
@@ -42,11 +42,11 @@ This keeps the default templates intact and gives you a clean experiment-specifi
 Then you create a recipe from the case template for each `variant_label` (e.g., `r1i1p1f1`) with a certain data version. For example:
 ```bash
 cd ~/cmor4cmip7/recipes/NorESM3-LM/piControl
-mkdir r1i1p1f1/v20261028
-cp -r template/*.nml r1i1p1f1/v20261028/
+mkdir r1i1p1f1/v20261126
+cp -r template/*.nml r1i1p1f1/v20261126/
 ```
 
-The following sections will instruct how to update these nameslists for this data version `NorESM3-LM/piControl/r1i1p1f1/v20261028`
+The following sections will instruct how to update these nameslists for this data version `NorESM3-LM/piControl/r1i1p1f1/v20261126`
 
 ## 3. Edit the namelist files
 
@@ -85,7 +85,7 @@ The `obasedir      = '/nird/datapeak/NS9034K/CMIP7'` is location for CMIP7 produ
 
 `createsubdirs = .true.` will create a hierachy of CMIP7 data structure direcotries , e.g.:
 ```
-MIP-DRS7/CMIP7/CMIP/NCC/NorESM3-LM/piControl/r1i1p1f1/glb/mon/tos/tavg-u-hm-sea/g202/v20261102/tos_tavg-u-hm-sea_mon_glb_g202_NorESM3-LM_piControl_r1i1p1f1_000101-001012.nc
+MIP-DRS7/CMIP7/CMIP/NCC/NorESM3-LM/piControl/r1i1p1f1/glb/mon/tos/tavg-u-hm-sea/g202/v20261126/tos_tavg-u-hm-sea_mon_glb_g202_NorESM3-LM_piControl_r1i1p1f1_000101-001012.nc
 ```
 
 ### 3.2 `model.nml`
@@ -119,7 +119,7 @@ Example:
 ```fortran
 &experiment
  casename               = 'n1850GHGGaxg.LM.nor30b27.002.20261016',
- osubdir                = 'NorESM3-LM/piControl/r1i1p1f1/v20261028',
+ osubdir                = 'NorESM3-LM/piControl/r1i1p1f1/v20261126',
  experiment_id          = 'piControl',
  parent_experiment_id   = 'piControl-spinup',
  parent_experiment_rip  = 'r1i1p1',
@@ -221,7 +221,7 @@ ls -l /scratch/$USER/cmorout
 
 The generated data should follow the CMIP7 directory structure and naming conventions implied by the CMIP7 data request and the configured experiment metadata.
 
-## 7. Validate the generated files
+## 7. Repack and validate the generated files
 
 A technical validation step is strongly recommended before publishing or distributing the data. The project provides a separate validation tool for this purpose.
 
@@ -236,17 +236,20 @@ The configuration needs to match your experiment, for example in `params.yml`:
 
 ```yaml
 datasets:
-  cmorout         : /nird/datapeak/NS9034K/CMIP7      # root of cmorized out
+  cmorout         : /nird/datapeak/NS9034K/.CMIP7      # root of cmorized out
   source_id       : NorESM3-LM
   experiment_id   : piControl
   variant_label   : r1i1p1f1
-  version         : v20261028
+  version         : v20261126
 webpage:
   www_root        : /nird/datalake/NS9560K/www/diagnostics/cmip7validate
 cache:
   root            : /scratch/yanchun/cmip7validate    # root of cmip7validate climo/ts cache
-  overwrite       : False                             # logic switch to overwrite ca
-ched climatologies and time series
+  # overwrite cached climatologies and time series, True/False
+# overwrite       : True
+  overwrite       : False                             
+  # number of worker processes used by preprocess_cache.py and cmip7repack (1 = serial)
+  num_threads     : 8      # number of threads
 ```
 
 The validation process involves intensive computation of climatoglies and time series of large number of datasets, it is therefore always recommended to set `overwrite` as `false` to speed up the performance, if the datasets is not changed. To overwrite specific datasets/variables, one can delete mannually the cache under the `cache.root`.
